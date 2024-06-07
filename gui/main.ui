@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Main</class>
+ <widget class="QMainWindow" name="Main">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Marcanac</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../logo.png</normaloff>../logo.png</iconset>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(208, 208, 208);</string>
+  </property>
+  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuPacientes">
+    <property name="title">
+     <string>Pacientes</string>
+    </property>
+    <addaction name="btn_adir_Paciente"/>
+    <addaction name="btnListado_Pacientes"/>
+   </widget>
+   <widget class="QMenu" name="menuProfesionales">
+    <property name="title">
+     <string>Profesionales</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuCoordinadores">
+    <property name="title">
+     <string>Coordinadores</string>
+    </property>
+   </widget>
+   <addaction name="menuPacientes"/>
+   <addaction name="menuProfesionales"/>
+   <addaction name="menuCoordinadores"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="btn_adir_Paciente">
+   <property name="text">
+    <string>Añadir Paciente</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
+  </action>
+  <action name="btnListado_Pacientes">
+   <property name="text">
+    <string>Listado de Pacientes</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

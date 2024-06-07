@@ -1,6 +1,7 @@
 from PyQt6 import uic
 from PyQt6.QtWidgets import QMessageBox
 from data.usuario import UsuarioData
+from gui.main import MainWindow
 from model.usuario import Usuario
 
 class Login():
@@ -23,7 +24,8 @@ class Login():
             usData = UsuarioData()
             res = usData.login(usuario)
             if res:
-               self.login.lblMensaje.setText("Login correcto")
+                self.main = MainWindow()
+                self.login.hide() #Oculta la ventana de login 
             else:
                 self.login.lblMensaje.setText("Datos de acceso incorrectos")
 
