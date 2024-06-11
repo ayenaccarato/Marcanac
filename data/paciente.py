@@ -12,10 +12,24 @@ class PacienteData():
             (id INTEGER PRIMARY KEY AUTOINCREMENT, 
             nombre TEXT, 
             apellido TEXT,
-            tipo TEXT,
+            domicilio TEXT,
+            localidad TEXT,
             documento TEXT UNIQUE,
             fechaNacimiento DATETIME,
-            sexo TEXT)"""
+            obraSocial TEXT,
+            numAfiliado TEXT,
+            telefono TEXT,
+            fechaIngreso DATETIME,
+            fechaEgreso DATETIME,
+            motivo TEXT,
+            activo BOOLEAN,
+            familiar TEXT,
+            modulo TEXT,
+            submodulo TEXT,
+            equip TEXT,
+            sopNutri TEXT,
+            asisRespi TEXT
+            )"""
             
             self.cursor.execute(sql_create_pacientes)
             self.db.commit()
@@ -29,8 +43,15 @@ class PacienteData():
         self.db = con.Conexion().conectar()
         self.cursor = self.db.cursor()
         self.cursor.execute("""
-        INSERT INTO pacientes values(null, '{}', '{}', '{}', '{}', '{}', '{}')
-        """.format(paciente._nombre, paciente._apellido, paciente._tipo, paciente._documento, paciente._fechaNacimiento, paciente._sexo))
+        INSERT INTO pacientes values
+        (null, '{}', '{}', '{}', '{}', '{}', 
+        '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')
+        """.format(paciente._nombre, paciente._apellido, paciente._domicilio,
+                paciente._localidad, paciente._documento, paciente._fechaNacimiento, 
+                paciente._obraSocial, paciente._numAfiliado, paciente._telefono, 
+                paciente._fechaIngreso, paciente._fechaEgreso, paciente._motivo, 
+                paciente._activo, paciente._familiar, paciente._modulo, paciente._submodulo, 
+                paciente._equip, paciente._sopNutri, paciente._asisRespi))
         self.db.commit()
         if self.cursor.rowcount == 1: #Aca me devuelve cuantos elementos afecto
                 return True

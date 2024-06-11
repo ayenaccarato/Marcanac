@@ -64,6 +64,9 @@
    <property name="text">
     <string>Listado de Pacientes</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
   </action>
  </widget>
  <resources/>
