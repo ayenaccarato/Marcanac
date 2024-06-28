@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Marcanac - Listado de Pacientes</string>
+   <string>Marcanac - Listado de Profesionales</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
@@ -111,7 +111,7 @@ QPushButton:hover {
              </font>
             </property>
             <property name="text">
-             <string>Pacientes</string>
+             <string>Profesionales</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -132,6 +132,19 @@ QPushButton:hover {
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
            <layout class="QGridLayout" name="gridLayout">
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_11">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Profesion</string>
+              </property>
+             </widget>
+            </item>
             <item row="0" column="2">
              <widget class="QLabel" name="label_7">
               <property name="font">
@@ -141,8 +154,56 @@ QPushButton:hover {
                </font>
               </property>
               <property name="text">
-               <string>Número de Documento</string>
+               <string>CUIT</string>
               </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QComboBox" name="cbProfesion">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <item>
+               <property name="text">
+                <string>--Seleccione--</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Enfermero/a</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Fonoaudiólogo/a</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Kinesiólogo/a</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Médico/a</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Psicólogo/a</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Terapista Ocupacional</string>
+               </property>
+              </item>
              </widget>
             </item>
             <item row="0" column="0">
@@ -172,7 +233,7 @@ QPushButton:hover {
              </widget>
             </item>
             <item row="0" column="3">
-             <widget class="QLineEdit" name="txtDocumento">
+             <widget class="QLineEdit" name="txtCuit">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -204,7 +265,7 @@ color: rgb(255, 255, 255);</string>
              </widget>
             </item>
             <item row="3" column="0" colspan="4">
-             <widget class="QTableWidget" name="tblListado">
+             <widget class="QTableWidget" name="tblListadoProf">
               <column>
                <property name="text">
                 <string>Apellido</string>
@@ -217,17 +278,32 @@ color: rgb(255, 255, 255);</string>
               </column>
               <column>
                <property name="text">
-                <string>Fecha de Ingreso</string>
+                <string>CBU 1</string>
                </property>
               </column>
               <column>
                <property name="text">
-                <string>Activo</string>
+                <string>CBU 2</string>
                </property>
               </column>
               <column>
                <property name="text">
-                <string>-</string>
+                <string>Alias</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Código</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Profesión</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>New Column</string>
                </property>
               </column>
              </widget>

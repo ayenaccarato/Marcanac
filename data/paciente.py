@@ -57,5 +57,50 @@ class PacienteData():
                 return True
         else:
             return False
+        
+
+    def mostrar(self, id):
+        self.db = con.Conexion().conectar()
+        self.cursor = self.db.cursor()
+        sql_ver = """ SELECT * FROM pacientes p
+            WHERE p.id = '{}'  
+        """.format(id)
+
+        self.cursor.execute(sql_ver)
+        data = self.cursor.fetchone()
+        
+        self.cursor.close()
+
+        return data
+
+    def modificar(self, id, paciente):
+        try:
+            self.db = con.Conexion().conectar()
+            self.cursor = self.db.cursor()
+
+            sql_update = """UPDATE pacientes SET 
+                nombre = '{}', apellido = '{}', domicilio = '{}', localidad = '{}',
+                documento = '{}', fechaNacimiento = '{}', obraSocial = '{}', numAfiliado = '{}', 
+                telefono = '{}', fechaIngreso = '{}', fechaEgreso = '{}', motivo = '{}', activo = '{}', 
+                familiar = '{}', modulo = '{}', submodulo = '{}', equip = '{}', 
+                sopNutri = '{}', asisRespi = '{}'   
+                WHERE id = '{}'""".format(
+                paciente._nombre, paciente._apellido, paciente._domicilio,
+                paciente._localidad, paciente._documento, paciente._fechaNacimiento, 
+                paciente._obraSocial, paciente._numAfiliado, paciente._telefono, 
+                paciente._fechaIngreso, paciente._fechaEgreso, paciente._motivo, 
+                paciente._activo, paciente._familiar, paciente._modulo, paciente._submodulo, 
+                paciente._equip, paciente._sopNutri, paciente._asisRespi, id)
+
+            self.cursor.execute(sql_update)
+            self.db.commit()
+            self.cursor.close()
+            return True, ""
+        except Exception as ex:
+            return False, str(ex)
+
+    
+    def eliminar(self):
+         pass
  
     

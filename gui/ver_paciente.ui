@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Marcanac - Nuevo Paciente</string>
+   <string>Marcanac - Paciente</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
@@ -76,7 +76,7 @@ QPushButton {
 }
 
 QPushButton:hover {
-    background-color: rgb(61, 61, 61);
+    background-color: rgb(255, 255, 255);
     border-radius: 20px;
 }
 </string>
@@ -114,7 +114,80 @@ QPushButton:hover {
              <string>Paciente</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignCenter</set>
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnInsumos">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="sizeIncrement">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="baseSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <family>Segoe UI</family>
+              <pointsize>10</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color: rgb(71, 40, 37);</string>
+            </property>
+            <property name="text">
+             <string>Insumos</string>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>16</width>
+              <height>16</height>
+             </size>
+            </property>
+            <property name="autoDefault">
+             <bool>false</bool>
+            </property>
+            <property name="default">
+             <bool>false</bool>
+            </property>
+            <property name="flat">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -148,6 +221,9 @@ QPushButton:hover {
             </item>
             <item row="18" column="1">
              <widget class="QCheckBox" name="arB">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -175,7 +251,7 @@ QPushButton:hover {
             <item row="5" column="3">
              <widget class="QLineEdit" name="txtFamiliar">
               <property name="enabled">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <property name="font">
                <font>
@@ -201,7 +277,7 @@ QPushButton:hover {
             <item row="5" column="1">
              <widget class="QLineEdit" name="txtNroAfi">
               <property name="enabled">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <property name="font">
                <font>
@@ -214,7 +290,7 @@ QPushButton:hover {
             <item row="3" column="3">
              <widget class="QLineEdit" name="txtLocalidad">
               <property name="enabled">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <property name="font">
                <font>
@@ -225,7 +301,7 @@ QPushButton:hover {
              </widget>
             </item>
             <item row="7" column="1">
-             <widget class="QLineEdit" name="txtMatricula">
+             <widget class="QLineEdit" name="txtMotivo">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -266,7 +342,7 @@ QPushButton:hover {
             <item row="1" column="3">
              <widget class="QDateEdit" name="txtFechaN">
               <property name="enabled">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <property name="font">
                <font>
@@ -281,6 +357,9 @@ QPushButton:hover {
             </item>
             <item row="9" column="3">
              <widget class="QComboBox" name="cbSN">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -316,6 +395,9 @@ QPushButton:hover {
             </item>
             <item row="11" column="1">
              <widget class="QCheckBox" name="fono">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -329,6 +411,9 @@ QPushButton:hover {
             </item>
             <item row="12" column="1">
              <widget class="QCheckBox" name="to">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -343,7 +428,7 @@ QPushButton:hover {
             <item row="3" column="1">
              <widget class="QLineEdit" name="txtDomicilio">
               <property name="enabled">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <property name="font">
                <font>
@@ -369,7 +454,7 @@ QPushButton:hover {
             <item row="0" column="1">
              <widget class="QLineEdit" name="txtNombre">
               <property name="enabled">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <property name="font">
                <font>
@@ -408,7 +493,7 @@ QPushButton:hover {
             <item row="0" column="3">
              <widget class="QLineEdit" name="txtApellido">
               <property name="enabled">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <property name="font">
                <font>
@@ -420,6 +505,9 @@ QPushButton:hover {
             </item>
             <item row="19" column="1">
              <widget class="QCheckBox" name="arC">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -433,6 +521,9 @@ QPushButton:hover {
             </item>
             <item row="6" column="1">
              <widget class="QDateEdit" name="txtFechaI">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -473,7 +564,7 @@ QPushButton:hover {
             <item row="4" column="1">
              <widget class="QLineEdit" name="txtTelefono">
               <property name="enabled">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <property name="font">
                <font>
@@ -498,6 +589,9 @@ QPushButton:hover {
             </item>
             <item row="4" column="3">
              <widget class="QComboBox" name="cbObraSocial">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -523,6 +617,9 @@ QPushButton:hover {
             </item>
             <item row="9" column="1">
              <widget class="QComboBox" name="cbModulo">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -629,7 +726,7 @@ QPushButton:hover {
             <item row="1" column="1">
              <widget class="QLineEdit" name="txtDocumento">
               <property name="enabled">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <property name="font">
                <font>
@@ -695,6 +792,9 @@ QPushButton:hover {
             </item>
             <item row="17" column="1">
              <widget class="QCheckBox" name="arA">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -709,6 +809,9 @@ QPushButton:hover {
             </item>
             <item row="14" column="3">
              <widget class="QCheckBox" name="silla">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -736,6 +839,9 @@ QPushButton:hover {
             </item>
             <item row="11" column="3">
              <widget class="QCheckBox" name="cama">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -776,6 +882,9 @@ QPushButton:hover {
             </item>
             <item row="12" column="3">
              <widget class="QCheckBox" name="colchon">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -789,6 +898,9 @@ QPushButton:hover {
             </item>
             <item row="14" column="1">
              <widget class="QCheckBox" name="psico">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -801,7 +913,7 @@ QPushButton:hover {
              </widget>
             </item>
             <item row="20" column="3">
-             <widget class="QPushButton" name="btnRegistrar">
+             <widget class="QPushButton" name="btnModificar">
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -815,7 +927,7 @@ QPushButton:hover {
 color: rgb(255, 255, 255);</string>
               </property>
               <property name="text">
-               <string>Registrar</string>
+               <string>Modificar</string>
               </property>
              </widget>
             </item>
