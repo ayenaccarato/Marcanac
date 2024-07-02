@@ -4,11 +4,13 @@ import json
 import sqlite3
 from PyQt6 import uic, QtCore
 from PyQt6.QtCore import Qt, QDate
-from PyQt6.QtWidgets import QMessageBox, QTableWidgetItem, QPushButton, QWidget, QHBoxLayout
+from PyQt6.QtWidgets import QMessageBox, QTableWidgetItem, QPushButton, QWidget, QHBoxLayout, QMenuBar
 from data.insumos import InsumoData
 from data.listados import ListadoData
 from data.paciente import PacienteData
+from data.paciente_coordinador import PacienteCoordinadorData
 from data.paciente_insumo import PacienteInsumoData
+from data.paciente_profesionales import PacienteProfesionalesData
 from data.profesional import ProfesionalData
 from gui.nuevo_paciente import NuevoPacienteWindow
 from model.insumo import Insumo
@@ -30,8 +32,6 @@ class MainWindow():
         self.main.btnMaximizar.clicked.connect(self.control_btnMaximizar) #Maximizo la pagina
         self.main.btnCerrar.clicked.connect(lambda:self.main.close()) #Cierro
 
-        
-
     def initGUI(self):       
 
         # Eliminar la barra de título
@@ -42,8 +42,6 @@ class MainWindow():
         #Botones del menú de main
         self.main.btnListado.clicked.connect(lambda: self.main.stackedWidget.setCurrentWidget(self.main.page_datos)) #Abro pagina de listados
         self.main.btnRegistrar.clicked.connect(lambda: self.main.stackedWidget.setCurrentWidget(self.main.page_registrar)) #Abro pagina de registros
-        self.main.btnInsumos.clicked.connect(lambda: self.main.stackedWidget.setCurrentWidget(self.main.page_insumos)) #Actualizo
-        #self.main.btnEliminar.clicked.connect(lambda: self.main.stackedWidget.setCurrentWidget(self.main.page_eliminar)) #Elimino
         #Listados
         self.main.listPacientes.clicked.connect(self.abrirListado)
         self.main.listProfesionales.clicked.connect(self.abrirListadoProfesionales)
@@ -61,9 +59,13 @@ class MainWindow():
         self.listadoProf = uic.loadUi("gui/listado_profesionales.ui")
         self.verProf = uic.loadUi("gui/ver_profesional.ui")
         self.actProf = uic.loadUi("gui/modificar_profesional.ui")
+        self.lisProfPac = uic.loadUi("gui/listado_profesionales_paciente.ui")
+        self.asocProf = uic.loadUi("gui/asociar_profesional.ui")
         #Insumos
         self.nInsumo = uic.loadUi("gui/cargar_insumo.ui")
         self.lInsumo = uic.loadUi("gui/listado_insumos.ui")
+        #Coordinador
+        self.nCoord = uic.loadUi("gui/asociar_coordinador.ui")
 
 #Métodos de controles de botones del main  
     def control_btnMinimizar(self):
@@ -79,8 +81,7 @@ class MainWindow():
         self.main.btnRestaurar.hide()
         self.main.btnMaximizar.show()
 
-
-                    #### Pacientes ####
+############# Pacientes ###############
     def abrirRegistro(self):   
         self.nuevo.btnRegistrar.clicked.connect(self.registrarPaciente)     
         self.nuevo.show()
@@ -171,6 +172,7 @@ class MainWindow():
                 mBox.setText("El paciente no pudo ser registrado")
                 
             mBox.exec()
+            self.nuevo.close() #Cierro la ventana
 
     def limpiarCamposPaciente(self):
         self.nuevo.txtNombre.setText("")
@@ -181,18 +183,29 @@ class MainWindow():
         self.nuevo.cbSexo.setCurrentIndex(0)
 
 ############# Listado ################
+    def boton_listado(self, id_valor, fila, lista):
+        # Crear el botón y añadirlo a la columna 7
+        # Crear el botón "Ver más" y conectarlo
+        btn = QPushButton("Ver más")
+        if lista == 'paciente':
+            btn.clicked.connect(lambda _, id_valor=id_valor: self.mostrarPaciente(id_valor))
+        else:
+            btn.clicked.connect(lambda _, id_valor=id_valor: self.mostrarProfesional(id_valor))
+        # Agregar estilo al botón
+        btn.setStyleSheet("background-color: rgb(71, 40, 37); color: rgb(255, 255, 255);")
+        widget = QWidget()
+        layout = QHBoxLayout(widget)
+        layout.addWidget(btn)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        if lista == 'paciente':
+            self.listado.tblListado.setCellWidget(fila, 4, widget)
+        else:
+            self.listadoProf.tblListadoProf.setCellWidget(fila, 7, widget)
 
-    def abrirListado(self):           
-        self.listado.btnBuscar.clicked.connect(self.buscarPac)  
-        self.listado.tblListado.setColumnWidth(2,150)
-        self.listado.tblListado.setColumnWidth(4,150)
-        self.listado.tblListado.setColumnWidth(5,150)   
-        self.listado.show()
-
-    def buscarPac(self):
+    def abrirListado(self):    
         lis = ListadoData() 
-        data = lis.buscarPaciente(self.listado.txtDocumento.text(), self.listado.txtApellido.text())
-        print(data)
+        data = lis.obtenerPacientes()    
         fila = 0
         self.listado.tblListado.setRowCount(len(data)) #Cuantas filas traen los datos
         for item in data:
@@ -207,26 +220,70 @@ class MainWindow():
             
             id_valor = item[0]
             
-            # Crear el botón y añadirlo a la columna 7
-            # Crear el botón "Ver más" y conectarlo
-            btn = QPushButton("Ver más")
-            btn.clicked.connect(lambda _, id_valor=id_valor: self.mostrarPaciente(id_valor))
-            # Agregar estilo al botón
-            btn.setStyleSheet("background-color: rgb(71, 40, 37); color: rgb(255, 255, 255);")
-            widget = QWidget()
-            layout = QHBoxLayout(widget)
-            layout.addWidget(btn)
-            layout.setContentsMargins(0, 0, 0, 0)
-            layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            self.listado.tblListado.setCellWidget(fila, 4, widget)
+            self.boton_listado(id_valor, fila, 'paciente')
 
             fila += 1
-        
+
+        self.listado.tblListado.setColumnWidth(2,150)
+        self.listado.tblListado.setColumnWidth(4,150)
+        self.listado.tblListado.setColumnWidth(5,150) 
+        self.listado.btnBuscar.clicked.connect(lambda: self.buscarPac())
+        self.listado.btnLista.setVisible(False)
+        self.limpiar_campos_busqueda('paciente')
+        self.listado.show()
+
+    def buscarPac(self):
+        self.listado.tblListado.clearContents()  # Limpiar contenido actual de la tabla
+        self.listado.tblListado.setRowCount(0)
+        lis = ListadoData() 
+        data = lis.buscarPaciente(self.listado.txtDocumento.text(), self.listado.txtApellido.text())
+        if data:
+              # Reiniciar número de filas
+            
+            fila = 0
+            for item in data:
+                self.listado.tblListado.insertRow(fila)
+                self.listado.tblListado.setItem(fila, 0, QTableWidgetItem(str(item[2]))) # Apellido
+                self.listado.tblListado.setItem(fila, 1, QTableWidgetItem(str(item[1]))) # Nombre
+                self.listado.tblListado.setItem(fila, 2, QTableWidgetItem(str(item[10]))) # Fecha de ingreso
+                
+                estado = "Activo" if item[11] == '' else "Inactivo"
+                self.listado.tblListado.setItem(fila, 3, QTableWidgetItem(estado))
+                
+                id_valor = item[0]
+                
+                self.boton_listado(id_valor, fila, 'paciente')
+                
+                fila += 1
+        else:
+            # Limpiar la tabla si no se encontraron resultados
+            self.listado.tblListado.clearContents()
+            self.listado.tblListado.setRowCount(0)
+        self.listado.btnLista.setVisible(True)
+        self.listado.btnLista.clicked.connect(lambda: self.abrirListado())
+
+    def limpiar_campos_busqueda(self, lista):
+        if lista == 'paciente':
+            self.listado.txtDocumento.clear()  # Limpia el contenido del primer QLineEdit
+            self.listado.txtApellido.clear()  # Limpia el contenido del segundo QLineEdit
+        else:
+            self.listadoProf.txtCuit.clear()  # Limpia el contenido del primer QLineEdit
+            self.listadoProf.txtApellido.clear()
+            self.listadoProf.cbProfesion.setCurrentIndex(0)
+
     def mostrarPaciente(self, id):
+        data = PacienteCoordinadorData()
+        coordinador = data.obtener_coordinador_de_paciente(id)
+        if coordinador:
+            nombre_completo = f"{coordinador[1]} {coordinador[2]}"
+            self.ver.txtCoordinador.setText(nombre_completo)
+            self.ver.swCoordinador.setCurrentIndex(0)
+        else:
+            self.ver.swCoordinador.setCurrentIndex(1)
+            self.ver.btnAsignar.clicked.connect(lambda: self.cargar_nombres_coordinadores(id))
+        
         objData = PacienteData()
         paciente = objData.mostrar(id)
-
-        #self.ver.btnInsumos.clicked.connect(self.mostrarInsumos(id))
 
         self.ver.txtNombre.setText(paciente[1])
         self.ver.txtApellido.setText(paciente[2])
@@ -283,7 +340,8 @@ class MainWindow():
 
         self.ver.btnModificar.clicked.connect(lambda: self.abrirVentanaModificarP(id))
         self.ver.btnInsumos.clicked.connect(lambda: self.mostrarInsumos(id))        
-        
+        self.ver.btnProfesionales.clicked.connect(lambda: self.mostrarProfesionales(id))
+
         self.ver.show()
 
     def abrirVentanaModificarP(self, id):
@@ -393,11 +451,7 @@ class MainWindow():
         else:
             mBox.setText(f"El paciente no pudo ser actualizado: {error_message}")
         mBox.exec()
-
-    
-        
-        
-
+        self.actPac.close() #Cierro la ventana
 
 ############### Profesionales ##################
 
@@ -449,20 +503,13 @@ class MainWindow():
                 mBox.setText(f"El profesional no pudo ser registrado: {error_message}")
                   
             mBox.exec()
+            self.prof.close() #Cierro la ventana
 
 ################## Listado ################
 
-    def abrirListadoProfesionales(self):           
-        self.listadoProf.btnBuscar.clicked.connect(self.buscar)  
-        self.listadoProf.tblListadoProf.setColumnWidth(2,150)
-        self.listadoProf.tblListadoProf.setColumnWidth(3,150)
-        #self.listadoProf.tblListadoProf.setColumnWidth(5,150)   
-        self.listadoProf.show()
-    
-    def buscar(self):
+    def abrirListadoProfesionales(self): 
         lis = ListadoData() 
-        data = lis.buscarProfesional(self.listadoProf.txtCuit.text(), self.listadoProf.txtApellido.text(), self.listadoProf.cbProfesion.currentText())
-        print(data)
+        data = lis.obtenerProfesionales()    
         fila = 0
         self.listadoProf.tblListadoProf.setRowCount(len(data)) #Cuantas filas traen los datos
         for item in data:
@@ -477,26 +524,55 @@ class MainWindow():
             self.listadoProf.tblListadoProf.setItem(fila, 4, QTableWidgetItem(str(item[12]))) #Alias
             self.listadoProf.tblListadoProf.setItem(fila, 5, QTableWidgetItem(str(item[17]))) #Codigo
             self.listadoProf.tblListadoProf.setItem(fila, 6, QTableWidgetItem(str(item[16]))) #Profesion
-            
-            
-            
+
             id_valor = item[0]
             
-            # Crear el botón y añadirlo a la columna 7
-            # Crear el botón "Ver más" y conectarlo
-            btn = QPushButton("Ver más")
-            btn.clicked.connect(lambda _, id_valor=id_valor: self.mostrarProfesional(id_valor))
-            # Agregar estilo al botón
-            btn.setStyleSheet("background-color: rgb(71, 40, 37); color: rgb(255, 255, 255);")
-            widget = QWidget()
-            layout = QHBoxLayout(widget)
-            layout.addWidget(btn)
-            layout.setContentsMargins(0, 0, 0, 0)
-            layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            self.listadoProf.tblListadoProf.setCellWidget(fila, 7, widget)
-        
-            
+            self.boton_listado(id_valor, fila, 'prof')
+
             fila += 1
+ 
+        self.listadoProf.tblListadoProf.setColumnWidth(2,150)
+        self.listadoProf.tblListadoProf.setColumnWidth(3,150)
+        
+        self.listadoProf.btnBuscar.clicked.connect(lambda: self.buscar())
+        self.listadoProf.btnLista.setVisible(False)
+        self.limpiar_campos_busqueda('prof')   
+        self.listadoProf.show()
+    
+    def buscar(self):
+        self.listadoProf.tblListadoProf.clearContents()  # Limpiar contenido actual de la tabla
+        self.listadoProf.tblListadoProf.setRowCount(0)
+        lis = ListadoData() 
+        data = lis.buscarProfesional(self.listadoProf.txtCuit.text(), self.listadoProf.txtApellido.text(), self.listadoProf.cbProfesion.currentText())
+        if data:
+              # Reiniciar número de filas
+            fila = 0
+            self.listadoProf.tblListadoProf.setRowCount(len(data)) #Cuantas filas traen los datos
+            for item in data:
+                self.listadoProf.tblListadoProf.setItem(fila, 0, QTableWidgetItem(str(item[2]))) #Apellido
+                self.listadoProf.tblListadoProf.setItem(fila, 1, QTableWidgetItem(str(item[1]))) #Nombre
+                self.listadoProf.tblListadoProf.setItem(fila, 2, QTableWidgetItem(str(item[10]))) #CBU
+                if item[11] == '': #CBU2
+                    self.listadoProf.tblListadoProf.setItem(fila, 3, QTableWidgetItem("---"))
+                else:
+                    self.listadoProf.tblListadoProf.setItem(fila, 3, QTableWidgetItem(str(item[11]))) 
+            
+                self.listadoProf.tblListadoProf.setItem(fila, 4, QTableWidgetItem(str(item[12]))) #Alias
+                self.listadoProf.tblListadoProf.setItem(fila, 5, QTableWidgetItem(str(item[17]))) #Codigo
+                self.listadoProf.tblListadoProf.setItem(fila, 6, QTableWidgetItem(str(item[16]))) #Profesion
+                
+                id_valor = item[0]
+                
+                self.boton_listado(id_valor, fila, 'prof')
+                        
+                fila += 1
+        else:
+            # Limpiar la tabla si no se encontraron resultados
+            self.listadoProf.tblListadoProf.clearContents()
+            self.listadoProf.tblListadoProf.setRowCount(0)
+        self.listadoProf.btnLista.setVisible(True)
+        self.listadoProf.btnLista.clicked.connect(lambda: self.abrirListadoProfesionales())
+       
 
     def mostrarProfesional(self, id):
         objData = ProfesionalData()
@@ -594,7 +670,78 @@ class MainWindow():
         else:
             mBox.setText(f"El profesional no pudo ser actualizado: {error_message}")
         mBox.exec()
-   
+        self.actProf.close() #Cierro la ventana
+
+    def cargar_nombres_profesionales(self, id_paciente):
+        objData = ProfesionalData()
+        profesionales = objData.obtener_profesionales()
+        self.asocProf.cbProfesionales.clear()  # Limpiar ComboBox antes de agregar nuevos items
+
+        if profesionales:
+            self.asocProf.cbProfesionales.addItem('--Seleccione--')
+            for id_profesional, nombre, apellido in profesionales:
+                item = f"{nombre} {apellido}"
+                self.asocProf.cbProfesionales.addItem(item, userData=id_profesional)
+        else:
+            self.asocProf.cbProfesionales.addItem("No hay profesionales cargados")
+
+        # Conectar señal para actualizar ID del profesional seleccionado
+        self.asocProf.cbProfesionales.currentIndexChanged.connect(lambda index: self.actualizar_id_profesional(index, id_paciente))
+
+        # Conectar botón Registrar
+        self.asocProf.btnRegistrar.clicked.connect(lambda: self.asociarProfesionalAPaciente(id_paciente, id_profesional))
+        self.asocProf.show()
+
+    def actualizar_id_profesional(self, index, id_paciente):
+        id_profesional = None
+        if index >= 0:
+            item_data = self.asocProf.cbProfesionales.itemData(index)
+            if item_data is not None:
+                id_profesional = item_data
+                print(f"ID del profesional seleccionado: {id_profesional}")
+                #self.asociarProfesionalAPaciente(id_paciente, id_profesional)
+            else:
+                print("No se encontró el ID del profesional seleccionado.")
+        else:
+            print("No se seleccionó ningún profesional.")
+        return id_profesional
+
+    def asociarProfesionalAPaciente(self, id_paciente, id_profesional):
+        try:
+            if id_profesional != None:
+                objData = PacienteProfesionalesData()
+                exito = objData.asociar_profesional_a_paciente(id_paciente, id_profesional)
+                mBox = QMessageBox()
+                if exito:
+                        mBox.setText("Profesional asociado al paciente correctamente.")
+                else:
+                        mBox.setText("No se pudo asociar el profesional al paciente.")
+                self.asocProf.close() #Cierro la ventana
+        except Exception:
+            mBox = QMessageBox()
+            mBox.setText('Seleccione un profesional')
+           
+    def mostrarProfesionales(self, id_paciente):
+
+            lis = PacienteProfesionalesData()
+            profesionales = lis.obtener_profesionales_de_paciente(id_paciente)        
+            
+            if profesionales:
+                self.lisProfPac.tblListadoPP.setRowCount(len(profesionales))  # Configurar el número de filas
+                print(profesionales)
+                fila = 0
+                for item in profesionales:
+                    print(item)
+                    self.lisProfPac.tblListadoPP.setItem(fila, 0, QTableWidgetItem(str(item[2]))) #Apellido
+                    self.lisProfPac.tblListadoPP.setItem(fila, 1, QTableWidgetItem(str(item[1]))) #Nombre
+                    self.lisProfPac.tblListadoPP.setItem(fila, 2, QTableWidgetItem(str(item[16]))) #Profesión
+
+                    fila += 1
+            
+            self.lisProfPac.btnProf.clicked.connect(lambda: self.cargar_nombres_profesionales(id_paciente))
+            self.lisProfPac.btnRefrescar.clicked.connect(lambda: self.mostrarProfesionales(id_paciente))
+            self.lisProfPac.show()
+
    ######## Insumos #########        
 
     def abrirRegistroInsumo(self, id):   
@@ -612,30 +759,27 @@ class MainWindow():
                 nuevoInsumo = Insumo(
                     fechaEntrega = fechaE,
                     nombre = self.nInsumo.cbInsumo.currentText(),
-                    cantidad = self.nInsumo.txtCantI.text(),
-                    paciente = id_paciente,     
+                    cantidad = self.nInsumo.txtCantI.text(),    
                 )
             else:
                 nuevoInsumo = Insumo(
                     fechaEntrega = fechaE,
                     nombre = self.nInsumo.txtOtro.text(),
-                    cantidad = self.nInsumo.txtCantO.text(), 
-                    paciente = id_paciente,    
+                    cantidad = self.nInsumo.txtCantO.text(),   
                 )
 
             objData = InsumoData()
             
             mBox = QMessageBox()
-            success, error_message = objData.registrar(insumo=nuevoInsumo)
+            success, error_message = objData.registrar(insumo=nuevoInsumo, id_paciente=id_paciente)
             if success:             
                 mBox.setText("Insumo agregado")      
                 #self.limpiarCamposPaciente()         
             else:
                 mBox.setText(f"El insumo no pudo ser agregado: {error_message}")
-                  
+                
             mBox.exec()
             self.nInsumo.close() #Cierro la ventana
-            
 
     def mostrarInsumos(self, id_paciente):
 
@@ -657,4 +801,55 @@ class MainWindow():
         self.lInsumo.btnInsumo.clicked.connect(lambda: self.abrirRegistroInsumo(id_paciente))
         self.lInsumo.btnRefrescar.clicked.connect(lambda: self.mostrarInsumos(id_paciente))
         self.lInsumo.show()
-        
+
+############## Coordinador - Paciente ################  
+
+    def cargar_nombres_coordinadores(self, id_paciente):
+        objData = ProfesionalData()
+        profesionales = objData.obtener_coordinadores()
+
+        self.nCoord.cbProfesionales.clear()  # Limpiar ComboBox antes de agregar nuevos items
+
+        if profesionales:
+            self.nCoord.cbProfesionales.addItem('--Seleccione--')
+            for id_profesional, nombre, apellido in profesionales:
+                item = f"{nombre} {apellido}"
+                self.nCoord.cbProfesionales.addItem(item, userData=id_profesional)
+        else:
+            self.nCoord.cbProfesionales.addItem("No hay profesionales cargados")
+
+        # Conectar señal para actualizar ID del profesional seleccionado
+        self.nCoord.cbProfesionales.currentIndexChanged.connect(lambda index: self.actualizar_id_profesional_coordinador(index, id_paciente))
+
+        # Conectar botón Registrar
+        self.nCoord.btnAsignar.clicked.connect(lambda: self.asociarCoordinadorAPaciente(id_paciente, id_profesional))
+        self.nCoord.show()
+
+    def actualizar_id_profesional_coordinador(self, index, id_paciente):
+        id_profesional = None
+        if index >= 0:
+            item_data = self.nCoord.cbProfesionales.itemData(index)
+            if item_data is not None:
+                id_profesional = item_data
+                print(f"ID del profesional seleccionado: {id_profesional}")
+                #self.asociarProfesionalAPaciente(id_paciente, id_profesional)
+            else:
+                print("No se encontró el ID del profesional seleccionado.")
+        else:
+            print("No se seleccionó ningún profesional.")
+        return id_profesional
+
+    def asociarCoordinadorAPaciente(self, id_paciente, id_profesional):
+        try:
+            if id_profesional != None:
+                objData = PacienteCoordinadorData()
+                exito = objData.asociar_coordinador_a_paciente(id_paciente, id_profesional)
+                mBox = QMessageBox()
+                if exito:
+                        mBox.setText("Coordinador asociado al paciente correctamente.")
+                else:
+                        mBox.setText("No se pudo asociar el coordinador al paciente.")
+                self.nCoord.close() #Cierro la ventana
+        except Exception:
+            mBox = QMessageBox()
+            mBox.setText('Seleccione un coordinador')    

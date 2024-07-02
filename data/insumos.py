@@ -1,6 +1,7 @@
 from datetime import datetime
 import sqlite3
 import conexion as con
+from data.paciente_insumo import PacienteInsumoData
 from model.insumo import Insumo
 
 class InsumoData():   
@@ -13,8 +14,7 @@ class InsumoData():
             (id INTEGER PRIMARY KEY AUTOINCREMENT, 
             fechaEntrega DATETIME,
             nombre TEXT, 
-            cantidad TEXT,
-            paciente INTEGER            
+            cantidad TEXT            
             )"""
             
             self.cursor.execute(sql_create_insumo)
@@ -25,32 +25,53 @@ class InsumoData():
         except Exception as ex:
             print("Tabla Insumos OK: ", ex)
 
-    def registrar(self, insumo:Insumo): 
+    def registrar(self, insumo: Insumo, id_paciente):
         try:
             self.db = con.Conexion().conectar()
             self.cursor = self.db.cursor()
-            self.cursor.execute("""
-                INSERT INTO insumos values (null, '{}', '{}', '{}', '{}')
-            """.format(insumo._fechaEntrega, insumo._nombre, insumo._cantidad, insumo._paciente))
+
+            # Insertar el insumo en la tabla 'insumos'
+            sql_insert_insumo = "INSERT INTO insumos (fechaEntrega, nombre, cantidad) VALUES (?, ?, ?)"
+            self.cursor.execute(sql_insert_insumo, (insumo._fechaEntrega, insumo._nombre, insumo._cantidad))
             self.db.commit()
-            if self.cursor.rowcount == 1:  # Asegurarse de que una fila fue insertada
-                return True, ""
+
+            # Obtener el ID del insumo recién insertado
+            insumo_id = self.cursor.lastrowid
+
+            # Asociar el insumo al paciente usando PacienteInsumoData
+            objPacienteInsumoData = PacienteInsumoData()
+            success = objPacienteInsumoData.asociar_insumo_a_paciente(id_paciente, insumo_id)
+
+            if success:
+                return True, None
             else:
-                return False, "No se pudo insertar el insumo."
+                return False, "Error al asociar insumo a paciente"
+
         except sqlite3.Error as e:
             return False, str(e)
-        
+
+        finally:
+            if self.cursor:
+                self.cursor.close()
+            if self.db:
+                self.db.close()
+
 
     def mostrar(self, id):
-        self.db = con.Conexion().conectar()
-        self.cursor = self.db.cursor()
-        sql_ver = """ SELECT * FROM insumos i
-            WHERE i.paciente = '{}'  
-        """.format(id)
-
-        self.cursor.execute(sql_ver)
-        data = self.cursor.fetchall()
-        
-        self.cursor.close()
-
-        return data
+        try:
+            self.db = con.Conexion().conectar()
+            self.cursor = self.db.cursor()
+            sql = """
+            SELECT * 
+            FROM insumos 
+            JOIN paciente_insumo ON insumos.id = paciente_insumo.insumo_id 
+            WHERE paciente_insumo.paciente_id = ?
+            """
+            self.cursor.execute(sql, (id,))
+            insumos = self.cursor.fetchall()
+            return insumos
+        except Exception as e:
+            return []
+        finally:
+            self.cursor.close()
+            self.db.close()

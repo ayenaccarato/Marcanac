@@ -148,5 +148,43 @@ class ProfesionalData():
         except Exception as ex:
             return False, str(ex)
 
+    def obtener_profesionales(self):
+        profesionales = []
+        try:
+            self.db = con.Conexion().conectar()
+            self.cursor = self.db.cursor()
+            self.cursor.execute("SELECT id, nombre, apellido FROM profesionales")
+            profesionales = self.cursor.fetchall()
+            
+            return profesionales  # Retorna la lista de tuplas (id, nombre, apellido)
+        except sqlite3.Error as e:
+            print(f"Error al obtener nombres de profesionales: {e}")
+            return []
+        finally:
+            if self.cursor:
+                self.cursor.close()
+            if self.db:
+                self.db.close()
+
+    def obtener_coordinadores(self):
+        profesionales = []
+        try:
+            self.db = con.Conexion().conectar()
+            self.cursor = self.db.cursor()
+            self.cursor.execute("""SELECT id, nombre, apellido
+                                    FROM profesionales
+                                    WHERE coord = 'True'""")
+            profesionales = self.cursor.fetchall()
+            
+            return profesionales  # Retorna la lista de tuplas (id, nombre, apellido)
+        except sqlite3.Error as e:
+            print(f"Error al obtener nombres de profesionales: {e}")
+            return []
+        finally:
+            if self.cursor:
+                self.cursor.close()
+            if self.db:
+                self.db.close()
+
     def eliminar(self):
          pass

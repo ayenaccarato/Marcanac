@@ -1,6 +1,23 @@
+import sqlite3
 import conexion as con
 
 class ListadoData():
+
+    def obtenerPacientes(self):
+        '''Retorna los pacientes desde la base de datos.'''
+        try:
+            with con.Conexion().conectar() as self.db:
+                self.cursor = self.db.cursor()
+                sql = "SELECT * FROM pacientes"
+                self.cursor.execute(sql)
+                data = self.cursor.fetchall()
+                return data
+        except sqlite3.Error as e:
+            print(f"Error al obtener pacientes: {e}")
+            return []
+        finally:
+            if self.cursor:
+                self.cursor.close()
 
     def buscarPaciente(self, documento, apellido): 
         '''Busco pacientes por distintos datos, dependiendo que se ingresa
@@ -11,6 +28,18 @@ class ListadoData():
             SELECT * FROM pacientes p
             WHERE p.documento = '{}' or p.apellido = '{}'  
         """.format(documento, apellido)
+        print(sql)
+        res = self.cursor.execute(sql)
+        data = res.fetchall() #Muestro todo lo que me devuelva
+        return data
+    
+    def obtenerProfesionales(self):
+        '''Retorno los profesionales'''
+        self.db = con.Conexion().conectar()
+        self.cursor = self.db.cursor()
+        sql = """
+            SELECT * FROM profesionales  
+        """
         print(sql)
         res = self.cursor.execute(sql)
         data = res.fetchall() #Muestro todo lo que me devuelva

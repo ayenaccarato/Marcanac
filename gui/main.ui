@@ -96,17 +96,26 @@ QPushButton:hover {
               <height>0</height>
              </size>
             </property>
+            <property name="font">
+             <font>
+              <family>Segoe UI black</family>
+              <pointsize>12</pointsize>
+              <weight>10</weight>
+              <italic>false</italic>
+              <bold>false</bold>
+             </font>
+            </property>
             <property name="styleSheet">
              <string notr="true">QPushButton {
 	background-color: rgb(255, 170, 127);
-	font: 87 12pt &quot;Arial Black&quot;;
+	font: 87 12pt &quot;Segoe UI black&quot;;
 	border-radius: 0px;
 }
 
 QPushButton:hover{
 	
 	background-color: rgb(255, 255, 255);
-	font: 87 12pt &quot;Arial Black&quot;;
+	font: 87 12pt &quot;Segoe UI black&quot;;
 }</string>
             </property>
             <property name="text">
@@ -241,7 +250,7 @@ QPushButton {
     border-radius: 20px;
 	border-bottom-left-radius:20px;
 	color:rgb(0, 0, 0);
-	font: 77 10pt &quot;Arial Black&quot;;
+	font: 77 12pt &quot;Segoe UI black&quot;;
 }
 
 QPushButton:hover {
@@ -250,7 +259,7 @@ QPushButton:hover {
     border-top-left-radius: 20px;
 	border-bottom-left-radius:20px;
 	color:rgb(0, 0, 0);
-	font: 77 10pt &quot;Arial Black&quot;;
+	font: 77 10pt &quot;Segoe UI black&quot;;
 }
 </string>
             </property>
@@ -269,8 +278,30 @@ QPushButton:hover {
                  <height>40</height>
                 </size>
                </property>
+               <property name="font">
+                <font>
+                 <family>Segoe UI black</family>
+                 <pointsize>12</pointsize>
+                 <weight>9</weight>
+                 <italic>false</italic>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
                <property name="text">
                 <string>Listado</string>
+               </property>
+               <property name="icon">
+                <iconset>
+                 <normaloff>imagenes/lista.png</normaloff>imagenes/lista.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>30</width>
+                 <height>30</height>
+                </size>
                </property>
               </widget>
              </item>
@@ -282,34 +313,30 @@ QPushButton:hover {
                  <height>40</height>
                 </size>
                </property>
+               <property name="font">
+                <font>
+                 <family>Segoe UI black</family>
+                 <pointsize>12</pointsize>
+                 <weight>9</weight>
+                 <italic>false</italic>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
                <property name="text">
                 <string>Registrar</string>
                </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="btnInsumos">
-               <property name="minimumSize">
+               <property name="icon">
+                <iconset>
+                 <normaloff>imagenes/registro.png</normaloff>imagenes/registro.png</iconset>
+               </property>
+               <property name="iconSize">
                 <size>
-                 <width>0</width>
-                 <height>40</height>
+                 <width>30</width>
+                 <height>30</height>
                 </size>
-               </property>
-               <property name="text">
-                <string>Insumos</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButton_4">
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>40</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>Eliminar</string>
                </property>
               </widget>
              </item>
@@ -323,53 +350,24 @@ QPushButton:hover {
     background-color: rgb(255, 255, 255);
 }
 
-QLabel {
-	font: 87 12pt &quot;Aria Black&quot;;
-	background-color: #000000ff;
-	color: rgb(0, 0, 0);
-	border: 0px solid #14C8DC
-}
-
-QLineEdit {
-	border:0px;
-	color: rgb(255, 255, 255);
-	border-bottom: 2px solid rgb(61, 61, 61);
-	font: 77 10pt &quot;Arial Black&quot;;
-}
-
-
 QPushButton {
-    background-color:#ffaa7f;
+	background-color: rgb(255, 170, 127);
     border-radius: 20px;
+	border-bottom-left-radius:20px;
 	color:rgb(0, 0, 0);
-	font: 77 10pt &quot;Arial Black&quot;;
+	font: 77 12pt &quot;Segoe UI black&quot;;
 }
 
 QPushButton:hover {
     background-color: #ffffff;
-	border-radius: 15px;
+	color: rgb(255, 170, 127);
+    border-top-left-radius: 20px;
+	border-bottom-left-radius:20px;
 	color:rgb(0, 0, 0);
-	font: 77 10pt &quot;Arial Black&quot;;
+	font: 77 10pt &quot;Segoe UI black&quot;;
 }
 
-QTableWidget {
-	background-color: #ffaa7;
-	color: rgb(0, 0, 0);
-	gridline-color: rgb(0, 206, 151);
-	font-size: 12pt;
-	color: #000000;
-}
-
-QHeaderView::section {
-	background-color:#ffaa7;
-	border: 1px solid rgb(0, 0, 0);
-	font-size: 12pt; 
-}
-
-QTableWidget QTableCornerButton::section {
-	background-color:rgb(0, 0, 0);
-	border: 1px solid #ffaa7;
-}</string>
+</string>
             </property>
             <property name="frameShape">
              <enum>QFrame::StyledPanel</enum>
@@ -396,29 +394,26 @@ QTableWidget QTableCornerButton::section {
              <item>
               <widget class="QStackedWidget" name="stackedWidget">
                <property name="currentIndex">
-                <number>3</number>
+                <number>2</number>
                </property>
                <widget class="QWidget" name="page_datos">
                 <layout class="QVBoxLayout" name="verticalLayout_5">
                  <item>
                   <widget class="QPushButton" name="listPacientes">
+                   <property name="font">
+                    <font>
+                     <family>Segoe UI black</family>
+                     <pointsize>12</pointsize>
+                     <weight>9</weight>
+                     <italic>false</italic>
+                     <bold>false</bold>
+                    </font>
+                   </property>
+                   <property name="cursor">
+                    <cursorShape>PointingHandCursor</cursorShape>
+                   </property>
                    <property name="styleSheet">
-                    <string notr="true">QPushButton {
-    background-color:#ffaa7f;
-    border-radius: 20px;
-	border-bottom-left-radius:20px;
-	color:rgb(0, 0, 0);
-	font: 77 10pt &quot;Arial Black&quot;;
-}
-
-QPushButton:hover {
-    background-color: #ffffff;
-	color: rgb(255, 170, 127);
-    border-top-left-radius: 20px;
-	border-bottom-left-radius:20px;
-	color:rgb(0, 0, 0);
-	font: 77 10pt &quot;Arial Black&quot;;
-}</string>
+                    <string notr="true"/>
                    </property>
                    <property name="text">
                     <string>Pacientes</string>
@@ -427,6 +422,18 @@ QPushButton:hover {
                  </item>
                  <item>
                   <widget class="QPushButton" name="listProfesionales">
+                   <property name="font">
+                    <font>
+                     <family>Segoe UI black</family>
+                     <pointsize>12</pointsize>
+                     <weight>9</weight>
+                     <italic>false</italic>
+                     <bold>false</bold>
+                    </font>
+                   </property>
+                   <property name="cursor">
+                    <cursorShape>PointingHandCursor</cursorShape>
+                   </property>
                    <property name="text">
                     <string>Profesionales</string>
                    </property>
@@ -438,6 +445,9 @@ QPushButton:hover {
                 <layout class="QVBoxLayout" name="verticalLayout_6">
                  <item>
                   <widget class="QPushButton" name="btnPaciente">
+                   <property name="cursor">
+                    <cursorShape>PointingHandCursor</cursorShape>
+                   </property>
                    <property name="text">
                     <string>Paciente</string>
                    </property>
@@ -445,6 +455,9 @@ QPushButton:hover {
                  </item>
                  <item>
                   <widget class="QPushButton" name="btnProfesional">
+                   <property name="cursor">
+                    <cursorShape>PointingHandCursor</cursorShape>
+                   </property>
                    <property name="text">
                     <string>Profesional</string>
                    </property>
@@ -453,29 +466,7 @@ QPushButton:hover {
                 </layout>
                </widget>
                <widget class="QWidget" name="page_insumos">
-                <layout class="QVBoxLayout" name="verticalLayout_7">
-                 <item>
-                  <widget class="QPushButton" name="btnAgregar">
-                   <property name="text">
-                    <string>Agregar</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="btnModificar">
-                   <property name="text">
-                    <string>Modificar</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="btnEliminar">
-                   <property name="text">
-                    <string>Eliminar</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
+                <layout class="QVBoxLayout" name="verticalLayout_7"/>
                </widget>
                <widget class="QWidget" name="page_eliminar"/>
               </widget>

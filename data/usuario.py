@@ -4,6 +4,7 @@ from model.usuario import Usuario
 class UsuarioData():   
 
     def __init__(self):
+        
         try:
             self.db = con.Conexion().conectar()
             self.cursor = self.db.cursor()

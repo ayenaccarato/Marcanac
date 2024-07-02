@@ -5,7 +5,7 @@ class PacienteInsumoData:
 
     def __init__(self):
         try:
-            self.db = con.Conexion("marcanac.db").conectar()
+            self.db = con.Conexion().conectar()
             self.cursor = self.db.cursor()
             sql_create_paciente_insumo = """
             CREATE TABLE IF NOT EXISTS paciente_insumo (
@@ -28,22 +28,27 @@ class PacienteInsumoData:
 
     def asociar_insumo_a_paciente(self, paciente_id, insumo_id):
         try:
-            self.db = con.Conexion("marcanac.db").conectar()
+            # Abrimos la conexión y creamos el cursor dentro del método
+            self.db = con.Conexion().conectar()
             self.cursor = self.db.cursor()
-            self.cursor.execute("""
-            INSERT INTO paciente_insumo (paciente_id, insumo_id) 
-            VALUES ('{}', '{}')
-            """, (paciente_id, insumo_id))
+            sql_insert_paciente_insumo = "INSERT INTO paciente_insumo (paciente_id, insumo_id) VALUES (?, ?)"
+            self.cursor.execute(sql_insert_paciente_insumo, (paciente_id, insumo_id))
             self.db.commit()
             print("Asociación paciente-insumo creada correctamente")
             return True
         except sqlite3.Error as e:
             print(f"Error al asociar insumo a paciente: {e}")
             return False
+        finally:
+            # Cerramos el cursor y la conexión en el bloque finally
+            if self.cursor:
+                self.cursor.close()
+            if self.db:
+                self.db.close()
 
     def obtener_insumos_de_paciente(self, paciente_id):
         try:
-            self.db = con.Conexion("marcanac.db").conectar()
+            self.db = con.Conexion().conectar()
             self.cursor = self.db.cursor()
             self.cursor.execute("""
             SELECT insumos.*
