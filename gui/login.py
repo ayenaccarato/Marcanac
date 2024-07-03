@@ -6,7 +6,7 @@ from model.usuario import Usuario
 
 class Login():
     def __init__(self):
-        self.login = uic.loadUi("gui/login_2.ui")
+        self.login = uic.loadUi("gui/login.ui")
         self.initGUI()
        # self.login.lblMensaje.setText("")
         self.login.show()

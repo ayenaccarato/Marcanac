@@ -1,10 +1,12 @@
-from ast import Lambda
-from datetime import datetime
 import json
+import os
 import sqlite3
-from PyQt6 import uic, QtCore
-from PyQt6.QtCore import Qt, QDate
-from PyQt6.QtWidgets import QMessageBox, QTableWidgetItem, QPushButton, QWidget, QHBoxLayout, QMenuBar
+import tempfile
+from PyQt6.QtGui import QIcon
+from PyQt6 import uic, QtCore, QtWidgets
+from PyQt6.QtCore import Qt, QDate, QStandardPaths, QByteArray, QMimeType
+from PyQt6.QtWidgets import QMessageBox, QTableWidgetItem, QPushButton, QWidget, QHBoxLayout, QFileDialog
+from data.archivos import ArchivosData
 from data.insumos import InsumoData
 from data.listados import ListadoData
 from data.paciente import PacienteData
@@ -66,6 +68,8 @@ class MainWindow():
         self.lInsumo = uic.loadUi("gui/listado_insumos.ui")
         #Coordinador
         self.nCoord = uic.loadUi("gui/asociar_coordinador.ui")
+        #Archivos
+        self.arc = uic.loadUi("gui/archivos.ui")
 
 #Métodos de controles de botones del main  
     def control_btnMinimizar(self):
@@ -125,10 +129,12 @@ class MainWindow():
     def registrarPaciente(self):
         mBox = QMessageBox()
         if self.nuevo.cbObraSocial.currentText() == "--Seleccione--" or self.nuevo.cbModulo.currentText() == "--Seleccione--":            
-            mBox.setText("Seleccione")
+            mBox.setWindowTitle('Mensaje')
+            mBox.setText("Seleccione una obra social o módulo")
             mBox.exec()
             #self.nuevo.cbTipo.setFocus()
-        elif len(self.nuevo.txtDocumento.text()) < 8:           
+        elif len(self.nuevo.txtDocumento.text()) < 8:  
+            mBox.setWindowTitle('Error')         
             mBox.setText("El número de documento ingresado es inválido")
             mBox.exec()
             #self.nuevo.txtApellido.setFocus() #Va al campo que debe completar
@@ -165,23 +171,44 @@ class MainWindow():
             objData = PacienteData()
             
             mBox = QMessageBox()
-            if objData.registrar(paciente=nuevoPaciente):                
+            if objData.registrar(paciente=nuevoPaciente):   
+                mBox.setWindowTitle('Mensaje')             
                 mBox.setText("Paciente registrado")      
-                #self.limpiarCamposPaciente()          
+                self.limpiarCamposPaciente()          
             else:
+                mBox.setWindowTitle('Error')
                 mBox.setText("El paciente no pudo ser registrado")
                 
             mBox.exec()
             self.nuevo.close() #Cierro la ventana
 
-    def limpiarCamposPaciente(self):
-        self.nuevo.txtNombre.setText("")
-        self.nuevo.txtApellido.setText("")
-        self.nuevo.cbTipo.setCurrentIndex(0)
-        self.nuevo.txtDocumento.setText("")
-        #self.nuevo.txtFecha.setDate("")
-        self.nuevo.cbSexo.setCurrentIndex(0)
-
+    def limpiarCamposPaciente(self):        
+        self.nuevo.txtNombre.clear()
+        self.nuevo.txtApellido.clear()
+        self.nuevo.txtDomicilio.clear()
+        self.nuevo.txtLocalidad.clear()
+        self.nuevo.txtDocumento.clear()
+        self.nuevo.txtFechaNacimiento.setDate(QtCore.QDate.currentDate())  # Restablece la fecha de nacimiento a la fecha actual
+        self.nuevo.cbObraSocial.setCurrentIndex(0)  # Restablece el combobox a su estado inicial
+        self.nuevo.txtNroAfi.clear()
+        self.nuevo.txtTelefono.clear()
+        self.nuevo.txtFechaIngreso.setDate(QtCore.QDate.currentDate())  # Restablece la fecha de ingreso a la fecha actual
+        self.nuevo.txtFamiliar.clear()
+        self.nuevo.cbModulo.setCurrentIndex(0)  # Restablece el combobox a su estado inicial
+        self.nuevo.cbSN.setCurrentIndex(0)  # Restablece el combobox a su estado inicial
+        # Limpiar checkboxes de submodulo
+        self.nuevo.fono.setChecked(False)
+        self.nuevo.to.setChecked(False)
+        self.nuevo.psico.setChecked(False)
+        # Limpiar checkboxes de Equipamiento
+        self.nuevo.cama.setChecked(False)
+        self.nuevo.colchon.setChecked(False)
+        self.nuevo.silla.setChecked(False)
+        # Limpiar checkboxes de Asistencia Respiratoria
+        self.nuevo.arA.setChecked(False)
+        self.nuevo.arB.setChecked(False)
+        self.nuevo.arC.setChecked(False)
+   
 ############# Listado ################
     def boton_listado(self, id_valor, fila, lista):
         # Crear el botón y añadirlo a la columna 7
@@ -233,34 +260,40 @@ class MainWindow():
         self.listado.show()
 
     def buscarPac(self):
-        self.listado.tblListado.clearContents()  # Limpiar contenido actual de la tabla
-        self.listado.tblListado.setRowCount(0)
-        lis = ListadoData() 
-        data = lis.buscarPaciente(self.listado.txtDocumento.text(), self.listado.txtApellido.text())
-        if data:
-              # Reiniciar número de filas
-            
-            fila = 0
-            for item in data:
-                self.listado.tblListado.insertRow(fila)
-                self.listado.tblListado.setItem(fila, 0, QTableWidgetItem(str(item[2]))) # Apellido
-                self.listado.tblListado.setItem(fila, 1, QTableWidgetItem(str(item[1]))) # Nombre
-                self.listado.tblListado.setItem(fila, 2, QTableWidgetItem(str(item[10]))) # Fecha de ingreso
-                
-                estado = "Activo" if item[11] == '' else "Inactivo"
-                self.listado.tblListado.setItem(fila, 3, QTableWidgetItem(estado))
-                
-                id_valor = item[0]
-                
-                self.boton_listado(id_valor, fila, 'paciente')
-                
-                fila += 1
+        if self.listado.txtApellido.text() == '' and self.listado.txtDocumento.text() == '':
+            mBox = QMessageBox()
+            mBox.setWindowTitle('Mensaje')
+            mBox.setText('Ingrese datos a buscar')
+            mBox.exec()
         else:
-            # Limpiar la tabla si no se encontraron resultados
-            self.listado.tblListado.clearContents()
+            self.listado.tblListado.clearContents()  # Limpiar contenido actual de la tabla
             self.listado.tblListado.setRowCount(0)
-        self.listado.btnLista.setVisible(True)
-        self.listado.btnLista.clicked.connect(lambda: self.abrirListado())
+            lis = ListadoData() 
+            data = lis.buscarPaciente(self.listado.txtDocumento.text(), self.listado.txtApellido.text())
+            if data:
+                # Reiniciar número de filas
+                
+                fila = 0
+                for item in data:
+                    self.listado.tblListado.insertRow(fila)
+                    self.listado.tblListado.setItem(fila, 0, QTableWidgetItem(str(item[2]))) # Apellido
+                    self.listado.tblListado.setItem(fila, 1, QTableWidgetItem(str(item[1]))) # Nombre
+                    self.listado.tblListado.setItem(fila, 2, QTableWidgetItem(str(item[10]))) # Fecha de ingreso
+                    
+                    estado = "Activo" if item[11] == '' else "Inactivo"
+                    self.listado.tblListado.setItem(fila, 3, QTableWidgetItem(estado))
+                    
+                    id_valor = item[0]
+                    
+                    self.boton_listado(id_valor, fila, 'paciente')
+                    
+                    fila += 1
+            else:
+                # Limpiar la tabla si no se encontraron resultados
+                self.listado.tblListado.clearContents()
+                self.listado.tblListado.setRowCount(0)
+            self.listado.btnLista.setVisible(True)
+            self.listado.btnLista.clicked.connect(lambda: self.abrirListado())
 
     def limpiar_campos_busqueda(self, lista):
         if lista == 'paciente':
@@ -341,6 +374,7 @@ class MainWindow():
         self.ver.btnModificar.clicked.connect(lambda: self.abrirVentanaModificarP(id))
         self.ver.btnInsumos.clicked.connect(lambda: self.mostrarInsumos(id))        
         self.ver.btnProfesionales.clicked.connect(lambda: self.mostrarProfesionales(id))
+        self.ver.btnCarpeta.clicked.connect(lambda: self.cargarArchivos(id))
 
         self.ver.show()
 
@@ -447,8 +481,10 @@ class MainWindow():
         success, error_message = objData.modificar(id, pacActualizado)
         mBox = QMessageBox()
         if success:
+            mBox.setWindowTitle('Mensaje')
             mBox.setText("Paciente actualizado correctamente")
         else:
+            mBox.setWindowTitle('Error')
             mBox.setText(f"El paciente no pudo ser actualizado: {error_message}")
         mBox.exec()
         self.actPac.close() #Cierro la ventana
@@ -461,11 +497,13 @@ class MainWindow():
 
     def registrarProfesional(self):
         mBox = QMessageBox()
-        if self.prof.cbProfesional.currentText() == "--Seleccione--":            
+        if self.prof.cbProfesional.currentText() == "--Seleccione--":    
+            mBox.setWindowTitle('Mensaje')        
             mBox.setText("Seleccione una profesión")
             mBox.exec()
             #self.nuevo.cbTipo.setFocus()
         elif len(self.prof.txtCbu1.text()) < 22 or len(self.prof.txtCbu2.text()) < 22:           
+            mBox.setWindowTitle('Error')
             mBox.setText("El CBU ingresado es inválido. Debe contener 22 números")
             mBox.exec()
             #self.nuevo.txtApellido.setFocus() #Va al campo que debe completar
@@ -496,15 +534,38 @@ class MainWindow():
             
             mBox = QMessageBox()
             success, error_message = objData.registrar(profesional=nuevoProfesional)
-            if success:                
+            if success:   
+                mBox.setWindowTitle('Mensaje')             
                 mBox.setText("Profesional registrado")      
-                #self.limpiarCamposPaciente()         
+                self.limpiarCamposProfesional()         
             else:
+                mBox.setWindowTitle('Error')
                 mBox.setText(f"El profesional no pudo ser registrado: {error_message}")
                   
             mBox.exec()
             self.prof.close() #Cierro la ventana
 
+    def limpiarCamposProfesional(self):  
+        self.prof.txtNombre.clear()
+        self.prof.txtApellido.clear()
+        self.prof.txtDomicilio.clear()
+        self.prof.txtLocalidad.clear()
+        self.prof.txtCuit.clear()
+        self.prof.txtFechaNacimiento.setDate(QtCore.QDate.currentDate())  # Restablece la fecha de nacimiento a la fecha actual
+        self.prof.txtCP.clear()  
+        self.prof.txtMatricula.clear()
+        self.prof.txtTelefono.clear()       
+        self.prof.txtCbu1.clear()
+        self.prof.txtCbu2clear() 
+        self.prof.txtAlias.clear()
+        self.prof.txtMail.clear()
+        self.prof.cbProfesional.setCurrentIndex(0)
+        self.prof.txtCodigo.clear()
+        # Limpiar checkbox de monotributo
+        self.prof.monotributo.setChecked(False)        
+        # Limpiar checkbox de coordinador
+        self.prof.coordinador.setChecked(False)
+        
 ################## Listado ################
 
     def abrirListadoProfesionales(self): 
@@ -573,7 +634,6 @@ class MainWindow():
         self.listadoProf.btnLista.setVisible(True)
         self.listadoProf.btnLista.clicked.connect(lambda: self.abrirListadoProfesionales())
        
-
     def mostrarProfesional(self, id):
         objData = ProfesionalData()
         profesional = objData.mostrar(id)
@@ -666,8 +726,10 @@ class MainWindow():
         success, error_message = objData.modificar(id, profActualizado)
         mBox = QMessageBox()
         if success:
+            mBox.setWindowTitle('Mensaje')
             mBox.setText("Profesional actualizado correctamente")
         else:
+            mBox.setWindowTitle('Error')
             mBox.setText(f"El profesional no pudo ser actualizado: {error_message}")
         mBox.exec()
         self.actProf.close() #Cierro la ventana
@@ -713,12 +775,15 @@ class MainWindow():
                 exito = objData.asociar_profesional_a_paciente(id_paciente, id_profesional)
                 mBox = QMessageBox()
                 if exito:
+                        mBox.setWindowTitle('Mensaje')
                         mBox.setText("Profesional asociado al paciente correctamente.")
                 else:
+                        mBox.setWindowTitle('Error')
                         mBox.setText("No se pudo asociar el profesional al paciente.")
                 self.asocProf.close() #Cierro la ventana
         except Exception:
             mBox = QMessageBox()
+            mBox.setWindowTitle('Mensaje')
             mBox.setText('Seleccione un profesional')
            
     def mostrarProfesionales(self, id_paciente):
@@ -751,6 +816,7 @@ class MainWindow():
     def registrarInsumo(self, id_paciente):
         mBox = QMessageBox()
         if self.nInsumo.cbInsumo.currentText() == "--Seleccione--" and self.nInsumo.txtOtro.text() == '':            
+            mBox.setWindowTitle('Mensaje')
             mBox.setText("Seleccione o escriba un insumo")
             mBox.exec()
         else:
@@ -772,10 +838,12 @@ class MainWindow():
             
             mBox = QMessageBox()
             success, error_message = objData.registrar(insumo=nuevoInsumo, id_paciente=id_paciente)
-            if success:             
+            if success:   
+                mBox.setWindowTitle('Mensaje')          
                 mBox.setText("Insumo agregado")      
                 #self.limpiarCamposPaciente()         
             else:
+                mBox.setWindowTitle('Error')
                 mBox.setText(f"El insumo no pudo ser agregado: {error_message}")
                 
             mBox.exec()
@@ -846,10 +914,101 @@ class MainWindow():
                 exito = objData.asociar_coordinador_a_paciente(id_paciente, id_profesional)
                 mBox = QMessageBox()
                 if exito:
-                        mBox.setText("Coordinador asociado al paciente correctamente.")
+                    mBox.setWindowTitle('Mensaje')
+                    mBox.setText("Coordinador asociado al paciente correctamente.")
                 else:
-                        mBox.setText("No se pudo asociar el coordinador al paciente.")
+                    mBox.setWindowTitle('Error')
+                    mBox.setText("No se pudo asociar el coordinador al paciente.")
                 self.nCoord.close() #Cierro la ventana
         except Exception:
             mBox = QMessageBox()
+            mBox.setWindowTitle('Mensaje')
             mBox.setText('Seleccione un coordinador')    
+
+############### Archivos ################
+
+    def cargarArchivos(self, id_paciente):
+        # Obtener la lista de archivos relacionados con el paciente desde la base de datos
+        lis = ArchivosData()
+        archivos = lis.obtener_archivos_por_paciente(id_paciente)
+        
+        if archivos:
+            self.arc.swArchivos.setCurrentIndex(0)
+            # Configura la tabla
+            self.arc.tableWidget.setRowCount(len(archivos))
+            self.arc.tableWidget.setColumnCount(2)  # Dos columnas para nombre y tipo de archivo
+            self.arc.tableWidget.setHorizontalHeaderLabels(["Archivo", "Tipo"])
+
+            # Añade los archivos a la tabla
+            for fila, archivo in enumerate(archivos):
+                # Añade los archivos a la tabla
+                nombre_archivo = archivo[0]  # Accede al primer elemento de la tupla (nombre_archivo)
+                contenido_archivo = archivo[1]  # Accede al segundo elemento de la tupla (contenido)
+
+                # Agregar el nombre del archivo a la celda
+                item_nombre = QTableWidgetItem(nombre_archivo)
+                self.arc.tableWidget.setItem(fila, 0, item_nombre)
+
+                # Obtener un ícono genérico o personalizado para el tipo de archivo
+                # Aquí usaremos un ícono predeterminado de archivos
+                icono_archivo = QIcon("path_to_generic_icon.png")  # Puedes usar un ícono de tu elección
+
+                # Agregar el ícono a la celda correspondiente
+                item_icono = QTableWidgetItem()  # Crear un QTableWidgetItem vacío
+                item_icono.setIcon(icono_archivo)  # Establecer el ícono en el QTableWidgetItem
+                self.arc.tableWidget.setItem(fila, 1, item_icono)
+
+                # Guardar el contenido del archivo en un atributo del widget
+                item_nombre.setData(Qt.ItemDataRole.UserRole, contenido_archivo)
+
+            self.arc.show()
+        else:
+            self.arc.swArchivos.setCurrentIndex(1)
+            self.arc.show()
+        self.arc.btnAgregar.clicked.connect(lambda: self.abrirArchivo(id_paciente))
+
+    def manejarCeldaClic(self, item):
+        '''Maneja el clic en una celda de la tabla de archivos'''
+        # Verificar si el ítem tiene datos de usuario (UserRole)
+        contenido_archivo = item.data(Qt.ItemDataRole.UserRole)
+        if contenido_archivo:
+            # Aquí puedes manejar la apertura o visualización del archivo según sea necesario
+            print(f"Contenido del archivo seleccionado: {contenido_archivo}")
+
+    def abrirArchivo(self, id_paciente):
+        '''Abre el buscador de archivos para poder cargar un archivo'''
+        options = QFileDialog.Option.DontUseNativeDialog
+        dir = QStandardPaths.writableLocation(QStandardPaths.StandardLocation.DocumentsLocation)
+        file_types = "All files(*)"
+        data_file, _ = QFileDialog.getOpenFileName(self.arc, "Abrir Archivo", dir, file_types, options=options)
+        if data_file:
+            print(f"Archivo seleccionado: {data_file}")
+            with open(data_file, 'rb') as file:
+                contenido = file.read()
+                nombre_archivo = os.path.basename(data_file)
+                # Guardar el archivo en la base de datos
+                lis = ArchivosData()
+                lis.guardar_archivo(nombre_archivo, contenido, id_paciente)
+
+                # Recargar la tabla de archivos
+                self.cargarArchivos(id_paciente)
+
+    # def manejarCeldaClic(self, item):
+    #     '''Maneja el clic en una celda de la tabla de archivos'''
+    #     # Verificar si el ítem tiene datos de usuario (UserRole)
+    #     contenido_archivo = item.data(Qt.UserRole)
+    #     if contenido_archivo:
+    #         # Guardar el contenido del archivo en un archivo temporal
+    #         try:
+    #             temp_file = tempfile.NamedTemporaryFile(delete=False)
+    #             temp_file.write(contenido_archivo)
+    #             temp_file.close()
+
+    #             # Abrir el archivo temporal con la aplicación predeterminada del sistema
+    #             os.startfile(temp_file.name)  # Esto funciona en Windows
+
+    #         except Exception as e:
+    #             mBox = QMessageBox()
+    #             mBox.setWindowTitle('Error')
+    #             mBox.setText(f"No se pudo abrir el archivo: {str(e)}")
+                

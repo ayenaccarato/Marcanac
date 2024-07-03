@@ -136,9 +136,9 @@ QPushButton:hover {
             <property name="font">
              <font>
               <family>Segoe UI</family>
-              <pointsize>12</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
+              <pointsize>10</pointsize>
+              <weight>50</weight>
+              <bold>false</bold>
              </font>
             </property>
             <property name="cursor">
@@ -148,7 +148,17 @@ QPushButton:hover {
              <string notr="true">color: rgb(71, 40, 37);</string>
             </property>
             <property name="text">
-             <string>Cargar profesional</string>
+             <string>Agregar</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>imagenes/profesional.png</normaloff>imagenes/profesional.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>25</width>
+              <height>25</height>
+             </size>
             </property>
            </widget>
           </item>
