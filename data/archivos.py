@@ -50,7 +50,7 @@ class ArchivosData():
             self.db = con.Conexion().conectar()
             self.cursor = self.db.cursor()
             self.cursor.execute('''
-                SELECT id_archivo, nombre_archivo
+                SELECT id_archivo, nombre_archivo, contenido
                 FROM archivos
                 WHERE id_paciente = ?
             ''', (id_paciente,))

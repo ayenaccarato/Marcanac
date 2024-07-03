@@ -936,35 +936,27 @@ class MainWindow():
             self.arc.swArchivos.setCurrentIndex(0)
             # Configura la tabla
             self.arc.tableWidget.setRowCount(len(archivos))
-            self.arc.tableWidget.setColumnCount(2)  # Dos columnas para nombre y tipo de archivo
-            self.arc.tableWidget.setHorizontalHeaderLabels(["Archivo", "Tipo"])
+            self.arc.tableWidget.setColumnCount(1)
+            self.arc.tableWidget.setHorizontalHeaderLabels(["Archivo"])
 
             # Añade los archivos a la tabla
             for fila, archivo in enumerate(archivos):
                 # Añade los archivos a la tabla
-                nombre_archivo = archivo[0]  # Accede al primer elemento de la tupla (nombre_archivo)
-                contenido_archivo = archivo[1]  # Accede al segundo elemento de la tupla (contenido)
+                nombre_archivo = archivo[1]  # Accede al primer elemento de la tupla (nombre_archivo)
+                contenido_archivo = archivo[2]  # Accede al segundo elemento de la tupla (contenido)
 
                 # Agregar el nombre del archivo a la celda
                 item_nombre = QTableWidgetItem(nombre_archivo)
                 self.arc.tableWidget.setItem(fila, 0, item_nombre)
-
-                # Obtener un ícono genérico o personalizado para el tipo de archivo
-                # Aquí usaremos un ícono predeterminado de archivos
-                icono_archivo = QIcon("path_to_generic_icon.png")  # Puedes usar un ícono de tu elección
-
-                # Agregar el ícono a la celda correspondiente
-                item_icono = QTableWidgetItem()  # Crear un QTableWidgetItem vacío
-                item_icono.setIcon(icono_archivo)  # Establecer el ícono en el QTableWidgetItem
-                self.arc.tableWidget.setItem(fila, 1, item_icono)
-
-                # Guardar el contenido del archivo en un atributo del widget
+               
+                # Guardar el contenido del archivo en el QTableWidgetItem
                 item_nombre.setData(Qt.ItemDataRole.UserRole, contenido_archivo)
-
+                self.arc.tableWidget.cellDoubleClicked.connect(lambda: self.manejarDobleClic(fila))
             self.arc.show()
         else:
             self.arc.swArchivos.setCurrentIndex(1)
             self.arc.show()
+        
         self.arc.btnAgregar.clicked.connect(lambda: self.abrirArchivo(id_paciente))
 
     def manejarCeldaClic(self, item):
@@ -977,10 +969,10 @@ class MainWindow():
 
     def abrirArchivo(self, id_paciente):
         '''Abre el buscador de archivos para poder cargar un archivo'''
-        options = QFileDialog.Option.DontUseNativeDialog
+        options = QFileDialog.Option
         dir = QStandardPaths.writableLocation(QStandardPaths.StandardLocation.DocumentsLocation)
         file_types = "All files(*)"
-        data_file, _ = QFileDialog.getOpenFileName(self.arc, "Abrir Archivo", dir, file_types, options=options)
+        data_file, _ = QFileDialog.getOpenFileName(self.arc, "Abrir Archivo", dir, file_types)
         if data_file:
             print(f"Archivo seleccionado: {data_file}")
             with open(data_file, 'rb') as file:
@@ -990,25 +982,22 @@ class MainWindow():
                 lis = ArchivosData()
                 lis.guardar_archivo(nombre_archivo, contenido, id_paciente)
 
+
                 # Recargar la tabla de archivos
                 self.cargarArchivos(id_paciente)
 
-    # def manejarCeldaClic(self, item):
-    #     '''Maneja el clic en una celda de la tabla de archivos'''
-    #     # Verificar si el ítem tiene datos de usuario (UserRole)
-    #     contenido_archivo = item.data(Qt.UserRole)
-    #     if contenido_archivo:
-    #         # Guardar el contenido del archivo en un archivo temporal
-    #         try:
-    #             temp_file = tempfile.NamedTemporaryFile(delete=False)
-    #             temp_file.write(contenido_archivo)
-    #             temp_file.close()
+    def manejarDobleClic(self, fila):
+        item = self.arc.tableWidget.item(fila, 0)
+        contenido_archivo = item.data(Qt.ItemDataRole.UserRole)
+        if contenido_archivo:
+            # Crear un archivo temporal para abrirlo con la aplicación predeterminada
+            temp_file_path = os.path.join(QStandardPaths.writableLocation(QStandardPaths.StandardLocation.TempLocation), item.text())
+            with open(temp_file_path, 'wb') as temp_file:
+                temp_file.write(contenido_archivo)
 
-    #             # Abrir el archivo temporal con la aplicación predeterminada del sistema
-    #             os.startfile(temp_file.name)  # Esto funciona en Windows
-
-    #         except Exception as e:
-    #             mBox = QMessageBox()
-    #             mBox.setWindowTitle('Error')
-    #             mBox.setText(f"No se pudo abrir el archivo: {str(e)}")
+            # Abrir el archivo con la aplicación predeterminada del sistema
+            if os.name == 'nt':  # Windows
+               os.startfile(temp_file_path) 
+            # elif os.name == 'posix':  # macOS, Linux
+            #     subprocess.call(('xdg-open', temp_file_path))
                 
