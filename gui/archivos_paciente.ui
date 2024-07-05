@@ -164,6 +164,13 @@ QPushButton:hover {
      </widget>
     </widget>
    </item>
+   <item>
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Nota: Los archivos se abrirán haciendo doble click sobre el nombre</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>

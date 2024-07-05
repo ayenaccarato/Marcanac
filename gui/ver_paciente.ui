@@ -1185,6 +1185,28 @@ color: rgb(255, 255, 255);</string>
               </widget>
              </widget>
             </item>
+            <item row="20" column="3">
+             <widget class="QPushButton" name="btnEliminar">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>12</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="cursor">
+               <cursorShape>PointingHandCursor</cursorShape>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(255, 0, 0);</string>
+              </property>
+              <property name="text">
+               <string>Eliminar</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
          </layout>

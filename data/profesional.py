@@ -29,12 +29,17 @@ class ProfesionalData():
             monotributo BOOLEAN,
             coord BOOLEAN,
             profesional TEXT,
-            codTransf TEXT UNIQUE
+            cuidador BOOLEAN,
+            codTransf TEXT UNIQUE,
+            nombre2 TEXT,
+            apellido2 TEXT,
+            CUIT2 TEXT UNIQUE DEFAULT NULL,
+            cbu3 TEXT
             )"""
             
             self.cursor.execute(sql_create_profesionales)
             
-            # Crea el trigger para verificar unicidad en cbu1 y cbu2
+            # Crea el trigger para verificar unicidad y longitud de los campos cbu1 y cbu2, y solo longitud de cbu3
             sql_create_trigger = """
             CREATE TRIGGER IF NOT EXISTS unique_cbu_and_others
             BEFORE INSERT ON profesionales
@@ -54,6 +59,21 @@ class ProfesionalData():
                 SELECT CASE
                     WHEN EXISTS (SELECT 1 FROM profesionales WHERE cbu1 = NEW.cbu2 OR cbu2 = NEW.cbu2) THEN
                         RAISE(ABORT, 'CBU2 ya existe')
+                END;
+                -- Verificar longitud de cbu1
+                SELECT CASE
+                    WHEN LENGTH(NEW.cbu1) != 22 THEN
+                        RAISE(ABORT, 'CBU1 debe tener 22 caracteres')
+                END;
+                -- Verificar longitud de cbu2
+                SELECT CASE
+                    WHEN LENGTH(NEW.cbu2) != 22 THEN
+                        RAISE(ABORT, 'CBU2 debe tener 22 caracteres')
+                END;
+                -- Verificar longitud de cbu3
+                SELECT CASE
+                    WHEN LENGTH(NEW.cbu3) != 0 AND LENGTH(NEW.cbu3) != 22 THEN
+                        RAISE(ABORT, 'CBU3 debe estar vacío o tener 22 caracteres')
                 END;
                 -- Verificar unicidad de matricula
                 SELECT CASE
@@ -86,14 +106,15 @@ class ProfesionalData():
             self.cursor.execute("""
             INSERT INTO profesionales values
             (null, '{}', '{}', '{}', '{}', '{}', 
-            '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')
+            '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', 
+                                '{}', '{}', '{}', '{}', '{}', '{}')
             """.format(profesional._nombre, profesional._apellido, profesional._domicilio,
                     profesional._localidad, profesional._CUIT, profesional._fechaNacimiento, 
                     profesional._codPostal, profesional._matricula, profesional._telefono, 
                     profesional._cbu1, profesional._cbu2, profesional._alias, profesional._mail, 
                     profesional._monotributo, profesional._coord, profesional._profesional, 
-                    profesional._codTransf))
-            
+                    profesional._cuidador, profesional._codTransf, profesional._nombre2, 
+                    profesional._apellido2, profesional._CUIT2, profesional._cbu3))
             
             self.db.commit()
 
@@ -132,14 +153,16 @@ class ProfesionalData():
                 nombre = '{}', apellido = '{}', domicilio = '{}', localidad = '{}', CUIT = '{}', 
                 fechaNacimiento = '{}', codPostal = '{}', matricula = '{}', telefono = '{}', 
                 cbu1 = '{}', cbu2 = '{}', alias = '{}', mail = '{}', monotributo = '{}', 
-                coord = '{}', profesional = '{}', codTransf = '{}' 
+                coord = '{}', profesional = '{}', cuidador = '{}', codTransf = '{}', nombre2 = '{}', apellido2 = '{}',
+                CUIT2 = '{}', cbu3 = '{}' 
                 WHERE id = '{}'""".format(
                 profesional._nombre, profesional._apellido, profesional._domicilio,
                 profesional._localidad, profesional._CUIT, profesional._fechaNacimiento, 
                 profesional._codPostal, profesional._matricula, profesional._telefono, 
                 profesional._cbu1, profesional._cbu2, profesional._alias, profesional._mail, 
                 profesional._monotributo, profesional._coord, profesional._profesional, 
-                profesional._codTransf, id)
+                profesional._cuidador, profesional._codTransf, profesional._nombre2, 
+                profesional._apellido2, profesional._CUIT2, profesional._cbu3, id)
 
             self.cursor.execute(sql_update)
             self.db.commit()

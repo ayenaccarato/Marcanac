@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>545</width>
-    <height>327</height>
+    <width>540</width>
+    <height>460</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -118,6 +118,36 @@ QPushButton:hover {
             </property>
            </widget>
           </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnCarpeta">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>imagenes/carpeta.png</normaloff>imagenes/carpeta.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -132,8 +162,8 @@ QPushButton:hover {
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
            <layout class="QGridLayout" name="gridLayout">
-            <item row="4" column="3">
-             <widget class="QLineEdit" name="txtTelefono">
+            <item row="10" column="1">
+             <widget class="QLineEdit" name="txtNombre_2">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -145,21 +175,8 @@ QPushButton:hover {
               </property>
              </widget>
             </item>
-            <item row="5" column="2">
-             <widget class="QLabel" name="label_11">
-              <property name="font">
-               <font>
-                <family>Segoe UI</family>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>Profesion</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="1">
-             <widget class="QLineEdit" name="txtCP">
+            <item row="11" column="1">
+             <widget class="QLineEdit" name="txtCuit_2">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -171,8 +188,8 @@ QPushButton:hover {
               </property>
              </widget>
             </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_2">
+            <item row="10" column="0">
+             <widget class="QLabel" name="label_18">
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -184,8 +201,8 @@ QPushButton:hover {
               </property>
              </widget>
             </item>
-            <item row="4" column="2">
-             <widget class="QLabel" name="label_9">
+            <item row="10" column="2">
+             <widget class="QLabel" name="label_19">
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -193,12 +210,196 @@ QPushButton:hover {
                </font>
               </property>
               <property name="text">
-               <string>Teléfono</string>
+               <string>Apellido</string>
               </property>
              </widget>
             </item>
-            <item row="5" column="1">
-             <widget class="QLineEdit" name="txtMail">
+            <item row="11" column="0">
+             <widget class="QLabel" name="label_20">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>CUIT</string>
+              </property>
+             </widget>
+            </item>
+            <item row="11" column="2">
+             <widget class="QLabel" name="label_21">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>CBU</string>
+              </property>
+             </widget>
+            </item>
+            <item row="11" column="3">
+             <widget class="QLineEdit" name="txtCbu3">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+             </widget>
+            </item>
+            <item row="10" column="3">
+             <widget class="QLineEdit" name="txtApellido_2">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+             </widget>
+            </item>
+            <item row="9" column="0" colspan="4">
+             <widget class="QFrame" name="frame_2">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>42</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QFrame {
+	background-color: rgb(255, 170, 127);
+}</string>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::StyledPanel</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_2">
+               <item>
+                <widget class="QLabel" name="label_17">
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>12</pointsize>
+                   <weight>75</weight>
+                   <bold>true</bold>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Pago a Terceros</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item row="7" column="1">
+             <widget class="QLineEdit" name="txtCodigo">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="3">
+             <widget class="QLineEdit" name="txtAlias">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="0">
+             <widget class="QLabel" name="label_15">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Código Transferencia</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QLabel" name="label_3">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Apellido</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLineEdit" name="txtNombre">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLineEdit" name="txtDomicilio">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="2">
+             <widget class="QLabel" name="label_5">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Localidad</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="3">
+             <widget class="QLineEdit" name="txtApellido">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -211,7 +412,7 @@ QPushButton:hover {
              </widget>
             </item>
             <item row="4" column="0">
-             <widget class="QLabel" name="label_8">
+             <widget class="QLabel" name="label_10">
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -219,12 +420,41 @@ QPushButton:hover {
                </font>
               </property>
               <property name="text">
-               <string>Código Postal</string>
+               <string>Mail</string>
               </property>
              </widget>
             </item>
-            <item row="2" column="3">
-             <widget class="QLineEdit" name="txtLocalidad">
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_4">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Domicilio</string>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="1">
+             <widget class="QCheckBox" name="coordinador">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Coordinador</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="3">
+             <widget class="QLineEdit" name="txtCbu1">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -236,8 +466,11 @@ QPushButton:hover {
               </property>
              </widget>
             </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_6">
+            <item row="8" column="0">
+             <widget class="QCheckBox" name="monotributo">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -245,11 +478,63 @@ QPushButton:hover {
                </font>
               </property>
               <property name="text">
-               <string>Fecha de Nacimiento</string>
+               <string>Monotributo</string>
               </property>
              </widget>
             </item>
-            <item row="5" column="3">
+            <item row="5" column="2">
+             <widget class="QLabel" name="label_12">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>CBU 1</string>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="0">
+             <widget class="QLabel" name="label_13">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>CBU 2</string>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="1">
+             <widget class="QLineEdit" name="txtCbu2">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="2">
+             <widget class="QLabel" name="label_14">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Alias</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="3">
              <widget class="QComboBox" name="cbProfesional">
               <property name="enabled">
                <bool>false</bool>
@@ -297,6 +582,19 @@ QPushButton:hover {
               </item>
              </widget>
             </item>
+            <item row="1" column="3">
+             <widget class="QLineEdit" name="txtCuit">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+             </widget>
+            </item>
             <item row="1" column="1">
              <widget class="QDateEdit" name="txtFechaN">
               <property name="enabled">
@@ -313,6 +611,19 @@ QPushButton:hover {
               </property>
              </widget>
             </item>
+            <item row="5" column="0">
+             <widget class="QLabel" name="label_16">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Matrícula</string>
+              </property>
+             </widget>
+            </item>
             <item row="1" column="2">
              <widget class="QLabel" name="label_7">
               <property name="font">
@@ -326,33 +637,7 @@ QPushButton:hover {
               </property>
              </widget>
             </item>
-            <item row="1" column="3">
-             <widget class="QLineEdit" name="txtCuit">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="font">
-               <font>
-                <family>Segoe UI</family>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="0">
-             <widget class="QLabel" name="label_16">
-              <property name="font">
-               <font>
-                <family>Segoe UI</family>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>Matrícula</string>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="1">
+            <item row="5" column="1">
              <widget class="QLineEdit" name="txtMatricula">
               <property name="enabled">
                <bool>false</bool>
@@ -365,8 +650,8 @@ QPushButton:hover {
               </property>
              </widget>
             </item>
-            <item row="2" column="1">
-             <widget class="QLineEdit" name="txtDomicilio">
+            <item row="3" column="1">
+             <widget class="QLineEdit" name="txtCP">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -378,8 +663,21 @@ QPushButton:hover {
               </property>
              </widget>
             </item>
-            <item row="0" column="1">
-             <widget class="QLineEdit" name="txtNombre">
+            <item row="4" column="2">
+             <widget class="QLabel" name="label_11">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Profesion</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="3">
+             <widget class="QLineEdit" name="txtTelefono">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -391,8 +689,8 @@ QPushButton:hover {
               </property>
              </widget>
             </item>
-            <item row="2" column="2">
-             <widget class="QLabel" name="label_5">
+            <item row="3" column="2">
+             <widget class="QLabel" name="label_9">
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -400,25 +698,12 @@ QPushButton:hover {
                </font>
               </property>
               <property name="text">
-               <string>Localidad</string>
+               <string>Teléfono</string>
               </property>
              </widget>
             </item>
-            <item row="0" column="2">
-             <widget class="QLabel" name="label_3">
-              <property name="font">
-               <font>
-                <family>Segoe UI</family>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>Apellido</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="3">
-             <widget class="QLineEdit" name="txtApellido">
+            <item row="4" column="1">
+             <widget class="QLineEdit" name="txtMail">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -430,8 +715,8 @@ QPushButton:hover {
               </property>
              </widget>
             </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="label_4">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_2">
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -439,12 +724,12 @@ QPushButton:hover {
                </font>
               </property>
               <property name="text">
-               <string>Domicilio</string>
+               <string>Nombre</string>
               </property>
              </widget>
             </item>
-            <item row="5" column="0">
-             <widget class="QLabel" name="label_10">
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_6">
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -452,15 +737,12 @@ QPushButton:hover {
                </font>
               </property>
               <property name="text">
-               <string>Mail</string>
+               <string>Fecha de Nacimiento</string>
               </property>
              </widget>
             </item>
-            <item row="10" column="1">
-             <widget class="QCheckBox" name="coordinador">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_8">
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -468,41 +750,12 @@ QPushButton:hover {
                </font>
               </property>
               <property name="text">
-               <string>Coordinador</string>
+               <string>Código Postal</string>
               </property>
              </widget>
             </item>
-            <item row="10" column="0">
-             <widget class="QCheckBox" name="monotributo">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="font">
-               <font>
-                <family>Segoe UI</family>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>Monotributo</string>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="2">
-             <widget class="QLabel" name="label_12">
-              <property name="font">
-               <font>
-                <family>Segoe UI</family>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>CBU 1</string>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="3">
-             <widget class="QLineEdit" name="txtCbu1">
+            <item row="2" column="3">
+             <widget class="QLineEdit" name="txtLocalidad">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -514,85 +767,7 @@ QPushButton:hover {
               </property>
              </widget>
             </item>
-            <item row="7" column="0">
-             <widget class="QLabel" name="label_13">
-              <property name="font">
-               <font>
-                <family>Segoe UI</family>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>CBU 2</string>
-              </property>
-             </widget>
-            </item>
-            <item row="7" column="1">
-             <widget class="QLineEdit" name="txtCbu2">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="font">
-               <font>
-                <family>Segoe UI</family>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-             </widget>
-            </item>
-            <item row="7" column="2">
-             <widget class="QLabel" name="label_14">
-              <property name="font">
-               <font>
-                <family>Segoe UI</family>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>Alias</string>
-              </property>
-             </widget>
-            </item>
-            <item row="7" column="3">
-             <widget class="QLineEdit" name="txtAlias">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="font">
-               <font>
-                <family>Segoe UI</family>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-             </widget>
-            </item>
-            <item row="8" column="0">
-             <widget class="QLabel" name="label_15">
-              <property name="font">
-               <font>
-                <family>Segoe UI</family>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>Código Transferencia</string>
-              </property>
-             </widget>
-            </item>
-            <item row="8" column="1">
-             <widget class="QLineEdit" name="txtCodigo">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="font">
-               <font>
-                <family>Segoe UI</family>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-             </widget>
-            </item>
-            <item row="10" column="3">
+            <item row="12" column="3">
              <widget class="QPushButton" name="btnModificar">
               <property name="font">
                <font>
@@ -608,6 +783,22 @@ color: rgb(255, 255, 255);</string>
               </property>
               <property name="text">
                <string>Modificar</string>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="2">
+             <widget class="QCheckBox" name="cuidador">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Cuidador</string>
               </property>
              </widget>
             </item>

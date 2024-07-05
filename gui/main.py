@@ -1,20 +1,19 @@
 import json
 import os
-import sqlite3
-import tempfile
-from PyQt6.QtGui import QIcon
-from PyQt6 import uic, QtCore, QtWidgets
-from PyQt6.QtCore import Qt, QDate, QStandardPaths, QByteArray, QMimeType
+
+from PyQt6.QtGui import QColor
+from PyQt6 import uic, QtCore
+from PyQt6.QtCore import Qt, QDate, QStandardPaths
 from PyQt6.QtWidgets import QMessageBox, QTableWidgetItem, QPushButton, QWidget, QHBoxLayout, QFileDialog
-from data.archivos import ArchivosData
+
+from data.archivos_paciente import ArchivosPacienteData
+from data.archivos_profesional import ArchivosProfesionalData
 from data.insumos import InsumoData
 from data.listados import ListadoData
 from data.paciente import PacienteData
 from data.paciente_coordinador import PacienteCoordinadorData
-from data.paciente_insumo import PacienteInsumoData
 from data.paciente_profesionales import PacienteProfesionalesData
 from data.profesional import ProfesionalData
-from gui.nuevo_paciente import NuevoPacienteWindow
 from model.insumo import Insumo
 from model.paciente import Paciente
 from model.profesional import Profesional
@@ -56,6 +55,7 @@ class MainWindow():
         self.listado = uic.loadUi("gui/listado_pacientes.ui") #Abre la interafz del listado
         self.ver = uic.loadUi("gui/ver_paciente.ui")
         self.actPac = uic.loadUi("gui/modificar_paciente.ui")
+        self.ePac = uic.loadUi("gui/mensaje_eliminar_pac.ui")
         #Profesional
         self.prof = uic.loadUi("gui/nuevo_profesional.ui")
         self.listadoProf = uic.loadUi("gui/listado_profesionales.ui")
@@ -69,7 +69,8 @@ class MainWindow():
         #Coordinador
         self.nCoord = uic.loadUi("gui/asociar_coordinador.ui")
         #Archivos
-        self.arc = uic.loadUi("gui/archivos.ui")
+        self.arc = uic.loadUi("gui/archivos_paciente.ui")
+        self.arcP = uic.loadUi("gui/archivos_profesional.ui")
 
 #Métodos de controles de botones del main  
     def control_btnMinimizar(self):
@@ -132,18 +133,16 @@ class MainWindow():
             mBox.setWindowTitle('Mensaje')
             mBox.setText("Seleccione una obra social o módulo")
             mBox.exec()
-            #self.nuevo.cbTipo.setFocus()
         elif len(self.nuevo.txtDocumento.text()) < 8:  
             mBox.setWindowTitle('Error')         
             mBox.setText("El número de documento ingresado es inválido")
             mBox.exec()
-            #self.nuevo.txtApellido.setFocus() #Va al campo que debe completar
         else:
             fechaN = self.nuevo.txtFechaN.date().toPyDate().strftime("%d/%m/%Y") #formateo la fecha
             fechaI = self.nuevo.txtFechaI.date().toPyDate().strftime("%d/%m/%Y")
             
             subm =json.dumps(self.agruparSubm('nuevo')) #Serializo el diccionario
-            print(subm)
+            
             equi = json.dumps(self.agruparEquip('nuevo'))
             asisR = json.dumps(self.agruparAsisR('nuevo'))
             nuevoPaciente = Paciente(
@@ -159,7 +158,6 @@ class MainWindow():
                 fechaIngreso = fechaI,
                 fechaEgreso = "",
                 motivo = "",
-                activo = True,
                 familiar = self.nuevo.txtFamiliar.text(),
                 modulo = self.nuevo.cbModulo.currentText(),
                 submodulo = subm,
@@ -188,11 +186,11 @@ class MainWindow():
         self.nuevo.txtDomicilio.clear()
         self.nuevo.txtLocalidad.clear()
         self.nuevo.txtDocumento.clear()
-        self.nuevo.txtFechaNacimiento.setDate(QtCore.QDate.currentDate())  # Restablece la fecha de nacimiento a la fecha actual
+        self.nuevo.txtFechaN.setDate(QtCore.QDate.currentDate())  # Restablece la fecha de nacimiento a la fecha actual
         self.nuevo.cbObraSocial.setCurrentIndex(0)  # Restablece el combobox a su estado inicial
         self.nuevo.txtNroAfi.clear()
         self.nuevo.txtTelefono.clear()
-        self.nuevo.txtFechaIngreso.setDate(QtCore.QDate.currentDate())  # Restablece la fecha de ingreso a la fecha actual
+        self.nuevo.txtFechaI.setDate(QtCore.QDate.currentDate())  # Restablece la fecha de ingreso a la fecha actual
         self.nuevo.txtFamiliar.clear()
         self.nuevo.cbModulo.setCurrentIndex(0)  # Restablece el combobox a su estado inicial
         self.nuevo.cbSN.setCurrentIndex(0)  # Restablece el combobox a su estado inicial
@@ -208,6 +206,29 @@ class MainWindow():
         self.nuevo.arA.setChecked(False)
         self.nuevo.arB.setChecked(False)
         self.nuevo.arC.setChecked(False)
+
+    def eliminar_paciente(self, id_paciente):
+        self.ePac.show()
+        # Mostrar un cuadro de diálogo de confirmación
+        self.ePac.btnCancelar.clicked.connect(lambda: self.ePac.close())
+        self.ePac.btnConfirmar.clicked.connect(lambda: self.confirmar(id_paciente))
+        
+    def confirmar(self, id_paciente):
+        '''Se elimina el paciente, si confirman'''
+        self.ePac.close()
+        paciente = PacienteData()
+        eliminado = paciente.eliminar(id_paciente)
+
+        mBox = QMessageBox()
+        if eliminado:  
+            mBox.setWindowTitle('Mensaje')             
+            mBox.setText("Paciente eliminado")                   
+        else:
+            mBox.setWindowTitle('Error')
+            mBox.setText("El paciente no pudo ser eliminado")
+            
+        mBox.exec()            
+        self.ver.close()
    
 ############# Listado ################
     def boton_listado(self, id_valor, fila, lista):
@@ -226,7 +247,7 @@ class MainWindow():
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         if lista == 'paciente':
-            self.listado.tblListado.setCellWidget(fila, 4, widget)
+            self.listado.tblListado.setCellWidget(fila, 3, widget)
         else:
             self.listadoProf.tblListadoProf.setCellWidget(fila, 7, widget)
 
@@ -240,10 +261,10 @@ class MainWindow():
             self.listado.tblListado.setItem(fila, 1, QTableWidgetItem(str(item[1]))) #Nombre
             self.listado.tblListado.setItem(fila, 2, QTableWidgetItem(str(item[10]))) #Fecha de ingreso
             
-            if item[11] == '':
-                self.listado.tblListado.setItem(fila, 3, QTableWidgetItem("Activo"))
+            if item[11] == '':                
+                self.setRowBackgroundColor(fila, QColor(170, 255, 127))  # Verde
             else:
-               self.listado.tblListado.setItem(fila, 3, QTableWidgetItem("Inactivo"))
+               self.setRowBackgroundColor(fila, QColor(255, 88, 66))  # Rojo
             
             id_valor = item[0]
             
@@ -258,6 +279,14 @@ class MainWindow():
         self.listado.btnLista.setVisible(False)
         self.limpiar_campos_busqueda('paciente')
         self.listado.show()
+
+    def setRowBackgroundColor(self, row, color):
+        # Verificar si la fila existe en la tabla antes de establecer el color
+        if row < self.listado.tblListado.rowCount():
+            for col in range(self.listado.tblListado.columnCount()):
+                item = self.listado.tblListado.item(row, col)
+                if item:
+                    item.setBackground(color)
 
     def buscarPac(self):
         if self.listado.txtApellido.text() == '' and self.listado.txtDocumento.text() == '':
@@ -346,26 +375,24 @@ class MainWindow():
 
         
         self.ver.txtMotivo.setText(paciente[12])   
-        self.ver.txtFamiliar.setText(paciente[14])
-        self.ver.cbModulo.setCurrentText(paciente[15])
+        self.ver.txtFamiliar.setText(paciente[13])
+        self.ver.cbModulo.setCurrentText(paciente[14])
 
-        dic = json.loads(paciente[16])
+        dic = json.loads(paciente[15])
         
         #Submodulo
-        self.ver.fono.setChecked(dic['Fono'])
-        print(dic['Fono'])
-        self.ver.to.setChecked(dic['TO'])
-        print(dic['TO'])
+        self.ver.fono.setChecked(dic["Fono"])        
+        self.ver.to.setChecked(dic['TO'])        
         self.ver.psico.setChecked(dic['Psico'])
-        print(dic['Psico'])
-        dicE = json.loads(paciente[17])
+        
+        dicE = json.loads(paciente[16])
         #Equipamiento
         self.ver.cama.setChecked(dicE['Cama'])
         self.ver.colchon.setChecked(dicE['Colchon'])
         self.ver.silla.setChecked(dicE['Silla'])
 
-        self.ver.cbSN.setCurrentText(paciente[18])
-        dicA = json.loads(paciente[19])
+        self.ver.cbSN.setCurrentText(paciente[17])
+        dicA = json.loads(paciente[18])
         #Asistencia Respiratoria
         self.ver.arA.setChecked(dicA['A'])
         self.ver.arB.setChecked(dicA['B'])
@@ -375,6 +402,7 @@ class MainWindow():
         self.ver.btnInsumos.clicked.connect(lambda: self.mostrarInsumos(id))        
         self.ver.btnProfesionales.clicked.connect(lambda: self.mostrarProfesionales(id))
         self.ver.btnCarpeta.clicked.connect(lambda: self.cargarArchivos(id))
+        self.ver.btnEliminar.clicked.connect(lambda: self.eliminar_paciente(id))
 
         self.ver.show()
 
@@ -444,10 +472,8 @@ class MainWindow():
         fechaI = self.actPac.txtFechaI.date().toPyDate().strftime("%d/%m/%Y")
         fecha = self.actPac.txtFechaE.date().toPyDate().strftime("%d/%m/%Y")
         
-        act = True
         if fecha != "01/01/2000": 
             fechaE = fecha
-            act = False
         else:
             fechaE = ""
 
@@ -468,7 +494,6 @@ class MainWindow():
                 fechaIngreso = fechaI,
                 fechaEgreso = fechaE,
                 motivo = self.actPac.txtMotivo.text(),
-                activo = act,
                 familiar = self.actPac.txtFamiliar.text(),
                 modulo = self.actPac.cbModulo.currentText(),
                 submodulo = subm,
@@ -488,6 +513,7 @@ class MainWindow():
             mBox.setText(f"El paciente no pudo ser actualizado: {error_message}")
         mBox.exec()
         self.actPac.close() #Cierro la ventana
+        self.ver.show()
 
 ############### Profesionales ##################
 
@@ -501,12 +527,18 @@ class MainWindow():
             mBox.setWindowTitle('Mensaje')        
             mBox.setText("Seleccione una profesión")
             mBox.exec()
-            #self.nuevo.cbTipo.setFocus()
-        elif len(self.prof.txtCbu1.text()) < 22 or len(self.prof.txtCbu2.text()) < 22:           
-            mBox.setWindowTitle('Error')
-            mBox.setText("El CBU ingresado es inválido. Debe contener 22 números")
-            mBox.exec()
-            #self.nuevo.txtApellido.setFocus() #Va al campo que debe completar
+        # elif len(self.prof.txtCbu1.text()) < 22:           
+        #     mBox.setWindowTitle('Error')
+        #     mBox.setText("El CBU 1 ingresado es inválido. Debe contener 22 números")
+        #     mBox.exec()
+        # elif len(self.prof.txtCbu2.text()) < 22:           
+        #     mBox.setWindowTitle('Error')
+        #     mBox.setText("El CBU 2 ingresado es inválido. Debe contener 22 números")
+        #     mBox.exec()   
+        # elif len(self.prof.txtCbu3.text()) != 0 and len(self.prof.txtCbu3.text()) < 22:           
+        #     mBox.setWindowTitle('Error')
+        #     mBox.setText("El CBU 3 ingresado es inválido. Debe contener 22 números")
+        #     mBox.exec()          
         else:
             fechaN = self.nuevo.txtFechaN.date().toPyDate().strftime("%d/%m/%Y") #formateo la fecha
                         
@@ -527,7 +559,13 @@ class MainWindow():
                 monotributo = self.prof.monotributo.isChecked(),
                 coord = self.prof.coordinador.isChecked(),
                 profesional = self.prof.cbProfesional.currentText(),
-                codTransf = self.prof.txtCodigo.text(),                
+                cuidador = self.prof.cuidador.isChecked(),
+                codTransf = self.prof.txtCodigo.text(), 
+                ### Datos de pago a terceros ### 
+                nombre2 = self.prof.txtNombre_2.text(),
+                apellido2 = self.prof.txtApellido_2.text(),
+                CUIT2 = self.prof.txtCuit_2.text(),
+                cbu3 = self.prof.txtCbu3.text()         
             )
 
             objData = ProfesionalData()
@@ -551,12 +589,12 @@ class MainWindow():
         self.prof.txtDomicilio.clear()
         self.prof.txtLocalidad.clear()
         self.prof.txtCuit.clear()
-        self.prof.txtFechaNacimiento.setDate(QtCore.QDate.currentDate())  # Restablece la fecha de nacimiento a la fecha actual
+        self.prof.txtFechaN.setDate(QtCore.QDate.currentDate())  # Restablece la fecha de nacimiento a la fecha actual
         self.prof.txtCP.clear()  
         self.prof.txtMatricula.clear()
         self.prof.txtTelefono.clear()       
         self.prof.txtCbu1.clear()
-        self.prof.txtCbu2clear() 
+        self.prof.txtCbu2.clear() 
         self.prof.txtAlias.clear()
         self.prof.txtMail.clear()
         self.prof.cbProfesional.setCurrentIndex(0)
@@ -565,6 +603,13 @@ class MainWindow():
         self.prof.monotributo.setChecked(False)        
         # Limpiar checkbox de coordinador
         self.prof.coordinador.setChecked(False)
+        # Limpiar checkbox de cuidador
+        self.prof.cuidador.setChecked(False)
+
+        self.prof.txtNombre_2.clear(),
+        self.prof.txtApellido_2.clear(),
+        self.prof.txtCuit_2.clear(),
+        self.prof.txtCbu3.clear()  
         
 ################## Listado ################
 
@@ -660,12 +705,21 @@ class MainWindow():
         self.verProf.coordinador.setChecked(profesional[15] == 'True')
         
         self.verProf.cbProfesional.setCurrentText(profesional[16])
-        self.verProf.txtCodigo.setText(profesional[17])
+        self.verProf.cuidador.setChecked(profesional[17] == 'True'),
+        self.verProf.txtCodigo.setText(profesional[18])
         
+        ## Datos pago a terceros ##
+        self.verProf.txtNombre_2.setText(profesional[19])
+        self.verProf.txtApellido_2.setText(profesional[20])
+        self.verProf.txtCuit_2.setText(profesional[21])
+        self.verProf.txtCbu3.setText(profesional[22])
+
         self.verProf.btnModificar.clicked.connect(lambda: self.abrirVentanaModificar(id))
+        self.verProf.btnCarpeta.clicked.connect(lambda: self.cargarArchivosProfesional(id))
         self.verProf.show()
 
     def abrirVentanaModificar(self, id):
+        self.verProf.close()
         self.actualizarProfesional(id)
         self.actProf.show()
 
@@ -695,7 +749,14 @@ class MainWindow():
         self.actProf.coordinador.setChecked(profesional[15] == 'True')
         
         self.actProf.cbProfesional.setCurrentText(profesional[16])
-        self.actProf.txtCodigo.setText(profesional[17])
+        self.actProf.cuidador.setChecked(profesional[17] == 'True'),
+        self.actProf.txtCodigo.setText(profesional[18])
+        
+        ## Datos pago a terceros ##
+        self.actProf.txtNombre_2.setText(profesional[19])
+        self.actProf.txtApellido_2.setText(profesional[20])
+        self.actProf.txtCuit_2.setText(profesional[21])
+        self.actProf.txtCbu3.setText(profesional[22])
 
         # Conectar el botón btnGuardar a guardarCambiosProfesional
         self.actProf.btnGuardar.clicked.connect(lambda: self.guardarCambiosProfesional(id))
@@ -719,7 +780,13 @@ class MainWindow():
             monotributo=self.actProf.monotributo.isChecked(),
             coord=self.actProf.coordinador.isChecked(),
             profesional=self.actProf.cbProfesional.currentText(),
-            codTransf=self.actProf.txtCodigo.text()
+            cuidador = self.actProf.cuidador.isChecked(),
+            codTransf=self.actProf.txtCodigo.text(),
+            ### Datos de pago a terceros ### 
+            nombre2 = self.actProf.txtNombre_2.text(),
+            apellido2 = self.actProf.txtApellido_2.text(),
+            CUIT2 = self.actProf.txtCuit_2.text(),
+            cbu3 = self.actProf.txtCbu3.text()     
         )
         
         objData = ProfesionalData()
@@ -733,6 +800,7 @@ class MainWindow():
             mBox.setText(f"El profesional no pudo ser actualizado: {error_message}")
         mBox.exec()
         self.actProf.close() #Cierro la ventana
+        self.verProf.show() #Vuelvo a abrir la ficha que estaban modificando
 
     def cargar_nombres_profesionales(self, id_paciente):
         objData = ProfesionalData()
@@ -793,10 +861,10 @@ class MainWindow():
             
             if profesionales:
                 self.lisProfPac.tblListadoPP.setRowCount(len(profesionales))  # Configurar el número de filas
-                print(profesionales)
+                
                 fila = 0
                 for item in profesionales:
-                    print(item)
+                    
                     self.lisProfPac.tblListadoPP.setItem(fila, 0, QTableWidgetItem(str(item[2]))) #Apellido
                     self.lisProfPac.tblListadoPP.setItem(fila, 1, QTableWidgetItem(str(item[1]))) #Nombre
                     self.lisProfPac.tblListadoPP.setItem(fila, 2, QTableWidgetItem(str(item[16]))) #Profesión
@@ -856,10 +924,10 @@ class MainWindow():
         
         if insumos:
             self.lInsumo.tblListadoI.setRowCount(len(insumos))  # Configurar el número de filas
-            print('entro')
+            
             fila = 0
             for item in insumos:
-                print(item)
+                
                 self.lInsumo.tblListadoI.setItem(fila, 0, QTableWidgetItem(str(item[1])))
                 self.lInsumo.tblListadoI.setItem(fila, 1, QTableWidgetItem(str(item[2])))
                 self.lInsumo.tblListadoI.setItem(fila, 2, QTableWidgetItem(str(item[3])))
@@ -925,11 +993,11 @@ class MainWindow():
             mBox.setWindowTitle('Mensaje')
             mBox.setText('Seleccione un coordinador')    
 
-############### Archivos ################
+############### Archivos - Paciente ################
 
     def cargarArchivos(self, id_paciente):
         # Obtener la lista de archivos relacionados con el paciente desde la base de datos
-        lis = ArchivosData()
+        lis = ArchivosPacienteData()
         archivos = lis.obtener_archivos_por_paciente(id_paciente)
         
         if archivos:
@@ -979,7 +1047,7 @@ class MainWindow():
                 contenido = file.read()
                 nombre_archivo = os.path.basename(data_file)
                 # Guardar el archivo en la base de datos
-                lis = ArchivosData()
+                lis = ArchivosPacienteData()
                 lis.guardar_archivo(nombre_archivo, contenido, id_paciente)
 
 
@@ -1000,4 +1068,73 @@ class MainWindow():
                os.startfile(temp_file_path) 
             # elif os.name == 'posix':  # macOS, Linux
             #     subprocess.call(('xdg-open', temp_file_path))
+
+############### Archivos - Profesional ################
+
+    def cargarArchivosProfesional(self, id_profesional):
+        # Obtener la lista de archivos relacionados con el paciente desde la base de datos
+        lis = ArchivosProfesionalData()
+        archivos = lis.obtener_archivos_por_profesional(id_profesional)
+        
+        if archivos:
+            self.arcP.swArchivos.setCurrentIndex(0)
+            # Configura la tabla
+            self.arcP.tblArchivos.setRowCount(len(archivos))
+            self.arcP.tblArchivos.setColumnCount(1)
+            self.arcP.tblArchivos.setHorizontalHeaderLabels(["Archivo"])
+
+            # Añade los archivos a la tabla
+            for fila, archivo in enumerate(archivos):
+                # Añade los archivos a la tabla
+                nombre_archivo = archivo[1]  # Accede al primer elemento de la tupla (nombre_archivo)
+                contenido_archivo = archivo[2]  # Accede al segundo elemento de la tupla (contenido)
+
+                # Agregar el nombre del archivo a la celda
+                item_nombre = QTableWidgetItem(nombre_archivo)
+                self.arcP.tblArchivos.setItem(fila, 0, item_nombre)
+               
+                # Guardar el contenido del archivo en el QTableWidgetItem
+                item_nombre.setData(Qt.ItemDataRole.UserRole, contenido_archivo)
+                self.arcP.tblArchivos.cellDoubleClicked.connect(lambda: self.manejarDobleClicP(fila))
+            self.arcP.show()
+        else:
+            self.arcP.swArchivos.setCurrentIndex(1)
+            self.arcP.show()
+        
+        self.arcP.btnAgregar.clicked.connect(lambda: self.abrirArchivoProfesional(id_profesional))
+
+    def abrirArchivoProfesional(self, id_profesional):
+        '''Abre el buscador de archivos para poder cargar un archivo'''
+        options = QFileDialog.Option
+        dir = QStandardPaths.writableLocation(QStandardPaths.StandardLocation.DocumentsLocation)
+        file_types = "All files(*)"
+        data_file, _ = QFileDialog.getOpenFileName(self.arc, "Abrir Archivo", dir, file_types)
+        if data_file:
+            print(f"Archivo seleccionado: {data_file}")
+            with open(data_file, 'rb') as file:
+                contenido = file.read()
+                nombre_archivo = os.path.basename(data_file)
+                # Guardar el archivo en la base de datos
+                lis = ArchivosProfesionalData()
+                lis.guardar_archivo(nombre_archivo, contenido, id_profesional)
+
+
+                # Recargar la tabla de archivos
+                self.cargarArchivosProfesional(id_profesional)
+
+    def manejarDobleClicP(self, fila):
+        item = self.arcP.tblArchivos.item(fila, 0)
+        contenido_archivo = item.data(Qt.ItemDataRole.UserRole)
+        if contenido_archivo:
+            # Crear un archivo temporal para abrirlo con la aplicación predeterminada
+            temp_file_path = os.path.join(QStandardPaths.writableLocation(QStandardPaths.StandardLocation.TempLocation), item.text())
+            with open(temp_file_path, 'wb') as temp_file:
+                temp_file.write(contenido_archivo)
+
+            # Abrir el archivo con la aplicación predeterminada del sistema
+            if os.name == 'nt':  # Windows
+               os.startfile(temp_file_path) 
+            elif os.name == 'posix':  # macOS, Linux
+                subprocess.call(('xdg-open', temp_file_path))
+
                 

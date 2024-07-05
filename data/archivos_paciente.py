@@ -2,19 +2,19 @@ import sqlite3
 import conexion as con
 from PyQt6 import QtWidgets
 
-class ArchivosData():
+class ArchivosPacienteData():
 
     def __init__(self):
         try:
             self.db = con.Conexion().conectar()
             self.cursor = self.db.cursor()
             self.cursor.execute('''
-                CREATE TABLE IF NOT EXISTS archivos (
+                CREATE TABLE IF NOT EXISTS archivos_paciente (
                     id_archivo INTEGER PRIMARY KEY AUTOINCREMENT,
                     nombre_archivo TEXT NOT NULL,
                     contenido BLOB,
                     id_paciente INTEGER,
-                    FOREIGN KEY (id_paciente) REFERENCES pacientes(id)  -- Ejemplo de clave foránea
+                    FOREIGN KEY (id_paciente) REFERENCES pacientes(id) ON DELETE CASCADE  -- Eliminación en cascada
                 )
             ''')
             self.db.commit()
@@ -31,7 +31,7 @@ class ArchivosData():
             self.db = con.Conexion().conectar()
             self.cursor = self.db.cursor()
             self.cursor.execute('''
-                INSERT INTO archivos (nombre_archivo, contenido, id_paciente)
+                INSERT INTO archivos_paciente (nombre_archivo, contenido, id_paciente)
                 VALUES (?, ?, ?)
             ''', (nombre_archivo, contenido, id_paciente))
             self.db.commit()
@@ -51,7 +51,7 @@ class ArchivosData():
             self.cursor = self.db.cursor()
             self.cursor.execute('''
                 SELECT id_archivo, nombre_archivo, contenido
-                FROM archivos
+                FROM archivos_paciente
                 WHERE id_paciente = ?
             ''', (id_paciente,))
             archivos = self.cursor.fetchall()
