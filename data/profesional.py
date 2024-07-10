@@ -50,6 +50,11 @@ class ProfesionalData():
                     WHEN EXISTS (SELECT 1 FROM profesionales WHERE CUIT = NEW.CUIT) THEN
                         RAISE(ABORT, 'CUIT ya existe')
                 END;
+                -- Verificar longitud de CUIT2
+                SELECT CASE
+                    WHEN LENGTH(NEW.CUIT2) != 0 THEN
+                        RAISE(ABORT, 'CUIT 2')
+                END;
                 -- Verificar unicidad de cbu1
                 SELECT CASE
                     WHEN EXISTS (SELECT 1 FROM profesionales WHERE cbu1 = NEW.cbu1 OR cbu2 = NEW.cbu1) THEN

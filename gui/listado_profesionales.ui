@@ -161,8 +161,8 @@ QPushButton:hover {
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
            <layout class="QGridLayout" name="gridLayout">
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_11">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_3">
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -170,21 +170,65 @@ QPushButton:hover {
                </font>
               </property>
               <property name="text">
-               <string>Profesion</string>
+               <string>Apellido</string>
               </property>
              </widget>
             </item>
-            <item row="0" column="2">
-             <widget class="QLabel" name="label_7">
+            <item row="0" column="1">
+             <widget class="QLineEdit" name="txtApellido">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
               <property name="font">
                <font>
                 <family>Segoe UI</family>
                 <pointsize>10</pointsize>
                </font>
               </property>
-              <property name="text">
-               <string>CUIT</string>
-              </property>
+             </widget>
+            </item>
+            <item row="2" column="0" colspan="4">
+             <widget class="QTableWidget" name="tblListadoProf">
+              <column>
+               <property name="text">
+                <string>Apellido</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Nombre</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>CBU 1</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>CBU 2</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Alias</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Código</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Profesión</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>New Column</string>
+               </property>
+              </column>
              </widget>
             </item>
             <item row="1" column="1">
@@ -235,8 +279,8 @@ QPushButton:hover {
               </item>
              </widget>
             </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_3">
+            <item row="0" column="2">
+             <widget class="QLabel" name="label_7">
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -244,20 +288,20 @@ QPushButton:hover {
                </font>
               </property>
               <property name="text">
-               <string>Apellido</string>
+               <string>CUIT</string>
               </property>
              </widget>
             </item>
-            <item row="0" column="1">
-             <widget class="QLineEdit" name="txtApellido">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_11">
               <property name="font">
                <font>
                 <family>Segoe UI</family>
                 <pointsize>10</pointsize>
                </font>
+              </property>
+              <property name="text">
+               <string>Profesion</string>
               </property>
              </widget>
             </item>
@@ -291,50 +335,6 @@ color: rgb(255, 255, 255);</string>
               <property name="text">
                <string>Buscar</string>
               </property>
-             </widget>
-            </item>
-            <item row="3" column="0" colspan="4">
-             <widget class="QTableWidget" name="tblListadoProf">
-              <column>
-               <property name="text">
-                <string>Apellido</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Nombre</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>CBU 1</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>CBU 2</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Alias</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Código</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Profesión</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>New Column</string>
-               </property>
-              </column>
              </widget>
             </item>
            </layout>

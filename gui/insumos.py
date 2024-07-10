@@ -52,6 +52,7 @@ class InsumosWindow():
                 mBox.setText(f"El insumo no pudo ser agregado: {error_message}")
                 
             mBox.exec()
+            self.mostrarInsumos(id_paciente)
             self.nInsumo.close() #Cierro la ventana
 
     def mostrarInsumos(self, id_paciente):

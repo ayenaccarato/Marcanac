@@ -49,7 +49,7 @@ class ProfesionalWindow():
         #     mBox.setText("El CBU 3 ingresado es inválido. Debe contener 22 números")
         #     mBox.exec()          
         else:
-            fechaN = self.nuevo.txtFechaN.date().toPyDate().strftime("%d/%m/%Y") #formateo la fecha
+            fechaN = self.prof.txtFechaN.date().toPyDate().strftime("%d/%m/%Y") #formateo la fecha
                         
             nuevoProfesional = Profesional(
                 nombre = self.prof.txtNombre.text(),
@@ -153,7 +153,7 @@ class ProfesionalWindow():
                self.listadoProf.tblListadoProf.setItem(fila, 3, QTableWidgetItem(str(item[11]))) 
            
             self.listadoProf.tblListadoProf.setItem(fila, 4, QTableWidgetItem(str(item[12]))) #Alias
-            self.listadoProf.tblListadoProf.setItem(fila, 5, QTableWidgetItem(str(item[17]))) #Codigo
+            self.listadoProf.tblListadoProf.setItem(fila, 5, QTableWidgetItem(str(item[18]))) #Codigo
             self.listadoProf.tblListadoProf.setItem(fila, 6, QTableWidgetItem(str(item[16]))) #Profesion
 
             id_valor = item[0]
@@ -202,7 +202,7 @@ class ProfesionalWindow():
                 
                 id_valor = item[0]
                 
-                self.boton_listado(id_valor, fila, 'prof')
+                self.boton_listado_profesional(id_valor, fila)
                         
                 fila += 1
         else:
@@ -338,6 +338,7 @@ class ProfesionalWindow():
             mBox.setText(f"El profesional no pudo ser actualizado: {error_message}")
         mBox.exec()
         self.actProf.close() #Cierro la ventana
+        self.mostrarProfesional(id)
         self.verProf.show() #Vuelvo a abrir la ficha que estaban modificando
 
     def cargar_nombres_profesionales(self, id_paciente):

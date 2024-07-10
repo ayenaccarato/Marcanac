@@ -9,6 +9,8 @@ from data.archivos_paciente import ArchivosPacienteData
 from data.listados import ListadoData
 from data.paciente import PacienteData
 from data.paciente_coordinador import PacienteCoordinadorData
+from gui.insumos import InsumosWindow
+from gui.profesional import ProfesionalWindow
 from model.paciente import Paciente
 
 class PacienteWindow():
@@ -20,7 +22,7 @@ class PacienteWindow():
         self.actPac = uic.loadUi("gui/modificar_paciente.ui")
         self.ePac = uic.loadUi("gui/mensaje_eliminar_pac.ui")
         #Archivos
-        self.arc = uic.loadUi("gui/archivos_paciente.ui")
+        self.arc = uic.loadUi("gui/archivos_paciente.ui")         
 
     def abrirRegistro(self):   
         self.nuevo.btnRegistrar.clicked.connect(self.registrarPaciente)     
@@ -270,7 +272,7 @@ class PacienteWindow():
             self.ver.swCoordinador.setCurrentIndex(0)
         else:
             self.ver.swCoordinador.setCurrentIndex(1)
-            self.ver.btnAsignar.clicked.connect(lambda: self.cargar_nombres_coordinadores(id))
+            self.ver.btnAsignar.clicked.connect(lambda: ProfesionalWindow.cargar_nombres_coordinadores(id))
         
         objData = PacienteData()
         paciente = objData.mostrar(id)
@@ -327,14 +329,15 @@ class PacienteWindow():
         self.ver.arC.setChecked(dicA['C'])
 
         self.ver.btnModificar.clicked.connect(lambda: self.abrirVentanaModificarP(id))
-        self.ver.btnInsumos.clicked.connect(lambda: self.mostrarInsumos(id))        
-        self.ver.btnProfesionales.clicked.connect(lambda: self.mostrarProfesionales(id))
+        self.ver.btnInsumos.clicked.connect(lambda: InsumosWindow().mostrarInsumos(id_paciente=id))        
+        self.ver.btnProfesionales.clicked.connect(lambda: ProfesionalWindow().mostrarProfesionales(id_paciente=id))
         self.ver.btnCarpeta.clicked.connect(lambda: self.cargarArchivos(id))
         self.ver.btnEliminar.clicked.connect(lambda: self.eliminar_paciente(id))
 
         self.ver.show()
 
     def abrirVentanaModificarP(self, id):
+        self.ver.close()
         self.actualizarPaciente(id)
         self.actPac.show()
 
@@ -441,6 +444,8 @@ class PacienteWindow():
             mBox.setText(f"El paciente no pudo ser actualizado: {error_message}")
         mBox.exec()
         self.actPac.close() #Cierro la ventana
+        self.mostrarPaciente(id)
+        self.abrirListado()
         self.ver.show()
 
 ############### Archivos - Paciente ################
