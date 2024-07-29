@@ -94,7 +94,7 @@ QPushButton:hover {
              <string/>
             </property>
             <property name="pixmap">
-             <pixmap>../logo.png</pixmap>
+             <pixmap>imagenes/logo.png</pixmap>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>

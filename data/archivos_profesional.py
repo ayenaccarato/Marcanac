@@ -14,7 +14,7 @@ class ArchivosProfesionalData():
                     nombre_archivo TEXT NOT NULL,
                     contenido BLOB,
                     id_profesional INTEGER,
-                    FOREIGN KEY (id_profesional) REFERENCES profesionales(id)  -- Ejemplo de clave foránea
+                    FOREIGN KEY (id_profesional) REFERENCES profesionales(id) ON DELETE CASCADE -- Ejemplo de clave foránea
                 )
             ''')
             self.db.commit()

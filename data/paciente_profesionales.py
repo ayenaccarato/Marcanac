@@ -14,7 +14,7 @@ class PacienteProfesionalesData:
                 profesional_id INTEGER,
                 FOREIGN KEY (paciente_id) REFERENCES pacientes(id),
                 FOREIGN KEY (profesional_id) REFERENCES profesionales(id),
-                UNIQUE(paciente_id, profesional_id)
+                UNIQUE(paciente_id, profesional_id) ON DELETE CASCADE
             )
             """
             self.cursor.execute(sql_create_paciente_profesionales)
@@ -87,5 +87,20 @@ class PacienteProfesionalesData:
         finally:
             if self.cursor:
                 self.cursor.close()
+            if self.db:
+                self.db.close()
+
+    def eliminar_relacion_paciente_profesional(self, paciente_id, profesional_id):
+        try:
+            self.db = con.Conexion().conectar()
+            self.cursor = self.db.cursor()
+            self.cursor.execute('''
+                DELETE FROM paciente_profesional
+                WHERE paciente_id = ? AND profesional_id = ?
+            ''', (paciente_id, profesional_id))
+            self.db.commit()
+        except sqlite3.Error as e:
+            print(f"Error al eliminar la relación: {e}")
+        finally:
             if self.db:
                 self.db.close()

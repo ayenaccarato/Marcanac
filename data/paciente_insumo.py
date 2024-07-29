@@ -14,7 +14,7 @@ class PacienteInsumoData:
                 insumo_id INTEGER,
                 FOREIGN KEY (paciente_id) REFERENCES pacientes(id),
                 FOREIGN KEY (insumo_id) REFERENCES insumos(id),
-                UNIQUE(paciente_id, insumo_id)
+                UNIQUE(paciente_id, insumo_id) ON DELETE CASCADE
             )
             """
             self.cursor.execute(sql_create_paciente_insumo)
@@ -62,4 +62,18 @@ class PacienteInsumoData:
             print(f"Error al obtener insumos del paciente: {e}")
             return []
 
-    # Agrega métodos similares para otras operaciones CRUD según sea necesario
+
+    def eliminar_relacion_paciente_insumo(self, paciente_id, insumo_id):
+        try:
+            self.db = con.Conexion().conectar()
+            self.cursor = self.db.cursor()
+            self.cursor.execute('''
+                DELETE FROM paciente_insumo
+                WHERE paciente_id = ? AND insumo_id = ?
+            ''', (paciente_id, insumo_id))
+            self.db.commit()
+        except sqlite3.Error as e:
+            print(f"Error al eliminar la relación: {e}")
+        finally:
+            if self.db:
+                self.db.close()

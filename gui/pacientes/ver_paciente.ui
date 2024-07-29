@@ -132,6 +132,13 @@ QPushButton:hover {
            </spacer>
           </item>
           <item>
+           <widget class="QPushButton" name="btnDescargar">
+            <property name="text">
+             <string>Descargar</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="btnCarpeta">
             <property name="font">
              <font>
@@ -152,7 +159,7 @@ QPushButton:hover {
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>imagenes/carpeta.png</normaloff>imagenes/carpeta.png</iconset>
+              <normaloff>../imagenes/carpeta.png</normaloff>../imagenes/carpeta.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -189,7 +196,7 @@ QPushButton:hover {
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>imagenes/profesionales.png</normaloff>imagenes/profesionales.png</iconset>
+              <normaloff>../imagenes/profesionales.png</normaloff>../imagenes/profesionales.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -244,7 +251,7 @@ QPushButton:hover {
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>imagenes/insumos.png</normaloff>imagenes/insumos.png</iconset>
+              <normaloff>../imagenes/insumos.png</normaloff>../imagenes/insumos.png</iconset>
             </property>
             <property name="iconSize">
              <size>

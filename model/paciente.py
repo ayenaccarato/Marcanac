@@ -25,4 +25,24 @@ class Paciente():
         self._equip = equip
         self._sopNutri = sopNutri
         self._asisRespi = asisRespi
+
+    @property
+    def nombre(self):
+        return self._nombre
+    
+    @property
+    def apellido(self):
+        return self._apellido
+    
+    @property
+    def domicilio(self):
+        return self._domicilio
+    
+    @property
+    def fechaNacimiento(self):
+        return self._fechaNacimiento
+    
+    @property
+    def telefono(self):
+        return self._telefono
         

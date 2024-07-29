@@ -29,7 +29,7 @@ class PacienteData():
             equip TEXT,
             sopNutri TEXT,
             asisRespi TEXT
-            )"""
+            ) """
             
             self.cursor.execute(sql_create_pacientes)
             self.db.commit()

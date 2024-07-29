@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Marcanac - Profesional</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../imagenes/logo.png</normaloff>../imagenes/logo.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
     <string notr="true">background-color: rgb(255, 255, 255);</string>
@@ -138,7 +142,7 @@ QPushButton:hover {
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>imagenes/carpeta.png</normaloff>imagenes/carpeta.png</iconset>
+              <normaloff>../imagenes/carpeta.png</normaloff>../imagenes/carpeta.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -777,6 +781,9 @@ QPushButton:hover {
                 <bold>true</bold>
                </font>
               </property>
+              <property name="cursor">
+               <cursorShape>PointingHandCursor</cursorShape>
+              </property>
               <property name="styleSheet">
                <string notr="true">background-color: rgb(71, 40, 37);
 color: rgb(255, 255, 255);</string>
@@ -799,6 +806,28 @@ color: rgb(255, 255, 255);</string>
               </property>
               <property name="text">
                <string>Cuidador</string>
+              </property>
+             </widget>
+            </item>
+            <item row="12" column="2">
+             <widget class="QPushButton" name="btnEliminar">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>12</pointsize>
+                <weight>50</weight>
+                <bold>false</bold>
+               </font>
+              </property>
+              <property name="cursor">
+               <cursorShape>PointingHandCursor</cursorShape>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">background-color: rgb(255, 0, 0);
+color: rgb(255, 255, 255);</string>
+              </property>
+              <property name="text">
+               <string>Eliminar</string>
               </property>
              </widget>
             </item>

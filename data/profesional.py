@@ -33,7 +33,7 @@ class ProfesionalData():
             codTransf TEXT UNIQUE,
             nombre2 TEXT,
             apellido2 TEXT,
-            CUIT2 TEXT UNIQUE DEFAULT NULL,
+            CUIT2 TEXT,
             cbu3 TEXT
             )"""
             
@@ -51,10 +51,7 @@ class ProfesionalData():
                         RAISE(ABORT, 'CUIT ya existe')
                 END;
                 -- Verificar longitud de CUIT2
-                SELECT CASE
-                    WHEN LENGTH(NEW.CUIT2) != 0 THEN
-                        RAISE(ABORT, 'CUIT 2')
-                END;
+                
                 -- Verificar unicidad de cbu1
                 SELECT CASE
                     WHEN EXISTS (SELECT 1 FROM profesionales WHERE cbu1 = NEW.cbu1 OR cbu2 = NEW.cbu1) THEN
@@ -214,5 +211,21 @@ class ProfesionalData():
             if self.db:
                 self.db.close()
 
-    def eliminar(self):
-         pass
+    def eliminar(self, id_profesional): 
+        try:
+            self.db = con.Conexion().conectar()
+            self.cursor = self.db.cursor()
+
+            # Eliminar profesionales y sus relaciones en cascada
+            self.cursor.execute('DELETE FROM profesionales WHERE id = ?', (id_profesional,))
+            self.db.commit()
+            print(f"Profesional con ID {id_profesional} y sus relaciones eliminados correctamente.")
+            return True, ""
+        except sqlite3.Error as ex:
+            return False, str(ex)            
+        finally:
+            if self.cursor:
+                self.cursor.close()
+            if self.db:
+                self.db.close()
+    

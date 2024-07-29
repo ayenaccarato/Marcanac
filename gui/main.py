@@ -1,13 +1,15 @@
 from PyQt6 import uic
-from PyQt6.QtCore import Qt
 
-from gui.insumos import InsumosWindow
-from gui.paciente import PacienteWindow
-from gui.profesional import ProfesionalWindow
+from gui.insumos.insumos import InsumosWindow
+from gui.pacientes.paciente import PacienteWindow
+from gui.profesionales.profesional import ProfesionalWindow
+from gui.usuario.usuario import UsuarioWindow
+from model.usuario import Usuario
 
 class MainWindow():
 
-    def __init__(self):
+    def __init__(self, user: Usuario):
+        self.usuario = user
         self.main = uic.loadUi("gui/main_2.ui")
         self.initGUI()
         self.main.show()
@@ -27,40 +29,23 @@ class MainWindow():
         # Configurar la opacidad de la ventana
         self.main.setWindowOpacity(1.0)
 
-        #Interfaz de distintas ventanas
-        #Paciente
-        paciente = PacienteWindow()
-        paciente.initGUI()
-        
-        #Profesional
-        profesional = ProfesionalWindow()
-        profesional.initGUI()
+        paciente = PacienteWindow(self.usuario)
+               
+        profesional = ProfesionalWindow(self.usuario)
 
-        #Insumos
-        insumos = InsumosWindow()
-        insumos.initGUI()       
-        
+        usuario = UsuarioWindow()
+
         #Botones del menú de main
         self.main.btnListado.clicked.connect(lambda: self.main.stackedWidget.setCurrentWidget(self.main.page_datos)) #Abro pagina de listados
         self.main.btnRegistrar.clicked.connect(lambda: self.main.stackedWidget.setCurrentWidget(self.main.page_registrar)) #Abro pagina de registros
         #Listados
-        self.main.listPacientes.clicked.connect(lambda: paciente.abrirListado())
+        self.main.listPacientes.clicked.connect(lambda: paciente.abrirListado() )
         self.main.listProfesionales.clicked.connect(lambda: profesional.abrirListadoProfesionales())
         #Registros
         self.main.btnPaciente.clicked.connect(lambda: paciente.abrirRegistro())
         self.main.btnProfesional.clicked.connect(lambda: profesional.abrirRegistroProf())
-
-#Métodos de controles de botones del main  
-    def control_btnMinimizar(self):
-        self.main.showMinimized()
-
-    def control_btnMaximizar(self):
-        self.main.showMaximized()
-        self.main.btnMaximizar.hide()
-        self.main.btnRestaurar.show()
-
-    def control_btnNormal(self):
-        self.main.showNormal()
-        self.main.btnRestaurar.hide()
-        self.main.btnMaximizar.show()
-      
+        print(self.usuario.rol)
+        if self.usuario.rol == 'admin':
+            self.main.btnUsuario.clicked.connect(lambda: usuario.abrirRegistro())
+        else:
+            self.main.btnUsuario.setVisible(False)

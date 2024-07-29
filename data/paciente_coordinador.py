@@ -13,7 +13,7 @@ class PacienteCoordinadorData:
             coordinador_id INTEGER,
             FOREIGN KEY (paciente_id) REFERENCES pacientes(id) ON DELETE CASCADE,
             FOREIGN KEY (coordinador_id) REFERENCES profesionales(id),
-            UNIQUE(paciente_id)
+            UNIQUE(paciente_id) ON DELETE CASCADE
             )"""
             self.cursor.execute(sql_create_paciente_coordinador)
             self.db.commit()

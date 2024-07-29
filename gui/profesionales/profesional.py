@@ -1,30 +1,25 @@
-import json
-import os
-
 from PyQt6 import uic, QtCore
-from PyQt6.QtCore import Qt, QDate, QStandardPaths
-from PyQt6.QtGui import QColor
-from PyQt6.QtWidgets import QMessageBox, QPushButton, QWidget, QHBoxLayout, QTableWidgetItem, QFileDialog
-from data.archivos_profesional import ArchivosProfesionalData
+from PyQt6.QtCore import Qt, QDate
+from PyQt6.QtWidgets import QMessageBox, QPushButton, QWidget, QHBoxLayout, QTableWidgetItem
 from data.listados import ListadoData
-from data.paciente_coordinador import PacienteCoordinadorData
 from data.paciente_profesionales import PacienteProfesionalesData
 from data.profesional import ProfesionalData
+from gui.profesionales.archivos_profesional import ArchivosProfesionalWindow
+from gui.profesionales.ver_profesional import VerProfesionalWindow
 from model.profesional import Profesional
+from model.usuario import Usuario
 
 class ProfesionalWindow():
 
-    def initGUI(self):
-        self.prof = uic.loadUi("gui/nuevo_profesional.ui")
-        self.listadoProf = uic.loadUi("gui/listado_profesionales.ui")
-        self.verProf = uic.loadUi("gui/ver_profesional.ui")
-        self.actProf = uic.loadUi("gui/modificar_profesional.ui")
-        self.lisProfPac = uic.loadUi("gui/listado_profesionales_paciente.ui")
-        self.asocProf = uic.loadUi("gui/asociar_profesional.ui")
-        #Coordinador
-        self.nCoord = uic.loadUi("gui/asociar_coordinador.ui")
-        #Archivos
-        self.arcP = uic.loadUi("gui/archivos_profesional.ui")
+    def __init__(self, user: Usuario):
+        self.usuario = user
+        self.prof = uic.loadUi("gui/profesionales/nuevo_profesional.ui")
+        self.listadoProf = uic.loadUi("gui/profesionales/listado_profesionales.ui")
+        self.verProf = uic.loadUi("gui/profesionales/ver_profesional.ui")
+        self.actProf = uic.loadUi("gui/profesionales/modificar_profesional.ui")
+
+        self.asocProf = uic.loadUi("gui/pacientes/asociar_profesional.ui")
+              
 
     def abrirRegistroProf(self):   
         self.prof.btnRegistrar.clicked.connect(self.registrarProfesional)     
@@ -125,6 +120,7 @@ class ProfesionalWindow():
     def boton_listado_profesional(self, id_valor, fila):
         # Crear el botón y añadirlo a la columna 7
         # Crear el botón "Ver más" y conectarlo
+        
         btn = QPushButton("Ver más")
         
         btn.clicked.connect(lambda _, id_valor=id_valor: self.mostrarProfesional(id_valor))
@@ -139,6 +135,7 @@ class ProfesionalWindow():
         self.listadoProf.tblListadoProf.setCellWidget(fila, 7, widget)
     
     def abrirListadoProfesionales(self): 
+
         lis = ListadoData() 
         data = lis.obtenerProfesionales()    
         fila = 0
@@ -218,6 +215,7 @@ class ProfesionalWindow():
         self.listadoProf.cbProfesion.setCurrentIndex(0)
 
     def mostrarProfesional(self, id):
+        archivos = ArchivosProfesionalWindow()
         objData = ProfesionalData()
         profesional = objData.mostrar(id)
 
@@ -253,7 +251,12 @@ class ProfesionalWindow():
         self.verProf.txtCbu3.setText(profesional[22])
 
         self.verProf.btnModificar.clicked.connect(lambda: self.abrirVentanaModificar(id))
-        self.verProf.btnCarpeta.clicked.connect(lambda: self.cargarArchivosProfesional(id))
+        self.verProf.btnCarpeta.clicked.connect(lambda: archivos.cargarArchivosProfesional(id_profesional=id))
+        if self.usuario.rol == 'admin':
+            self.verProf.btnEliminar.clicked.connect(lambda: self.eliminar_profesional(id))
+        else:
+            self.verProf.btnEliminar.setVisible(False)
+            
         self.verProf.show()
 
     def abrirVentanaModificar(self, id):
@@ -341,6 +344,48 @@ class ProfesionalWindow():
         self.mostrarProfesional(id)
         self.verProf.show() #Vuelvo a abrir la ficha que estaban modificando
 
+### Eliminar ###
+
+    def eliminar_profesional(self, id_profesional):
+        # Crear el cuadro de diálogo de confirmación
+        mBox = QMessageBox()
+        mBox.setWindowTitle('Confirmar eliminación')
+        mBox.setText("¿Está seguro que desea eliminar este profesional?")
+
+        # Añadir botones personalizados
+        si_btn = mBox.addButton("Sí", QMessageBox.ButtonRole.YesRole)
+        no_btn = mBox.addButton("No", QMessageBox.ButtonRole.NoRole)
+        
+        mBox.setDefaultButton(no_btn)
+        mBox.exec()
+
+        if mBox.clickedButton() == si_btn:
+            self.confirmar(id_profesional)
+        else:
+            print("Eliminación cancelada")
+
+    def confirmar(self, id_profesional):
+        '''Se elimina el profesional, si confirman'''
+        profesional = ProfesionalData()
+        eliminado = profesional.eliminar(id_profesional)
+
+        mBox = QMessageBox()
+        if eliminado:
+            mBox.setWindowTitle('Mensaje')
+            mBox.setText("Profesional eliminado")
+        else:
+            mBox.setWindowTitle('Error')
+            mBox.setText("El profesional no pudo ser eliminado")
+
+        mBox.exec() 
+
+        #Cierro las ventanas y vuelvo a abrir el listado para refrescar la informacion
+        self.listadoProf.close()
+        self.verProf.close()   
+        self.abrirListadoProfesionales() 
+
+####################
+    
     def cargar_nombres_profesionales(self, id_paciente):
         objData = ProfesionalData()
         profesionales = objData.obtener_profesionales()
@@ -387,154 +432,12 @@ class ProfesionalWindow():
                 else:
                         mBox.setWindowTitle('Error')
                         mBox.setText("No se pudo asociar el profesional al paciente.")
-                self.asocProf.close() #Cierro la ventana
-                self.ver.close()
-                self.ver.show()
+                self.asocProf.close() #Cierro la ventana       
         except Exception:
             mBox = QMessageBox()
             mBox.setWindowTitle('Mensaje')
             mBox.setText('Seleccione un profesional')
            
-    def mostrarProfesionales(self, id_paciente):
-
-            lis = PacienteProfesionalesData()
-            profesionales = lis.obtener_profesionales_de_paciente(id_paciente)        
-            
-            if profesionales:
-                self.lisProfPac.tblListadoPP.setRowCount(len(profesionales))  # Configurar el número de filas
-                
-                fila = 0
-                for item in profesionales:
-                    
-                    self.lisProfPac.tblListadoPP.setItem(fila, 0, QTableWidgetItem(str(item[2]))) #Apellido
-                    self.lisProfPac.tblListadoPP.setItem(fila, 1, QTableWidgetItem(str(item[1]))) #Nombre
-                    self.lisProfPac.tblListadoPP.setItem(fila, 2, QTableWidgetItem(str(item[16]))) #Profesión
-
-                    fila += 1
-            
-            self.lisProfPac.btnProf.clicked.connect(lambda: self.cargar_nombres_profesionales(id_paciente))
-            self.lisProfPac.btnRefrescar.clicked.connect(lambda: self.mostrarProfesionales(id_paciente))
-            self.lisProfPac.show()
+    
 
 ################# Coordinador - Paciente ###############
-
-    def cargar_nombres_coordinadores(self, id_paciente):
-        objData = ProfesionalData()
-        profesionales = objData.obtener_coordinadores()
-
-        self.nCoord.cbProfesionales.clear()  # Limpiar ComboBox antes de agregar nuevos items
-
-        if profesionales:
-            self.nCoord.cbProfesionales.addItem('--Seleccione--')
-            for id_profesional, nombre, apellido in profesionales:
-                item = f"{nombre} {apellido}"
-                self.nCoord.cbProfesionales.addItem(item, userData=id_profesional)
-        else:
-            self.nCoord.cbProfesionales.addItem("No hay profesionales cargados")
-
-        # Conectar señal para actualizar ID del profesional seleccionado
-        self.nCoord.cbProfesionales.currentIndexChanged.connect(lambda index: self.actualizar_id_profesional_coordinador(index, id_paciente))
-
-        # Conectar botón Registrar
-        self.nCoord.btnAsignar.clicked.connect(lambda: self.asociarCoordinadorAPaciente(id_paciente, id_profesional))
-        self.nCoord.show()
-
-    def actualizar_id_profesional_coordinador(self, index, id_paciente):
-        id_profesional = None
-        if index >= 0:
-            item_data = self.nCoord.cbProfesionales.itemData(index)
-            if item_data is not None:
-                id_profesional = item_data
-                print(f"ID del profesional seleccionado: {id_profesional}")
-                #self.asociarProfesionalAPaciente(id_paciente, id_profesional)
-            else:
-                print("No se encontró el ID del profesional seleccionado.")
-        else:
-            print("No se seleccionó ningún profesional.")
-        return id_profesional
-
-    def asociarCoordinadorAPaciente(self, id_paciente, id_profesional):
-        try:
-            if id_profesional != None:
-                objData = PacienteCoordinadorData()
-                exito = objData.asociar_coordinador_a_paciente(id_paciente, id_profesional)
-                mBox = QMessageBox()
-                if exito:
-                    mBox.setWindowTitle('Mensaje')
-                    mBox.setText("Coordinador asociado al paciente correctamente.")
-                else:
-                    mBox.setWindowTitle('Error')
-                    mBox.setText("No se pudo asociar el coordinador al paciente.")
-                self.nCoord.close() #Cierro la ventana
-        except Exception:
-            mBox = QMessageBox()
-            mBox.setWindowTitle('Mensaje')
-            mBox.setText('Seleccione un coordinador')   
-
-############### Archivos - Profesional ##################
-
-    def cargarArchivosProfesional(self, id_profesional):
-        # Obtener la lista de archivos relacionados con el paciente desde la base de datos
-        lis = ArchivosProfesionalData()
-        archivos = lis.obtener_archivos_por_profesional(id_profesional)
-        
-        if archivos:
-            self.arcP.swArchivos.setCurrentIndex(0)
-            # Configura la tabla
-            self.arcP.tblArchivos.setRowCount(len(archivos))
-            self.arcP.tblArchivos.setColumnCount(1)
-            self.arcP.tblArchivos.setHorizontalHeaderLabels(["Archivo"])
-
-            # Añade los archivos a la tabla
-            for fila, archivo in enumerate(archivos):
-                # Añade los archivos a la tabla
-                nombre_archivo = archivo[1]  # Accede al primer elemento de la tupla (nombre_archivo)
-                contenido_archivo = archivo[2]  # Accede al segundo elemento de la tupla (contenido)
-
-                # Agregar el nombre del archivo a la celda
-                item_nombre = QTableWidgetItem(nombre_archivo)
-                self.arcP.tblArchivos.setItem(fila, 0, item_nombre)
-               
-                # Guardar el contenido del archivo en el QTableWidgetItem
-                item_nombre.setData(Qt.ItemDataRole.UserRole, contenido_archivo)
-                self.arcP.tblArchivos.cellDoubleClicked.connect(lambda: self.manejarDobleClicP(fila))
-            self.arcP.show()
-        else:
-            self.arcP.swArchivos.setCurrentIndex(1)
-            self.arcP.show()
-        
-        self.arcP.btnAgregar.clicked.connect(lambda: self.abrirArchivoProfesional(id_profesional))
-
-    def abrirArchivoProfesional(self, id_profesional):
-        '''Abre el buscador de archivos para poder cargar un archivo'''
-        options = QFileDialog.Option
-        dir = QStandardPaths.writableLocation(QStandardPaths.StandardLocation.DocumentsLocation)
-        file_types = "All files(*)"
-        data_file, _ = QFileDialog.getOpenFileName(self.arc, "Abrir Archivo", dir, file_types)
-        if data_file:
-            print(f"Archivo seleccionado: {data_file}")
-            with open(data_file, 'rb') as file:
-                contenido = file.read()
-                nombre_archivo = os.path.basename(data_file)
-                # Guardar el archivo en la base de datos
-                lis = ArchivosProfesionalData()
-                lis.guardar_archivo(nombre_archivo, contenido, id_profesional)
-
-
-                # Recargar la tabla de archivos
-                self.cargarArchivosProfesional(id_profesional)
-
-    def manejarDobleClicP(self, fila):
-        item = self.arcP.tblArchivos.item(fila, 0)
-        contenido_archivo = item.data(Qt.ItemDataRole.UserRole)
-        if contenido_archivo:
-            # Crear un archivo temporal para abrirlo con la aplicación predeterminada
-            temp_file_path = os.path.join(QStandardPaths.writableLocation(QStandardPaths.StandardLocation.TempLocation), item.text())
-            with open(temp_file_path, 'wb') as temp_file:
-                temp_file.write(contenido_archivo)
-
-            # Abrir el archivo con la aplicación predeterminada del sistema
-            if os.name == 'nt':  # Windows
-               os.startfile(temp_file_path) 
-            elif os.name == 'posix':  # macOS, Linux
-                subprocess.call(('xdg-open', temp_file_path))

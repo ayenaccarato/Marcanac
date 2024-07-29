@@ -56,7 +56,6 @@ class InsumoData():
             if self.db:
                 self.db.close()
 
-
     def mostrar(self, id):
         try:
             self.db = con.Conexion().conectar()
@@ -75,3 +74,21 @@ class InsumoData():
         finally:
             self.cursor.close()
             self.db.close()
+
+    def eliminar(self, id):
+        try:
+            self.db = con.Conexion().conectar()
+            self.cursor = self.db.cursor()
+
+            # Eliminar insumo y sus relaciones en cascada
+            self.cursor.execute('DELETE FROM pacientes WHERE id = ?', (id,))
+            self.db.commit()
+            print(f"Insumo con ID {id} y sus relaciones eliminados correctamente.")
+            return True, ""
+        except sqlite3.Error as ex:
+            return False, str(ex)            
+        finally:
+            if self.cursor:
+                self.cursor.close()
+            if self.db:
+                self.db.close()

@@ -7,11 +7,15 @@
     <x>0</x>
     <y>0</y>
     <width>409</width>
-    <height>259</height>
+    <height>294</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Marcanac</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>imagenes/logo.png</normaloff>imagenes/logo.png</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(255, 255, 255);</string>
@@ -164,6 +168,9 @@ QPushButton:hover {
               <height>40</height>
              </size>
             </property>
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
             <property name="text">
              <string>Listado</string>
             </property>
@@ -186,6 +193,9 @@ QPushButton:hover {
               <width>0</width>
               <height>40</height>
              </size>
+            </property>
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
             </property>
             <property name="text">
              <string>Registrar</string>
@@ -238,6 +248,10 @@ QPushButton:hover {
 	font: 77 10pt &quot;Segoe UI black&quot;;
 }</string>
             </property>
+            <property name="currentIndex">
+             <number>0</number>
+            </property>
+            <widget class="QWidget" name="page_vacia"/>
             <widget class="QWidget" name="page_datos">
              <layout class="QVBoxLayout" name="verticalLayout_4">
               <item>
@@ -271,6 +285,32 @@ QPushButton:hover {
             <widget class="QWidget" name="page_registrar">
              <layout class="QVBoxLayout" name="verticalLayout_5">
               <item>
+               <widget class="QPushButton" name="btnUsuario">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>40</height>
+                 </size>
+                </property>
+                <property name="cursor">
+                 <cursorShape>PointingHandCursor</cursorShape>
+                </property>
+                <property name="text">
+                 <string>Usuario</string>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>imagenes/usuario.png</normaloff>imagenes/usuario.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>30</width>
+                  <height>30</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QPushButton" name="btnPaciente">
                 <property name="minimumSize">
                  <size>
@@ -278,8 +318,21 @@ QPushButton:hover {
                   <height>40</height>
                  </size>
                 </property>
+                <property name="cursor">
+                 <cursorShape>PointingHandCursor</cursorShape>
+                </property>
                 <property name="text">
-                 <string>Paciente</string>
+                 <string> Paciente</string>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>imagenes/paciente.png</normaloff>imagenes/paciente.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>30</width>
+                  <height>30</height>
+                 </size>
                 </property>
                </widget>
               </item>
@@ -291,8 +344,21 @@ QPushButton:hover {
                   <height>40</height>
                  </size>
                 </property>
+                <property name="cursor">
+                 <cursorShape>PointingHandCursor</cursorShape>
+                </property>
                 <property name="text">
-                 <string>Profesional</string>
+                 <string> Profesional</string>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>imagenes/profesional.png</normaloff>imagenes/profesional.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>25</width>
+                  <height>25</height>
+                 </size>
                 </property>
                </widget>
               </item>

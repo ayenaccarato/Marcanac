@@ -99,7 +99,7 @@ QPushButton:hover {
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>imagenes/archivo.png</normaloff>imagenes/archivo.png</iconset>
+          <normaloff>../imagenes/archivo.png</normaloff>../imagenes/archivo.png</iconset>
         </property>
         <property name="iconSize">
          <size>
