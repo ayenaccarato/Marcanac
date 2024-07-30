@@ -1,15 +1,8 @@
 import json
 
-from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph
-
-import itertools
 from reportlab.lib.pagesizes import A4
-
-
-
+from reportlab.lib.units import cm
 
 from PyQt6 import uic, QtCore
 from PyQt6.QtCore import Qt, QDate
@@ -608,33 +601,7 @@ class PacienteWindow():
             self.lisProfPac.show()
 
 
-##############
-    # def descargar_pdf(self, id_paciente):
-    #     # Obtener la información del paciente
-    #     paciente = PacienteData()
-    #     data = paciente.mostrar(id_paciente)
-    #     paciente_data = {
-    #         'nombre': data[1],
-    #         'apellido': data[2],
-    #         'documento': data[5],
-    #         'fecha_nacimiento': data[6],
-    #         'direccion': data[3],
-    #         'telefono': data[9]
-    #     }
-        
-    #     # Generar el PDF
-    #     archivo_pdf = self.generar_pdf_paciente(paciente_data)
-        
-    #     # Mostrar diálogo para guardar el archivo
-    #     filePath, _ = QFileDialog.getSaveFileName(self.ver, "Guardar PDF", archivo_pdf, "PDF Files (*.pdf)")
-    #     if filePath:
-    #         # Renombrar el archivo al nombre seleccionado por el usuario
-    #         import os
-    #         os.rename(archivo_pdf, filePath)
-    #         mBox = QMessageBox()
-    #         mBox.setWindowTitle('Mensaje')
-    #         mBox.setText('PDF generado y guardado exitosamente')
-    #         mBox.exec()
+############## PDF #################
 
     def descargar_pdf(self, id_paciente):
         try:
@@ -647,7 +614,20 @@ class PacienteWindow():
                 'dni': data[5],
                 'fecha_nacimiento': data[6],
                 'direccion': data[3],
-                'telefono': data[9]
+                'localidad': data[4],
+                'telefono': data[9],
+                'obra_social': data[7],
+                'numero_afiliado': data[8],
+                'familiar_a_cargo': data[13],
+                'fecha_ingreso': data[10],
+                'fecha_egreso': data[11],
+                'motivo': data[12],
+                'modulo': data[14],
+                'soporte_nutricional': data[17],
+                'submodulo': data[15],
+                'equipamiento': data[16],
+                'asistencia_respiratoria': data[18]
+                
             }
             
             # Mostrar el cuadro de diálogo para guardar el archivo PDF
@@ -664,106 +644,124 @@ class PacienteWindow():
         except Exception as e:
             QMessageBox.critical(None, "Error", f"Ocurrió un error: {str(e)}")
 
-# Función para generar el PDF (definida anteriormente)
-    # def generar_pdf_paciente(self, paciente_data):
-    #     from reportlab.lib.pagesizes import letter
-    #     from reportlab.pdfgen import canvas
-
-    #     # Definir el nombre del archivo PDF
-    #     archivo_pdf = f"{paciente_data['nombre']}_{paciente_data['apellido']}.pdf"
-        
-    #     document = SimpleDocTemplate(archivo_pdf, pagesize=letter)
-    #     styles = getSampleStyleSheet()
-    #     content = []
-
-    #     # Añadir Título
-    #     title_style = styles['Title']
-    #     content.append(Paragraph("Paciente", title_style))
-
-    #     # Añadir Información del Paciente
-    #     normal_style = styles['Normal']
-    #     content.append(Paragraph(f"Nombre: {paciente_data['nombre']}", normal_style))
-    #     content.append(Paragraph(f"Apellido: {paciente_data['apellido']}", normal_style))
-    #     content.append(Paragraph(f"DNI: {paciente_data['documento']}", normal_style))
-    #     content.append(Paragraph(f"Fecha de Nacimiento: {paciente_data['fecha_nacimiento']}", normal_style))
-    #     content.append(Paragraph(f"Dirección: {paciente_data['direccion']}", normal_style))
-    #     content.append(Paragraph(f"Teléfono: {paciente_data['telefono']}", normal_style))
-
-    #     # Generar PDF
-    #     document.build(content)
-    #     return archivo_pdf
-
-        # # Crear un canvas para el PDF
-        # c = canvas.Canvas(archivo_pdf, pagesize=letter)
-        # width, height = letter
-        
-        # # Agregar contenido al PDF
-        # c.setFont("Helvetica", 12)
-        # c.drawString(100, height - 100, f"Nombre: {paciente_data['nombre']}")
-        # c.drawString(100, height - 120, f"Apellido: {paciente_data['apellido']}")
-        # c.drawString(100, height - 140, f"DNI: {paciente_data['documento']}")
-        # c.drawString(100, height - 160, f"Fecha de Nacimiento: {paciente_data['fecha_nacimiento']}")
-        # c.drawString(100, height - 180, f"Dirección: {paciente_data['direccion']}")
-        # c.drawString(100, height - 200, f"Teléfono: {paciente_data['telefono']}")
-        
-        # # Agregar más información según sea necesario
-        
-        # # Guardar el PDF
-        # c.showPage()
-        # c.save()
-        
-        # return archivo_pdf
-
     def generar_pdf_paciente(self, paciente_data, filePath):
         try:
             c = canvas.Canvas(filePath, pagesize=A4)
             width, height = A4
-            margin = 50
-            line_height = 20
+            margin = 2 * cm
+            line_height = 0.5 * cm
+            box_margin = 0.2 * cm
             
             # Ajustar el título
-            c.setFont("Helvetica-Bold", 12)
+            c.setFont("Helvetica-Bold", 14)
             title_x = margin
             title_y = height - margin
-            c.drawString(title_x, title_y, "Información del Paciente")
+            c.drawString(title_x, title_y, "Paciente")
             
             # Ajustar el espacio después del título
-            current_y = title_y - line_height
+            current_y = title_y - line_height * 2
             
             # Ajustar los campos
             c.setFont("Helvetica", 10)
-            col_widths = [150, 300]  # Ancho de las columnas
-            max_cols = 2  # Número máximo de columnas por línea
-            
+            col_width = (width - 2 * margin) / 2  # Dividir el ancho de la página en 2 columnas
+            box_height = 2 * line_height  # Altura de cada recuadro
+
             fields = [
-                ('Nombre', paciente_data['nombre']),
-                ('Apellido', paciente_data['apellido']),
-                ('DNI', paciente_data['dni']),
-                ('Fecha de Nacimiento', paciente_data['fecha_nacimiento']),
-                ('Dirección', paciente_data['direccion']),
-                ('Teléfono', paciente_data['telefono'])
+                ('Nombre', paciente_data.get('nombre', '')),
+                ('Apellido', paciente_data.get('apellido', '')),
+                ('Número de Documento', paciente_data.get('dni', '')),
+                ('Fecha de Nacimiento', paciente_data.get('fecha_nacimiento', '')),
+                ('Domicilio', paciente_data.get('direccion', '')),
+                ('Localidad', paciente_data.get('localidad', '')),
+                ('Teléfono', paciente_data.get('telefono', '')),
+                ('Obra Social', paciente_data.get('obra_social', '')),
+                ('Número de Afiliado', paciente_data.get('numero_afiliado', '')),
+                ('Familiar a Cargo', paciente_data.get('familiar_a_cargo', '')),
+                ('Fecha de Ingreso', paciente_data.get('fecha_ingreso', '')),
+                ('Fecha de Egreso', paciente_data.get('fecha_egreso', '')),
+                ('Motivo', paciente_data.get('motivo', '')),
+                ('Coordinador', paciente_data.get('coordinador', ''))
             ]
             
             for i, (field, value) in enumerate(fields):
-                col = i % max_cols
-                row = i // max_cols
+                col = i % 2
+                row = i // 2
                 
                 # Calcular posiciones para el campo
-                x = margin + col * (col_widths[col] + 20)
-                y = current_y - row * (line_height * 1.5)
+                x = margin + col * col_width
+                y = current_y - row * box_height
                 
-                # Ajustar el ancho máximo para el texto
-                text_width = col_widths[col] - 20
+                # Dibujar el recuadro para el título
+                title_box_x = x
+                title_box_y = y - box_height + line_height
+                c.rect(title_box_x, title_box_y, col_width / 2, box_height)
                 
-                # Dibujar campo y valor
-                c.drawString(x, y, f"{field}:")
-                c.drawString(x + text_width, y, value[:text_width])
+                # Dibujar el recuadro para el valor
+                value_box_x = x + col_width / 2
+                value_box_y = y - box_height + line_height
+                c.rect(value_box_x, value_box_y, col_width / 2, box_height)
                 
-                # Ajustar el ancho del campo y valor en caso de desbordamiento
-                if len(value) > text_width:
-                    lines = [value[i:i + text_width] for i in range(0, len(value), text_width)]
-                    for j, line in enumerate(lines):
-                        c.drawString(x + text_width, y - (j + 1) * line_height, line)
+                # Dibujar campo y valor dentro del recuadro
+                title_text_x = title_box_x + box_margin
+                title_text_y = title_box_y + box_height - line_height - box_margin
+                value_text_x = value_box_x + box_margin
+                value_text_y = value_box_y + box_height - line_height - box_margin
+                
+                c.drawString(title_text_x, title_text_y, f"{field}:")
+                c.drawString(value_text_x, value_text_y, value)
+            
+            # Agregar sección de Resolución
+            current_y = current_y - (len(fields) // 2) * box_height - box_height
+            c.setFont("Helvetica-Bold", 12)
+            c.drawString(margin, current_y, "Resolución")
+            c.line(margin, current_y - 0.2 * cm, width - margin, current_y - 0.2 * cm)
+            
+            # Sub-secciones (solo los datos cargados)
+            current_y = current_y - line_height * 1.5
+            c.setFont("Helvetica", 10)
+            
+            # Procesar diccionarios para submodulo, asistencia respiratoria y equipamiento
+            def procesar_diccionario(diccionario_str):
+                diccionario = json.loads(diccionario_str)
+                return ', '.join([key for key, value in diccionario.items() if value])
+            
+            submodulo = procesar_diccionario(paciente_data.get('submodulo', '{}'))
+            asistencia_respiratoria = procesar_diccionario(paciente_data.get('asistencia_respiratoria', '{}'))
+            equipamiento = procesar_diccionario(paciente_data.get('equipamiento', '{}'))
+            
+            sections = [
+                ('Módulo', paciente_data.get('modulo', '')),
+                ('Soporte Nutricional', paciente_data.get('soporte_nutricional', '')),
+                ('SubMódulo', submodulo),
+                ('Equipamiento', equipamiento),
+                ('Asistencia Respiratoria', asistencia_respiratoria)
+            ]
+            
+            for i, (label, value) in enumerate(sections):
+                col = i % 2
+                row = i // 2
+                
+                x = margin + col * col_width
+                y = current_y - row * box_height
+                
+                # Dibujar el recuadro para el título
+                title_box_x = x
+                title_box_y = y - box_height + line_height
+                c.rect(title_box_x, title_box_y, col_width / 2, box_height)
+                
+                # Dibujar el recuadro para el valor
+                value_box_x = x + col_width / 2
+                value_box_y = y - box_height + line_height
+                c.rect(value_box_x, value_box_y, col_width / 2, box_height)
+                
+                # Dibujar campo y valor dentro del recuadro
+                title_text_x = title_box_x + box_margin
+                title_text_y = title_box_y + box_height - line_height - box_margin
+                value_text_x = value_box_x + box_margin
+                value_text_y = value_box_y + box_height - line_height - box_margin
+                
+                c.drawString(title_text_x, title_text_y, f"{label}:")
+                c.drawString(value_text_x, value_text_y, value)
             
             # Finalizar el PDF
             c.save()

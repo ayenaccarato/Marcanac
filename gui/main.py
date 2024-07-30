@@ -12,15 +12,8 @@ class MainWindow():
         self.usuario = user
         self.main = uic.loadUi("gui/main_2.ui")
         self.initGUI()
-        self.main.show()
-        #self.main.showMaximized()
+        self.main.show()    
 
-        # self.main.btnRestaurar.hide() #Oculto boton         
-
-        # self.main.btnMinimizar.clicked.connect(self.control_btnMinimizar) #Minimizo la pantalla
-        # self.main.btnRestaurar.clicked.connect(self.control_btnNormal) #Vuelve a la normalidad
-        # self.main.btnMaximizar.clicked.connect(self.control_btnMaximizar) #Maximizo la pagina
-        # self.main.btnCerrar.clicked.connect(lambda:self.main.close()) #Cierro
 
     def initGUI(self):       
 

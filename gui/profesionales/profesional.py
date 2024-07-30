@@ -1,6 +1,10 @@
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import cm
+
 from PyQt6 import uic, QtCore
 from PyQt6.QtCore import Qt, QDate
-from PyQt6.QtWidgets import QMessageBox, QPushButton, QWidget, QHBoxLayout, QTableWidgetItem
+from PyQt6.QtWidgets import QFileDialog, QMessageBox, QPushButton, QWidget, QHBoxLayout, QTableWidgetItem
 from data.listados import ListadoData
 from data.paciente_profesionales import PacienteProfesionalesData
 from data.profesional import ProfesionalData
@@ -256,6 +260,8 @@ class ProfesionalWindow():
             self.verProf.btnEliminar.clicked.connect(lambda: self.eliminar_profesional(id))
         else:
             self.verProf.btnEliminar.setVisible(False)
+
+        self.verProf.btnDescargar.clicked.connect(lambda: self.descargar_pdf(id_profesional=id))
             
         self.verProf.show()
 
@@ -440,4 +446,178 @@ class ProfesionalWindow():
            
     
 
-################# Coordinador - Paciente ###############
+################# PDF ###############
+
+    def descargar_pdf(self, id_profesional):
+        try:
+            # Obtener la información del profesional
+            profesional = ProfesionalData()
+            data = profesional.mostrar(id_profesional)
+            profesional_data = {
+                'nombre': data[1],
+                'apellido': data[2],
+                'cuit': data[5],
+                'fecha_nacimiento': data[6],
+                'direccion': data[3],
+                'localidad': data[4],
+                'codigo_postal': data[7],
+                'telefono': data[9],                
+                'mail': data[13],
+                'profesion': data[16],
+                'matricula': data[8],
+                'cbu1': data[10],
+                'cbu2': data[11],
+                'alias': data[12],
+                'monotributo': data[14],
+                'coordinador': data[15],
+                'cuidador': data[17],  
+                'codigo_trans': data[18],
+                'nombre2': data[19],
+                'apellido2': data[20],
+                'cuit2': data[21],
+                'cbu3': data[22]              
+            }
+            
+            # Mostrar el cuadro de diálogo para guardar el archivo PDF
+            filePath, _ = QFileDialog.getSaveFileName(self.verProf, "Guardar PDF", f"{profesional_data['nombre']}_{profesional_data['apellido']}.pdf", "PDF Files (*.pdf)")
+            
+            if filePath:
+                # Generar el PDF
+                if self.generar_pdf_profesional(profesional_data, filePath):
+                    QMessageBox.information(None, "Éxito", "El PDF se guardó correctamente.")
+                else:
+                    QMessageBox.warning(None, "Error", "No se pudo guardar el PDF.")
+            else:
+                QMessageBox.warning(None, "Advertencia", "No se seleccionó ningún archivo para guardar.")
+        except Exception as e:
+            QMessageBox.critical(None, "Error", f"Ocurrió un error: {str(e)}")
+
+    def generar_pdf_profesional(self, profesional_data, filePath):
+        try:
+            c = canvas.Canvas(filePath, pagesize=A4)
+            width, height = A4
+            margin = 1 * cm
+            line_height = 0.5 * cm
+            box_margin = 0.2 * cm
+            
+            # Ajustar el título
+            c.setFont("Helvetica-Bold", 14)
+            title_x = margin
+            title_y = height - margin
+            c.drawString(title_x, title_y, "Profesional")
+            
+            # Ajustar el espacio después del título
+            current_y = title_y - line_height * 2
+            
+            # Ajustar los campos
+            c.setFont("Helvetica", 10)
+            col_width = (width - 2 * margin) / 2  # Dividir el ancho de la página en 2 columnas
+            box_height = 2 * line_height  # Altura de cada recuadro
+
+            def procesar_boolean(data):
+                if data == 'True':
+                    return 'Sí'
+                else:
+                    return 'No'
+                
+            monotributo = procesar_boolean(profesional_data.get('monotributo', '{}'))
+
+            coordinador = procesar_boolean(profesional_data.get('coordinador', '{}'))
+            cuidador = procesar_boolean(profesional_data.get('cuidador', '{}'))
+            fields = [ 
+                ('Nombre', profesional_data.get('nombre', '')),
+                ('Apellido', profesional_data.get('apellido', '')),
+                ('CUIT', profesional_data.get('cuit', '')),
+                ('Fecha de Nacimiento', profesional_data.get('fecha_nacimiento', '')),
+                ('Domicilio', profesional_data.get('direccion', '')),
+                ('Localidad', profesional_data.get('localidad', '')),
+                ('Teléfono', profesional_data.get('telefono', '')),
+                ('Código Postal', profesional_data.get('codigo_postal', '')),
+                ('Mail', profesional_data.get('mail', '')),
+                ('Profesión', profesional_data.get('profesion', '')),
+                ('Matrícula', profesional_data.get('matricula', '')),
+                ('CBU 1', profesional_data.get('cbu1', '')),
+                ('CBU 2', profesional_data.get('cbu2', '')),
+                ('Alias', profesional_data.get('alias', '')),
+                ('Monotributo', monotributo),
+                ('Coordinador', coordinador),
+                ('Cuidador', cuidador),
+                ('Código de transferencia', profesional_data.get('codigo_trans', '')),
+            ]
+            
+            for i, (field, value) in enumerate(fields):
+                col = i % 2
+                row = i // 2
+                
+                # Calcular posiciones para el campo
+                x = margin + col * col_width
+                y = current_y - row * box_height
+                
+                # Dibujar el recuadro para el título
+                title_box_x = x
+                title_box_y = y - box_height + line_height
+                c.rect(title_box_x, title_box_y, col_width / 2, box_height)
+                
+                # Dibujar el recuadro para el valor
+                value_box_x = x + col_width / 2
+                value_box_y = y - box_height + line_height
+                c.rect(value_box_x, value_box_y, col_width / 2, box_height)
+                
+                # Dibujar campo y valor dentro del recuadro
+                title_text_x = title_box_x + box_margin
+                title_text_y = title_box_y + box_height - line_height - box_margin
+                value_text_x = value_box_x + box_margin
+                value_text_y = value_box_y + box_height - line_height - box_margin
+                
+                c.drawString(title_text_x, title_text_y, f"{field}:")
+                c.drawString(value_text_x, value_text_y, value)
+            
+            # Agregar sección de Pago a terceros
+            current_y = current_y - (len(fields) // 2) * box_height - box_height
+            c.setFont("Helvetica-Bold", 12)
+            c.drawString(margin, current_y, "Pago a Terceros")
+            c.line(margin, current_y - 0.2 * cm, width - margin, current_y - 0.2 * cm)
+            
+            # Sub-secciones (solo los datos cargados)
+            current_y = current_y - line_height * 1.5
+            c.setFont("Helvetica", 10)            
+            
+            sections = [
+                ('Nombre', profesional_data.get('nombre2', '')),
+                ('Apellido', profesional_data.get('apellido2', '')),
+                ('CUIT', profesional_data.get('cuit2', '')),
+                ('CBU', profesional_data.get('cbu3', '')),               
+            ]
+            
+            for i, (label, value) in enumerate(sections):
+                col = i % 2
+                row = i // 2
+                
+                x = margin + col * col_width
+                y = current_y - row * box_height
+                
+                # Dibujar el recuadro para el título
+                title_box_x = x
+                title_box_y = y - box_height + line_height
+                c.rect(title_box_x, title_box_y, col_width / 2, box_height)
+                
+                # Dibujar el recuadro para el valor
+                value_box_x = x + col_width / 2
+                value_box_y = y - box_height + line_height
+                c.rect(value_box_x, value_box_y, col_width / 2, box_height)
+                
+                # Dibujar campo y valor dentro del recuadro
+                title_text_x = title_box_x + box_margin
+                title_text_y = title_box_y + box_height - line_height - box_margin
+                value_text_x = value_box_x + box_margin
+                value_text_y = value_box_y + box_height - line_height - box_margin
+                
+                c.drawString(title_text_x, title_text_y, f"{label}:")
+                c.drawString(value_text_x, value_text_y, value)
+            
+            # Finalizar el PDF
+            c.save()
+            return True
+        except Exception as e:
+            print(f"Error al generar el PDF: {str(e)}")
+            return False
