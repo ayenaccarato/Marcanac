@@ -9,7 +9,7 @@ from data.listados import ListadoData
 from data.paciente_profesionales import PacienteProfesionalesData
 from data.profesional import ProfesionalData
 from gui.profesionales.archivos_profesional import ArchivosProfesionalWindow
-from gui.profesionales.ver_profesional import VerProfesionalWindow
+
 from model.profesional import Profesional
 from model.usuario import Usuario
 

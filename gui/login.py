@@ -1,3 +1,5 @@
+import os
+
 from PyQt6 import uic
 from PyQt6.QtWidgets import QMessageBox
 from data.usuario import UsuarioData
@@ -7,7 +9,8 @@ from model.usuario import Usuario
 class Login():
 
     def __init__(self):
-        self.login = uic.loadUi("gui/login.ui")
+        ui_file = os.path.join('gui', 'login.ui')
+        self.login = uic.loadUi(ui_file)
         self.initGUI()
         self.login.show()
 
