@@ -1,4 +1,5 @@
 import json
+import os
 
 from PyQt6 import uic, QtCore
 from PyQt6.QtCore import Qt, QDate
@@ -13,8 +14,21 @@ from model.insumo import Insumo
 class InsumosWindow():
 
     def __init__(self):
-        self.nInsumo = uic.loadUi("gui/insumos/cargar_insumo.ui")
-        self.lInsumo = uic.loadUi("gui/insumos/listado_insumos.ui")
+        #elf.nInsumo = uic.loadUi("gui/insumos/cargar_insumo.ui")
+        ui_file = os.path.join(os.path.dirname(__file__), '..', 'insumos', 'cargar_insumo.ui')
+        ui_file = os.path.abspath(ui_file)  # Convierte a ruta absoluta
+        if not os.path.isfile(ui_file):
+            print(f"Error: el archivo {ui_file} no se encuentra.")
+            return
+        self.nInsumo = uic.loadUi(ui_file)
+
+        #self.lInsumo = uic.loadUi("gui/insumos/listado_insumos.ui")
+        ui_file_i = os.path.join(os.path.dirname(__file__), '..', 'gui', 'insumos', 'listado_insumos.ui')
+        ui_file_i = os.path.abspath(ui_file_i)  # Convierte a ruta absoluta
+        if not os.path.isfile(ui_file_i):
+            print(f"Error: el archivo {ui_file_i} no se encuentra.")
+            return
+        self.lInsumo = uic.loadUi(ui_file_i)
 
 ####### Nuevo #######
 
