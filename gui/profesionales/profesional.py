@@ -1,3 +1,5 @@
+import os
+
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
@@ -17,12 +19,46 @@ class ProfesionalWindow():
 
     def __init__(self, user: Usuario):
         self.usuario = user
-        self.prof = uic.loadUi("gui/profesionales/nuevo_profesional.ui")
-        self.listadoProf = uic.loadUi("gui/profesionales/listado_profesionales.ui")
-        self.verProf = uic.loadUi("gui/profesionales/ver_profesional.ui")
-        self.actProf = uic.loadUi("gui/profesionales/modificar_profesional.ui")
+        #self.prof = uic.loadUi("gui/profesionales/nuevo_profesional.ui")
+        ui_file_prof = os.path.join(os.path.dirname(__file__), '..', 'profesionales' ,'nuevo_profesional.ui')
+        ui_file_prof = os.path.abspath(ui_file_prof)  # Convierte a ruta absoluta
+        if not os.path.isfile(ui_file_prof):
+            print(f"Error: el archivo {ui_file_prof} no se encuentra.")
+            return
+        self.prof = uic.loadUi(ui_file_prof)
+        
+        #self.listadoProf = uic.loadUi("gui/profesionales/listado_profesionales.ui")
+        ui_file_lis = os.path.join(os.path.dirname(__file__), '..', 'profesionales' ,'listado_profesionales.ui')
+        ui_file_lis = os.path.abspath(ui_file_lis)  # Convierte a ruta absoluta
+        if not os.path.isfile(ui_file_lis):
+            print(f"Error: el archivo {ui_file_lis} no se encuentra.")
+            return
+        self.listadoProf = uic.loadUi(ui_file_lis)
 
-        self.asocProf = uic.loadUi("gui/pacientes/asociar_profesional.ui")
+        #self.verProf = uic.loadUi("gui/profesionales/ver_profesional.ui")
+        ui_file_ver = os.path.join(os.path.dirname(__file__), '..', 'profesionales' ,'ver_profesional.ui')
+        ui_file_ver = os.path.abspath(ui_file_ver)  # Convierte a ruta absoluta
+        if not os.path.isfile(ui_file_ver):
+            print(f"Error: el archivo {ui_file_ver} no se encuentra.")
+            return
+        self.verProf = uic.loadUi(ui_file_ver)
+
+        #self.actProf = uic.loadUi("gui/profesionales/modificar_profesional.ui")
+        ui_file_act = os.path.join(os.path.dirname(__file__), '..', 'profesionales' ,'modificar_profesional.ui')
+        ui_file_act = os.path.abspath(ui_file_act)  # Convierte a ruta absoluta
+        if not os.path.isfile(ui_file_act):
+            print(f"Error: el archivo {ui_file_act} no se encuentra.")
+            return
+        self.actProf = uic.loadUi(ui_file_act)
+
+        #self.asocProf = uic.loadUi("gui/pacientes/asociar_profesional.ui")
+        ui_file_a= os.path.join(os.path.dirname(__file__), '..', 'profesionales' ,'listado_profesionales.ui')
+        ui_file_a = os.path.abspath(ui_file_a)  # Convierte a ruta absoluta
+        if not os.path.isfile(ui_file_a):
+            print(f"Error: el archivo {ui_file_a} no se encuentra.")
+            return
+        self.asocProf = uic.loadUi(ui_file_a)
+
               
 
     def abrirRegistroProf(self):   
