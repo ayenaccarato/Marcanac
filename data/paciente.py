@@ -1,47 +1,57 @@
-from datetime import datetime
 import sqlite3
 import conexion as con
 from model.paciente import Paciente
 
-class PacienteData():   
-
+class PacienteData:
+    
     def __init__(self):
+        self.conn = con.Conexion()  # Usa la instancia de Conexion
+        self.db = self.conn.conectar()
+        self.cursor = self.db.cursor()
+
+        # Configura un tiempo de espera para los bloqueos
+        self.cursor.execute("PRAGMA busy_timeout = 3000")
+
         try:
-            self.db = con.Conexion().conectar()
-            self.cursor = self.db.cursor()
-            sql_create_pacientes = """ CREATE TABLE IF NOT EXISTS pacientes
-            (id INTEGER PRIMARY KEY AUTOINCREMENT, 
-            nombre TEXT, 
-            apellido TEXT,
-            domicilio TEXT,
-            localidad TEXT,
-            documento TEXT UNIQUE,
-            fechaNacimiento DATETIME,
-            obraSocial TEXT,
-            numAfiliado TEXT,
-            telefono TEXT,
-            fechaIngreso DATETIME,
-            fechaEgreso DATETIME,
-            motivo TEXT,
-            familiar TEXT,
-            modulo TEXT,
-            submodulo TEXT,
-            equip TEXT,
-            sopNutri TEXT,
-            asisRespi TEXT
+            sql_create_pacientes = """ CREATE TABLE IF NOT EXISTS pacientes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT, 
+                nombre TEXT, 
+                apellido TEXT,
+                domicilio TEXT,
+                localidad TEXT,
+                documento TEXT UNIQUE,
+                fechaNacimiento DATETIME,
+                obraSocial TEXT,
+                numAfiliado TEXT,
+                telefono TEXT,
+                fechaIngreso DATETIME,
+                fechaEgreso DATETIME,
+                motivo TEXT,
+                familiar TEXT,
+                modulo TEXT,
+                submodulo TEXT,
+                equip TEXT,
+                sopNutri TEXT,
+                asisRespi TEXT
             ) """
-            
             self.cursor.execute(sql_create_pacientes)
             self.db.commit()
-            self.cursor.close() 
-            self.db.close()           
             print("Tabla Pacientes creada")
+        except sqlite3.Error as ex:
+            print("Error al crear la tabla Pacientes:", ex)
         except Exception as ex:
-            print("Tabla Pacientes OK: ", ex)
+            print("Error inesperado al crear la tabla Pacientes:", ex)
+        finally:
+            self.cursor.close()
+            self.db.close()
 
     def registrar(self, paciente:Paciente): 
         self.db = con.Conexion().conectar()
         self.cursor = self.db.cursor()
+
+        # # Configura un tiempo de espera para los bloqueos
+        # self.cursor.execute("PRAGMA busy_timeout = 3000")
+
         self.cursor.execute("""
         INSERT INTO pacientes values
         (null, '{}', '{}', '{}', '{}', '{}', 
