@@ -1,4 +1,5 @@
 import json
+import os
 
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
@@ -7,7 +8,7 @@ from reportlab.lib.units import cm
 from PyQt6 import uic, QtCore
 from PyQt6.QtCore import Qt, QDate
 from PyQt6.QtGui import QColor
-from PyQt6.QtWidgets import QFileDialog, QMessageBox, QPushButton, QWidget, QHBoxLayout, QTableWidgetItem
+from PyQt6.QtWidgets import QFileDialog, QMessageBox, QPushButton, QWidget, QHBoxLayout, QTableWidgetItem, QTableWidget
 
 from data.listados import ListadoData
 from data.paciente import PacienteData
@@ -23,16 +24,61 @@ from model.usuario import Usuario
 class PacienteWindow():
 
     def __init__(self, user: Usuario):
+        PacienteData()
         self.usuario = user
-        self.actPac = uic.loadUi("gui/pacientes/modificar_paciente.ui")
         
-        self.listado = uic.loadUi("gui/pacientes/listado_pacientes.ui")
-        self.nuevo = uic.loadUi("gui/pacientes/nuevo_paciente.ui")
-        self.ver = uic.loadUi("gui/pacientes/ver_paciente.ui")
-        #Coordinador
-        self.nCoord = uic.loadUi("gui/pacientes/asociar_coordinador.ui")
-        #Profesionales del paciente
-        self.lisProfPac = uic.loadUi("gui/pacientes/listado_profesionales_paciente.ui")
+        # Cargar UI para modificar paciente
+        ui_file = os.path.join(os.path.dirname(__file__), '..', 'pacientes', 'modificar_paciente.ui')
+        ui_file = os.path.abspath(ui_file)
+        if not os.path.isfile(ui_file):
+            print(f"Error: el archivo {ui_file} no se encuentra.")
+            return
+        self.actPac = uic.loadUi(ui_file)
+
+        # Cargar UI para listado de pacientes
+        try:
+            ui_file_lis = os.path.join(os.path.dirname(__file__), '..', 'pacientes', 'listado_pacientes.ui')
+            ui_file_lis = os.path.abspath(ui_file_lis)
+            if not os.path.isfile(ui_file_lis):
+                print(f"Error: el archivo {ui_file_lis} no se encuentra.")
+                return
+            self.listado = uic.loadUi(ui_file_lis)
+        except Exception as e:
+            QMessageBox.critical(None, "Error", f"Error aa: {e}")
+            print(f"Ruta del archivo listado_pacientes.ui: {ui_file_lis}")
+            print(f"Existe el archivo: {os.path.isfile(ui_file_lis)}")
+        
+        # Cargar UI para nuevo paciente
+        ui_file_n = os.path.join(os.path.dirname(__file__), '..', 'pacientes', 'nuevo_paciente.ui')
+        ui_file_n = os.path.abspath(ui_file_n)
+        if not os.path.isfile(ui_file_n):
+            print(f"Error: el archivo {ui_file_n} no se encuentra.")
+            return
+        self.nuevo = uic.loadUi(ui_file_n)
+        
+        # Cargar UI para ver paciente
+        ui_file_ver = os.path.join(os.path.dirname(__file__), '..', 'pacientes', 'ver_paciente.ui')
+        ui_file_ver = os.path.abspath(ui_file_ver)
+        if not os.path.isfile(ui_file_ver):
+            print(f"Error: el archivo {ui_file_ver} no se encuentra.")
+            return
+        self.ver = uic.loadUi(ui_file_ver)
+        
+        # Cargar UI para asociar coordinador
+        ui_file_c = os.path.join(os.path.dirname(__file__), '..', 'pacientes', 'asociar_coordinador.ui')
+        ui_file_c = os.path.abspath(ui_file_c)
+        if not os.path.isfile(ui_file_c):
+            print(f"Error: el archivo {ui_file_c} no se encuentra.")
+            return
+        self.nCoord = uic.loadUi(ui_file_c)
+        
+        # Cargar UI para listado de profesionales del paciente
+        ui_file_lisP = os.path.join(os.path.dirname(__file__), '..', 'pacientes', 'listado_profesionales_paciente.ui')
+        ui_file_lisP = os.path.abspath(ui_file_lisP)
+        if not os.path.isfile(ui_file_lisP):
+            print(f"Error: el archivo {ui_file_lisP} no se encuentra.")
+            return
+        self.lisProfPac = uic.loadUi(ui_file_lisP)
 
 ### Registrar ###
 
@@ -40,19 +86,53 @@ class PacienteWindow():
         self.nuevo.btnRegistrar.clicked.connect(self.registrarPaciente)     
         self.nuevo.show()
 
+    def registro(self, doc):
+        fechaN = self.nuevo.txtFechaN.date().toPyDate().strftime("%d/%m/%Y") #formateo la fecha
+        fechaI = self.nuevo.txtFechaI.date().toPyDate().strftime("%d/%m/%Y")
+                    
+        subm =json.dumps(self.agruparSubm('nuevo')) #Serializo el diccionario
+                    
+        equi = json.dumps(self.agruparEquip('nuevo'))
+        asisR = json.dumps(self.agruparAsisR('nuevo'))
+        nuevoPaciente = Paciente(
+            nombre = self.nuevo.txtNombre.text(),
+            apellido = self.nuevo.txtApellido.text(),
+            domicilio = self.nuevo.txtDomicilio.text(),
+            localidad = self.nuevo.txtLocalidad.text(),
+            documento = int(doc),
+            fechaNacimiento = fechaN,
+            obraSocial = self.nuevo.cbObraSocial.currentText(),
+            numAfiliado = int(self.nuevo.txtNroAfi.text()),
+            telefono = self.nuevo.txtTelefono.text(),
+            fechaIngreso = fechaI,
+            fechaEgreso = "",
+            motivo = "",
+            familiar = self.nuevo.txtFamiliar.text(),
+            modulo = self.nuevo.cbModulo.currentText(),
+            submodulo = subm,
+            equip = equi,
+            sopNutri = self.nuevo.cbSN.currentText(),
+            asisRespi = asisR,
+        )
+
+        objData = PacienteData()                    
+                   
+        if objData.registrar(paciente=nuevoPaciente):   
+            print('registro')
+            QMessageBox.information(None, 'Mensaje', 'Paciente registrado')   
+            self.limpiarCamposPaciente()          
+        else:
+            QMessageBox.warning(None, 'Error', 'El paciente no pudo ser registrado')
+                        
+        self.nuevo.close() #Cierro la ventana
+
     def registrarPaciente(self):
-        mBox = QMessageBox()
         if self.nuevo.cbObraSocial.currentText() == "--Seleccione--" or self.nuevo.cbModulo.currentText() == "--Seleccione--":            
-            mBox.setWindowTitle('Mensaje')
-            mBox.setText("Seleccione una obra social o módulo")
-            mBox.exec()
+            QMessageBox.information(None, 'Mensaje', 'Seleccione una obra social o módulo')
 
         elif len(self.nuevo.txtDocumento.text()) < 7:  
-            mBox.setWindowTitle('Error')         
-            mBox.setText("El número de documento ingresado es inválido")
-            mBox.exec()
-        else:
-            if len(self.nuevo.txtDocumento.text()) == 7:
+            QMessageBox.warning(None, 'Error', 'El número de documento ingresado es inválido')
+        elif len(self.nuevo.txtDocumento.text()) == 7:
                 doc = self.nuevo.txtDocumento.text()
                 mBox = QMessageBox()
                 mBox.setWindowTitle('Confirmar registro')
@@ -66,52 +146,15 @@ class PacienteWindow():
                 mBox.exec()
 
                 if mBox.clickedButton() == si_btn:
+                    print('aaa')
                     #Se agrega un 0 adelante para que complete los 8 digitos
                     doc = '0' + self.nuevo.txtDocumento.text()
-
-                    fechaN = self.nuevo.txtFechaN.date().toPyDate().strftime("%d/%m/%Y") #formateo la fecha
-                    fechaI = self.nuevo.txtFechaI.date().toPyDate().strftime("%d/%m/%Y")
-                    
-                    subm =json.dumps(self.agruparSubm('nuevo')) #Serializo el diccionario
-                    
-                    equi = json.dumps(self.agruparEquip('nuevo'))
-                    asisR = json.dumps(self.agruparAsisR('nuevo'))
-                    nuevoPaciente = Paciente(
-                        nombre = self.nuevo.txtNombre.text(),
-                        apellido = self.nuevo.txtApellido.text(),
-                        domicilio = self.nuevo.txtDomicilio.text(),
-                        localidad = self.nuevo.txtLocalidad.text(),
-                        documento = int(doc),
-                        fechaNacimiento = fechaN,
-                        obraSocial = self.nuevo.cbObraSocial.currentText(),
-                        numAfiliado = int(self.nuevo.txtNroAfi.text()),
-                        telefono = self.nuevo.txtTelefono.text(),
-                        fechaIngreso = fechaI,
-                        fechaEgreso = "",
-                        motivo = "",
-                        familiar = self.nuevo.txtFamiliar.text(),
-                        modulo = self.nuevo.cbModulo.currentText(),
-                        submodulo = subm,
-                        equip = equi,
-                        sopNutri = self.nuevo.cbSN.currentText(),
-                        asisRespi = asisR,
-                    )
-
-                    objData = PacienteData()
-                    
-                    mBox = QMessageBox()
-                    if objData.registrar(paciente=nuevoPaciente):   
-                        mBox.setWindowTitle('Mensaje')             
-                        mBox.setText("Paciente registrado")      
-                        self.limpiarCamposPaciente()          
-                    else:
-                        mBox.setWindowTitle('Error')
-                        mBox.setText("El paciente no pudo ser registrado")
-                        
-                    mBox.exec()
-                    self.nuevo.close() #Cierro la ventana
+                    self.registro(doc)
                 else:
                     print("Ingrese otro documento")
+        else:
+            doc = self.nuevo.txtDocumento.text()
+            self.registro(doc)
             
 
     def agruparSubm(self, ventana):
@@ -444,34 +487,69 @@ class PacienteWindow():
        
         self.listado.tblListado.setCellWidget(fila, 3, widget)
 
+    # def abrirListado(self):    
+    #     lis = ListadoData() 
+    #     data = lis.obtenerPacientes()    
+    #     fila = 0
+    #     self.listado.tblListado.setRowCount(len(data)) #Cuantas filas traen los datos
+    #     for item in data:
+    #         self.listado.tblListado.setItem(fila, 0, QTableWidgetItem(str(item[2]))) #Apellido
+    #         self.listado.tblListado.setItem(fila, 1, QTableWidgetItem(str(item[1]))) #Nombre
+    #         self.listado.tblListado.setItem(fila, 2, QTableWidgetItem(str(item[10]))) #Fecha de ingreso
+            
+    #         if item[11] == '':                
+    #             self.setRowBackgroundColorP(fila, QColor(170, 255, 127))  # Verde
+    #         else:
+    #            self.setRowBackgroundColorP(fila, QColor(255, 88, 66))  # Rojo
+            
+    #         id_valor = item[0]
+            
+    #         self.boton_listado_paciente(id_valor, fila)
+
+    #         fila += 1
+
+    #     self.listado.tblListado.setColumnWidth(2,150)
+    #     self.listado.tblListado.setColumnWidth(4,150)
+    #     self.listado.tblListado.setColumnWidth(5,150) 
+    #     self.listado.btnBuscar.clicked.connect(lambda: self.buscarPac())
+    #     self.listado.btnLista.setVisible(False)
+    #     self.limpiar_campos_busqueda()
+    #     self.listado.show()
+
     def abrirListado(self):    
         lis = ListadoData() 
         data = lis.obtenerPacientes()    
-        fila = 0
-        self.listado.tblListado.setRowCount(len(data)) #Cuantas filas traen los datos
-        for item in data:
-            self.listado.tblListado.setItem(fila, 0, QTableWidgetItem(str(item[2]))) #Apellido
-            self.listado.tblListado.setItem(fila, 1, QTableWidgetItem(str(item[1]))) #Nombre
-            self.listado.tblListado.setItem(fila, 2, QTableWidgetItem(str(item[10]))) #Fecha de ingreso
-            
-            if item[11] == '':                
-                self.setRowBackgroundColorP(fila, QColor(170, 255, 127))  # Verde
+
+        if hasattr(self.listado, 'tblListado'):
+            if isinstance(self.listado.tblListado, QTableWidget):
+                fila = 0
+                self.listado.tblListado.setRowCount(len(data)) # Cuantas filas traen los datos
+                for item in data:
+                    self.listado.tblListado.setItem(fila, 0, QTableWidgetItem(str(item[2]))) # Apellido
+                    self.listado.tblListado.setItem(fila, 1, QTableWidgetItem(str(item[1]))) # Nombre
+                    self.listado.tblListado.setItem(fila, 2, QTableWidgetItem(str(item[10]))) # Fecha de ingreso
+                    
+                    if item[11] == '':                
+                        self.setRowBackgroundColorP(fila, QColor(170, 255, 127))  # Verde
+                    else:
+                        self.setRowBackgroundColorP(fila, QColor(255, 88, 66))  # Rojo
+                    
+                    id_valor = item[0]
+                    
+                    self.boton_listado_paciente(id_valor, fila)
+                    fila += 1
+
+                self.listado.tblListado.setColumnWidth(2, 150)
+                self.listado.tblListado.setColumnWidth(4, 150)
+                self.listado.tblListado.setColumnWidth(5, 150) 
+                self.listado.btnBuscar.clicked.connect(lambda: self.buscarPac())
+                self.listado.btnLista.setVisible(False)
+                self.limpiar_campos_busqueda()
+                self.listado.show()
             else:
-               self.setRowBackgroundColorP(fila, QColor(255, 88, 66))  # Rojo
-            
-            id_valor = item[0]
-            
-            self.boton_listado_paciente(id_valor, fila)
-
-            fila += 1
-
-        self.listado.tblListado.setColumnWidth(2,150)
-        self.listado.tblListado.setColumnWidth(4,150)
-        self.listado.tblListado.setColumnWidth(5,150) 
-        self.listado.btnBuscar.clicked.connect(lambda: self.buscarPac())
-        self.listado.btnLista.setVisible(False)
-        self.limpiar_campos_busqueda()
-        self.listado.show()
+                print("Error: 'tblListado' no es un QTableWidget.")
+        else:
+            print("Error: 'listado' no tiene el atributo 'tblListado'.")
 
     def setRowBackgroundColorP(self, row, color):
         # Verificar si la fila existe en la tabla antes de establecer el color
