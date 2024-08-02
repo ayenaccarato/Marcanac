@@ -9,14 +9,14 @@ class PacienteProfesionalesData:
             self.cursor = self.db.cursor()
             sql_create_paciente_profesionales = """
             CREATE TABLE IF NOT EXISTS paciente_profesionales (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                paciente_id INTEGER,
-                profesional_id INTEGER,
-                FOREIGN KEY (paciente_id) REFERENCES pacientes(id),
-                FOREIGN KEY (profesional_id) REFERENCES profesionales(id),
-                UNIQUE(paciente_id, profesional_id) ON DELETE CASCADE
-            )
-            """
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            paciente_id INTEGER,
+            profesional_id INTEGER,
+            FOREIGN KEY (paciente_id) REFERENCES pacientes(id) ON DELETE CASCADE,
+            FOREIGN KEY (profesional_id) REFERENCES profesionales(id) ON DELETE CASCADE,
+            UNIQUE(paciente_id, profesional_id)
+        )
+        """
             self.cursor.execute(sql_create_paciente_profesionales)
             self.db.commit()
             print("Tabla paciente_profesionales creada")

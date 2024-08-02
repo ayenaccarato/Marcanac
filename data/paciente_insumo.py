@@ -12,9 +12,9 @@ class PacienteInsumoData:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 paciente_id INTEGER,
                 insumo_id INTEGER,
-                FOREIGN KEY (paciente_id) REFERENCES pacientes(id),
-                FOREIGN KEY (insumo_id) REFERENCES insumos(id),
-                UNIQUE(paciente_id, insumo_id) ON DELETE CASCADE
+                FOREIGN KEY (paciente_id) REFERENCES pacientes(id) ON DELETE CASCADE,
+                FOREIGN KEY (insumo_id) REFERENCES insumos(id) ON DELETE CASCADE,
+                UNIQUE(paciente_id, insumo_id)
             )
             """
             self.cursor.execute(sql_create_paciente_insumo)

@@ -27,13 +27,11 @@ class UsuarioData():
         except Exception as ex:
             print(ex)
         finally:
-            print("cerre la base")
             # Verificar si el cursor y la conexión existen antes de cerrarlos
             if self.cursor:
                 self.cursor.close()
             if self.db:
                 self.db.close()
-            print("cerre la base")
 
     def crear_usuario(self, usuario: Usuario):
         try:
