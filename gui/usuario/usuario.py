@@ -35,15 +35,10 @@ class UsuarioWindow():
         self.nuevo.show()
 
     def registrar(self):        
-        mBox = QMessageBox()
-        if self.nuevo.cbRol.currentText() == "--Seleccione--":            
-            mBox.setWindowTitle('Mensaje')
-            mBox.setText("Seleccione un rol")
-            mBox.exec()
-        elif self.nuevo.txtUsuario.text() == "" or self.nuevo.txtClave.text() == "":            
-            mBox.setWindowTitle('Mensaje')
-            mBox.setText("Debe completar los campos")
-            mBox.exec() 
+        if self.nuevo.cbRol.currentText() == "--Seleccione--":   
+            QMessageBox.information(None, 'Mensaje', 'Seleccione un rol')         
+        elif self.nuevo.txtUsuario.text() == "" or self.nuevo.txtClave.text() == "":   
+            QMessageBox.warning(None, 'Error', 'Debe completar los campos')         
 
         else:
             if self.nuevo.cbRol.currentText() == "Administrador":
@@ -59,16 +54,11 @@ class UsuarioWindow():
             )
 
             objData = UsuarioData()
-                    
-            #mBox = QMessageBox()
-            if objData.crear_usuario(usuario=nuevoUsuario):   
-                # mBox.setWindowTitle('Mensaje')             
-                # mBox.setText("Usuario registrado")      
+
+            if objData.crear_usuario(usuario=nuevoUsuario):      
                 QMessageBox.information(None, 'Mensaje', 'Usuario registrado')
                                
             else:
-                #mBox.setWindowTitle('Error')
-                #mBox.setText("El usuario no pudo ser registrado")
                 QMessageBox.warning(None, 'Error', 'El usuario no pudo ser registrado')       
-            #mBox.exec()
+
             self.nuevo.close() #Cierro la ventana
