@@ -9,7 +9,14 @@ from data.archivos_profesional import ArchivosProfesionalData
 class ArchivosProfesionalWindow():
 
     def __init__(self):
-        self.arcP = uic.loadUi("gui/profesionales/archivos_profesional.ui")
+        ArchivosProfesionalData()
+        #self.arcP = uic.loadUi("gui/profesionales/archivos_profesional.ui")
+        ui_file = os.path.join(os.path.dirname(__file__), '..', 'profesionales', 'archivos_profesional.ui')
+        ui_file = os.path.abspath(ui_file)
+        if not os.path.isfile(ui_file):
+            print(f"Error: el archivo {ui_file} no se encuentra.")
+            return
+        self.arcP = uic.loadUi(ui_file)
 
     def cargarArchivosProfesional(self, id_profesional):
         # Obtener la lista de archivos relacionados con el paciente desde la base de datos
@@ -48,7 +55,7 @@ class ArchivosProfesionalWindow():
         options = QFileDialog.Option
         dir = QStandardPaths.writableLocation(QStandardPaths.StandardLocation.DocumentsLocation)
         file_types = "All files(*)"
-        data_file, _ = QFileDialog.getOpenFileName(self.arc, "Abrir Archivo", dir, file_types)
+        data_file, _ = QFileDialog.getOpenFileName(self.arcP, "Abrir Archivo", dir, file_types)
         if data_file:
             print(f"Archivo seleccionado: {data_file}")
             with open(data_file, 'rb') as file:

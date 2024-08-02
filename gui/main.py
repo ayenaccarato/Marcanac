@@ -1,5 +1,10 @@
-from PyQt6 import uic
+import os
 
+from PyQt6 import uic
+from PyQt6.QtWidgets import QMainWindow
+from data.insumos import InsumoData
+from data.paciente import PacienteData
+from data.profesional import ProfesionalData
 from gui.insumos.insumos import InsumosWindow
 from gui.pacientes.paciente import PacienteWindow
 from gui.profesionales.profesional import ProfesionalWindow
@@ -9,11 +14,21 @@ from model.usuario import Usuario
 class MainWindow():
 
     def __init__(self, user: Usuario):
-        self.usuario = user
-        self.main = uic.loadUi("gui/main_2.ui")
+        self.usuario = user #Obtengo el usuario logueado
+
+        #Creo tablas
+        
+        # self.profesionales_data = ProfesionalData()
+        # self.insumos_data = InsumoData()
+
+        ui_file = os.path.join(os.path.dirname(__file__), '..', 'gui', 'main.ui')
+        ui_file = os.path.abspath(ui_file)  # Convierte a ruta absoluta
+        if not os.path.isfile(ui_file):
+            print(f"Error: el archivo {ui_file} no se encuentra.")
+            return
+        self.main = uic.loadUi(ui_file)
         self.initGUI()
         self.main.show()    
-
 
     def initGUI(self):       
 

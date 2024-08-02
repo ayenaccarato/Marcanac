@@ -139,6 +139,9 @@ QPushButton:hover {
               <pointsize>10</pointsize>
              </font>
             </property>
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
             <property name="styleSheet">
              <string notr="true">color: rgb(71, 40, 37);</string>
             </property>
@@ -327,6 +330,9 @@ QPushButton:hover {
                 <weight>75</weight>
                 <bold>true</bold>
                </font>
+              </property>
+              <property name="cursor">
+               <cursorShape>PointingHandCursor</cursorShape>
               </property>
               <property name="styleSheet">
                <string notr="true">background-color: rgb(71, 40, 37);

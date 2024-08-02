@@ -3,12 +3,16 @@ import bcrypt
 from model.usuario import Usuario
 
 class UsuarioData():   
-        
-    def login(self, usuario:Usuario):
+
+    def __init__(self):
+        self.db = None
+        self.cursor = None
+
+    def login(self, usuario: Usuario):
         try:
             self.db = con.Conexion().conectar()
             self.cursor = self.db.cursor()
-            self.cursor.execute("SELECT * FROM usuarios WHERE usuario = '{}';".format(usuario._usuario))
+            self.cursor.execute("SELECT * FROM usuarios WHERE usuario = ?;", (usuario._usuario,))
             data = self.cursor.fetchone()
             if data:
                 clave_hash = data[3] 
@@ -23,6 +27,7 @@ class UsuarioData():
         except Exception as ex:
             print(ex)
         finally:
+            # Verificar si el cursor y la conexión existen antes de cerrarlos
             if self.cursor:
                 self.cursor.close()
             if self.db:
@@ -37,11 +42,11 @@ class UsuarioData():
             self.cursor.execute(sql_insert, (usuario._nombre, usuario._usuario, hashed_password.decode('utf-8'), usuario._rol))
             self.db.commit()
             return True
-
         except Exception as ex:
             print(ex)
             return False
         finally:
+            # Verificar si el cursor y la conexión existen antes de cerrarlos
             if self.cursor:
                 self.cursor.close()
             if self.db:
