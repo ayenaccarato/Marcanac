@@ -21,7 +21,7 @@ class MainWindow():
         # self.profesionales_data = ProfesionalData()
         # self.insumos_data = InsumoData()
 
-        ui_file = os.path.join(os.path.dirname(__file__), '..', 'gui', 'main_2.ui')
+        ui_file = os.path.join(os.path.dirname(__file__), '..', 'gui', 'main.ui')
         ui_file = os.path.abspath(ui_file)  # Convierte a ruta absoluta
         if not os.path.isfile(ui_file):
             print(f"Error: el archivo {ui_file} no se encuentra.")
