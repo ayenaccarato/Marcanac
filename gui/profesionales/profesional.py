@@ -18,6 +18,7 @@ from model.usuario import Usuario
 class ProfesionalWindow():
 
     def __init__(self, user: Usuario):
+        ProfesionalData()
         self.usuario = user
         #self.prof = uic.loadUi("gui/profesionales/nuevo_profesional.ui")
         ui_file_prof = os.path.join(os.path.dirname(__file__), '..', 'profesionales' ,'nuevo_profesional.ui')
@@ -52,25 +53,21 @@ class ProfesionalWindow():
         self.actProf = uic.loadUi(ui_file_act)
 
         #self.asocProf = uic.loadUi("gui/pacientes/asociar_profesional.ui")
-        ui_file_a= os.path.join(os.path.dirname(__file__), '..', 'profesionales' ,'listado_profesionales.ui')
+        ui_file_a= os.path.join(os.path.dirname(__file__), '..', 'pacientes' ,'asociar_profesional.ui')
         ui_file_a = os.path.abspath(ui_file_a)  # Convierte a ruta absoluta
         if not os.path.isfile(ui_file_a):
             print(f"Error: el archivo {ui_file_a} no se encuentra.")
             return
         self.asocProf = uic.loadUi(ui_file_a)
 
-              
-
     def abrirRegistroProf(self):   
         self.prof.btnRegistrar.clicked.connect(self.registrarProfesional)     
         self.prof.show()
 
     def registrarProfesional(self):
-        mBox = QMessageBox()
         if self.prof.cbProfesional.currentText() == "--Seleccione--":    
-            mBox.setWindowTitle('Mensaje')        
-            mBox.setText("Seleccione una profesión")
-            mBox.exec()
+            QMessageBox.information(None, 'Mensaje', 'Seleccione una profesión')
+            
         # elif len(self.prof.txtCbu1.text()) < 22:           
         #     mBox.setWindowTitle('Error')
         #     mBox.setText("El CBU 1 ingresado es inválido. Debe contener 22 números")
@@ -114,17 +111,13 @@ class ProfesionalWindow():
 
             objData = ProfesionalData()
             
-            mBox = QMessageBox()
             success, error_message = objData.registrar(profesional=nuevoProfesional)
             if success:   
-                mBox.setWindowTitle('Mensaje')             
-                mBox.setText("Profesional registrado")      
+                QMessageBox.information(None, 'Mensaje', 'Profesional registrado') 
                 self.limpiarCamposProfesional()         
             else:
-                mBox.setWindowTitle('Error')
-                mBox.setText(f"El profesional no pudo ser registrado: {error_message}")
-                  
-            mBox.exec()
+                QMessageBox.critical(None, 'Error', f'El profesional no pudo ser registrado: {error_message}')
+
             self.prof.close() #Cierro la ventana
 
     def limpiarCamposProfesional(self):  
@@ -254,52 +247,66 @@ class ProfesionalWindow():
         self.listadoProf.txtApellido.clear()
         self.listadoProf.cbProfesion.setCurrentIndex(0)
 
-    def mostrarProfesional(self, id):
-        archivos = ArchivosProfesionalWindow()
-        objData = ProfesionalData()
-        profesional = objData.mostrar(id)
-
-        self.verProf.txtNombre.setText(profesional[1])
-        self.verProf.txtApellido.setText(profesional[2])
-        self.verProf.txtDomicilio.setText(profesional[3])
-        self.verProf.txtLocalidad.setText(profesional[4])
-        self.verProf.txtCuit.setText(profesional[5])
-
-        day, month, year = map(int, profesional[6].split("/"))
-        date_qt = QDate(year, month, day)
-        self.verProf.txtFechaN.setDate(date_qt)
-        
-        self.verProf.txtCP.setText(profesional[7])
-        self.verProf.txtMatricula.setText(profesional[8])
-        self.verProf.txtTelefono.setText(profesional[9])
-        self.verProf.txtCbu1.setText(profesional[10])
-        self.verProf.txtCbu2.setText(profesional[11])
-        self.verProf.txtAlias.setText(profesional[12])
-        self.verProf.txtMail.setText(profesional[13])
-        
-        self.verProf.monotributo.setChecked(profesional[14] == 'True')
-        self.verProf.coordinador.setChecked(profesional[15] == 'True')
-        
-        self.verProf.cbProfesional.setCurrentText(profesional[16])
-        self.verProf.cuidador.setChecked(profesional[17] == 'True'),
-        self.verProf.txtCodigo.setText(profesional[18])
-        
-        ## Datos pago a terceros ##
-        self.verProf.txtNombre_2.setText(profesional[19])
-        self.verProf.txtApellido_2.setText(profesional[20])
-        self.verProf.txtCuit_2.setText(profesional[21])
-        self.verProf.txtCbu3.setText(profesional[22])
-
-        self.verProf.btnModificar.clicked.connect(lambda: self.abrirVentanaModificar(id))
-        self.verProf.btnCarpeta.clicked.connect(lambda: archivos.cargarArchivosProfesional(id_profesional=id))
-        if self.usuario.rol == 'admin':
-            self.verProf.btnEliminar.clicked.connect(lambda: self.eliminar_profesional(id))
+    def set_fecha(self, fecha_str, widget):
+        if fecha_str:
+            try:
+                # Asume que la fecha en la base de datos está en formato 'dd/mm/yyyy'
+                day, month, year = map(int, fecha_str.split("/"))
+                date_qt = QDate(year, month, day)
+            except ValueError:
+                # Manejar error de formato de fecha
+                date_qt = QDate(2000, 1, 1)  # O alguna otra fecha predeterminada
         else:
-            self.verProf.btnEliminar.setVisible(False)
+            date_qt = QDate(2000, 1, 1)  # O alguna otra fecha predeterminada
+        widget.setDate(date_qt)
 
-        self.verProf.btnDescargar.clicked.connect(lambda: self.descargar_pdf(id_profesional=id))
+    def mostrarProfesional(self, id):
+        try:
+            archivos = ArchivosProfesionalWindow()
+            objData = ProfesionalData()
+            profesional = objData.mostrar(id)
+
+            self.verProf.txtNombre.setText(profesional[1])
+            self.verProf.txtApellido.setText(profesional[2])
+            self.verProf.txtDomicilio.setText(profesional[3])
+            self.verProf.txtLocalidad.setText(profesional[4])
+            self.verProf.txtCuit.setText(profesional[5])
+
+            self.set_fecha(profesional[6], self.verProf.txtFechaN)
             
-        self.verProf.show()
+            self.verProf.txtCP.setText(profesional[7])
+            self.verProf.txtMatricula.setText(profesional[8])
+            self.verProf.txtTelefono.setText(profesional[9])
+            self.verProf.txtCbu1.setText(profesional[10])
+            self.verProf.txtCbu2.setText(profesional[11])
+            self.verProf.txtAlias.setText(profesional[12])
+            self.verProf.txtMail.setText(profesional[13])
+            
+            self.verProf.monotributo.setChecked(profesional[14] == 'True')
+            self.verProf.coordinador.setChecked(profesional[15] == 'True')
+            
+            self.verProf.cbProfesional.setCurrentText(profesional[16])
+            self.verProf.cuidador.setChecked(profesional[17] == 'True')
+            self.verProf.txtCodigo.setText(profesional[18])
+            
+            # Datos pago a terceros
+            self.verProf.txtNombre_2.setText(profesional[19])
+            self.verProf.txtApellido_2.setText(profesional[20])
+            self.verProf.txtCuit_2.setText(profesional[21])
+            self.verProf.txtCbu3.setText(profesional[22])
+
+            self.verProf.btnModificar.clicked.connect(lambda: self.abrirVentanaModificar(id))
+            self.verProf.btnCarpeta.clicked.connect(lambda: archivos.cargarArchivosProfesional(id_profesional=id))
+            if self.usuario.rol == 'admin':
+                self.verProf.btnEliminar.clicked.connect(lambda: self.eliminar_profesional(id))
+            else:
+                self.verProf.btnEliminar.setVisible(False)
+
+            self.verProf.btnDescargar.clicked.connect(lambda: self.descargar_pdf(id_profesional=id))
+
+            self.verProf.show()
+        except Exception as e:
+            QMessageBox.critical(None, 'Error', f"Error: {e}")
 
     def abrirVentanaModificar(self, id):
         self.verProf.close()
@@ -307,42 +314,43 @@ class ProfesionalWindow():
         self.actProf.show()
 
     def actualizarProfesional(self, id):
-        objData = ProfesionalData()
-        profesional = objData.mostrar(id)
+        try:
+            objData = ProfesionalData()
+            profesional = objData.mostrar(id)
 
-        self.actProf.txtNombre.setText(profesional[1])
-        self.actProf.txtApellido.setText(profesional[2])
-        self.actProf.txtDomicilio.setText(profesional[3])
-        self.actProf.txtLocalidad.setText(profesional[4])
-        self.actProf.txtCuit.setText(profesional[5])
+            self.actProf.txtNombre.setText(profesional[1])
+            self.actProf.txtApellido.setText(profesional[2])
+            self.actProf.txtDomicilio.setText(profesional[3])
+            self.actProf.txtLocalidad.setText(profesional[4])
+            self.actProf.txtCuit.setText(profesional[5])
 
-        day, month, year = map(int, profesional[6].split("/"))
-        date_qt = QDate(year, month, day)
-        self.actProf.txtFechaN.setDate(date_qt)
-        
-        self.actProf.txtCP.setText(profesional[7])
-        self.actProf.txtMatricula.setText(profesional[8])
-        self.actProf.txtTelefono.setText(profesional[9])
-        self.actProf.txtCbu1.setText(profesional[10])
-        self.actProf.txtCbu2.setText(profesional[11])
-        self.actProf.txtAlias.setText(profesional[12])
-        self.actProf.txtMail.setText(profesional[13])
-        
-        self.actProf.monotributo.setChecked(profesional[14] == 'True')
-        self.actProf.coordinador.setChecked(profesional[15] == 'True')
-        
-        self.actProf.cbProfesional.setCurrentText(profesional[16])
-        self.actProf.cuidador.setChecked(profesional[17] == 'True'),
-        self.actProf.txtCodigo.setText(profesional[18])
-        
-        ## Datos pago a terceros ##
-        self.actProf.txtNombre_2.setText(profesional[19])
-        self.actProf.txtApellido_2.setText(profesional[20])
-        self.actProf.txtCuit_2.setText(profesional[21])
-        self.actProf.txtCbu3.setText(profesional[22])
+            self.set_fecha(profesional[6], self.actProf.txtFechaN)
+            
+            self.actProf.txtCP.setText(profesional[7])
+            self.actProf.txtMatricula.setText(profesional[8])
+            self.actProf.txtTelefono.setText(profesional[9])
+            self.actProf.txtCbu1.setText(profesional[10])
+            self.actProf.txtCbu2.setText(profesional[11])
+            self.actProf.txtAlias.setText(profesional[12])
+            self.actProf.txtMail.setText(profesional[13])
+            
+            self.actProf.monotributo.setChecked(profesional[14] == 'True')
+            self.actProf.coordinador.setChecked(profesional[15] == 'True')
+            
+            self.actProf.cbProfesional.setCurrentText(profesional[16])
+            self.actProf.cuidador.setChecked(profesional[17] == 'True')
+            self.actProf.txtCodigo.setText(profesional[18])
+            
+            # Datos pago a terceros
+            self.actProf.txtNombre_2.setText(profesional[19])
+            self.actProf.txtApellido_2.setText(profesional[20])
+            self.actProf.txtCuit_2.setText(profesional[21])
+            self.actProf.txtCbu3.setText(profesional[22])
 
-        # Conectar el botón btnGuardar a guardarCambiosProfesional
-        self.actProf.btnGuardar.clicked.connect(lambda: self.guardarCambiosProfesional(id))
+            # Conectar el botón btnGuardar a guardarCambiosProfesional
+            self.actProf.btnGuardar.clicked.connect(lambda: self.guardarCambiosProfesional(id))
+        except Exception as e:
+            QMessageBox.critical(None, 'Error', f"Error: {e}")
 
     def guardarCambiosProfesional(self, id):
         fechaN = self.actProf.txtFechaN.date().toPyDate().strftime("%d/%m/%Y")
@@ -374,14 +382,13 @@ class ProfesionalWindow():
         
         objData = ProfesionalData()
         success, error_message = objData.modificar(id, profActualizado)
-        mBox = QMessageBox()
+        
         if success:
-            mBox.setWindowTitle('Mensaje')
-            mBox.setText("Profesional actualizado correctamente")
+            QMessageBox.information(None, 'Mensaje', 'Profesional actualizado correctamente')
+            
         else:
-            mBox.setWindowTitle('Error')
-            mBox.setText(f"El profesional no pudo ser actualizado: {error_message}")
-        mBox.exec()
+            QMessageBox.critical(None, 'Error', f'El profesional no pudo ser actualizado: {error_message}')
+            
         self.actProf.close() #Cierro la ventana
         self.mostrarProfesional(id)
         self.verProf.show() #Vuelvo a abrir la ficha que estaban modificando
@@ -411,15 +418,12 @@ class ProfesionalWindow():
         profesional = ProfesionalData()
         eliminado = profesional.eliminar(id_profesional)
 
-        mBox = QMessageBox()
+        
         if eliminado:
-            mBox.setWindowTitle('Mensaje')
-            mBox.setText("Profesional eliminado")
+            QMessageBox.information(None, 'Mensaje', 'Profesional eliminado')
+            
         else:
-            mBox.setWindowTitle('Error')
-            mBox.setText("El profesional no pudo ser eliminado")
-
-        mBox.exec() 
+            QMessageBox.critical(None, 'Error', 'El profesional no pudo ser eliminado')
 
         #Cierro las ventanas y vuelvo a abrir el listado para refrescar la informacion
         self.listadoProf.close()
@@ -467,21 +471,17 @@ class ProfesionalWindow():
             if id_profesional != None:
                 objData = PacienteProfesionalesData()
                 exito = objData.asociar_profesional_a_paciente(id_paciente, id_profesional)
-                mBox = QMessageBox()
+                
                 if exito:
-                        mBox.setWindowTitle('Mensaje')
-                        mBox.setText("Profesional asociado al paciente correctamente.")
+                    QMessageBox.information(None, 'Mensaje', 'Profesional asociado al paciente correctamente')
+                        
                 else:
-                        mBox.setWindowTitle('Error')
-                        mBox.setText("No se pudo asociar el profesional al paciente.")
+                    QMessageBox.warning(None, 'Error', 'No se pudo asociar el profesional al paciente')
+            
                 self.asocProf.close() #Cierro la ventana       
         except Exception:
-            mBox = QMessageBox()
-            mBox.setWindowTitle('Mensaje')
-            mBox.setText('Seleccione un profesional')
+            QMessageBox.critical(None, 'Error', 'Seleccione un profesional')
            
-    
-
 ################# PDF ###############
 
     def descargar_pdf(self, id_profesional):
