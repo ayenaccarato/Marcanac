@@ -9,8 +9,15 @@ from data.archivos_paciente import ArchivosPacienteData
 class ArchivosPacienteWindow():
 
     def __init__(self):
-        self.arc = uic.loadUi("gui/pacientes/archivos_paciente.ui")
+        ArchivosPacienteData()
+        #self.arc = uic.loadUi("gui/pacientes/archivos_paciente.ui")
         #self.arc.show()
+        ui_file = os.path.join(os.path.dirname(__file__), '..', 'pacientes', 'archivos_paciente.ui')
+        ui_file = os.path.abspath(ui_file)
+        if not os.path.isfile(ui_file):
+            print(f"Error: el archivo {ui_file} no se encuentra.")
+            return
+        self.arc = uic.loadUi(ui_file)
 
     def cargarArchivos(self, id_paciente):
         # Obtener la lista de archivos relacionados con el paciente desde la base de datos

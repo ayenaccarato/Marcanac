@@ -24,7 +24,11 @@ from model.usuario import Usuario
 class PacienteWindow():
 
     def __init__(self, user: Usuario):
+        #Creo las tablas
         PacienteData()
+        PacienteCoordinadorData()
+        PacienteProfesionalesData()
+        #Me guardo el usuario logueado
         self.usuario = user
         
         # Cargar UI para modificar paciente
@@ -156,7 +160,6 @@ class PacienteWindow():
             doc = self.nuevo.txtDocumento.text()
             self.registro(doc)
             
-
     def agruparSubm(self, ventana):
         ''' Convierto en un diccionario, 
         que submódulo tiene'''
@@ -235,61 +238,52 @@ class PacienteWindow():
         self.actPac.show()
 
     def actualizarPaciente(self, id):
-        objData = PacienteData()
-        paciente = objData.mostrar(id)
+        try:
+            objData = PacienteData()
+            paciente = objData.mostrar(id)
 
-        self.actPac.txtNombre.setText(paciente[1])
-        self.actPac.txtApellido.setText(paciente[2])
-        self.actPac.txtDomicilio.setText(paciente[3])
-        self.actPac.txtLocalidad.setText(paciente[4])
-        self.actPac.txtDocumento.setText(paciente[5])
+            self.actPac.txtNombre.setText(paciente[1])
+            self.actPac.txtApellido.setText(paciente[2])
+            self.actPac.txtDomicilio.setText(paciente[3])
+            self.actPac.txtLocalidad.setText(paciente[4])
+            self.actPac.txtDocumento.setText(paciente[5])
 
-        day, month, year = map(int, paciente[6].split("/"))
-        date_qt = QDate(year, month, day)
-        self.actPac.txtFechaN.setDate(date_qt)
-        
-        self.actPac.cbObraSocial.setCurrentText(paciente[7])
-        self.actPac.txtNroAfi.setText(paciente[8])
-        self.actPac.txtTelefono.setText(paciente[9])
+            self.set_fecha(paciente[6], self.actPac.txtFechaN)
+            self.set_fecha(paciente[10], self.actPac.txtFechaI)
+            self.set_fecha(paciente[11], self.actPac.txtFechaE)
 
-        day, month, year = map(int, paciente[10].split("/"))
-        date_qt = QDate(year, month, day)
-        self.actPac.txtFechaI.setDate(date_qt)
+            self.actPac.cbObraSocial.setCurrentText(paciente[7])
+            self.actPac.txtNroAfi.setText(paciente[8])
+            self.actPac.txtTelefono.setText(paciente[9])
 
-        if paciente[11] != '':
-            day, month, year = map(int, paciente[11].split("/"))
-            date_qt = QDate(year, month, day)
-            self.actPac.txtFechaE.setDate(date_qt)
-        else:
-            date_qt = QDate(2000, 1, 1)
-            self.actPac.txtFechaE.setDate(date_qt)
+            self.actPac.txtMotivo.setText(paciente[12])
+            self.actPac.txtFamiliar.setText(paciente[13])
+            self.actPac.cbModulo.setCurrentText(paciente[14])
 
-        
-        self.actPac.txtMotivo.setText(paciente[12])   
-        self.actPac.txtFamiliar.setText(paciente[13])
-        self.actPac.cbModulo.setCurrentText(paciente[14])
+            dic = json.loads(paciente[15])
+            
+            # Submodulo
+            self.actPac.fono.setChecked(dic['Fono'])
+            self.actPac.to.setChecked(dic['TO'])
+            self.actPac.psico.setChecked(dic['Psico'])
 
-        dic = json.loads(paciente[15])
-        
-        #Submodulo
-        self.actPac.fono.setChecked(dic['Fono'])
-        self.actPac.to.setChecked(dic['TO'])
-        self.actPac.psico.setChecked(dic['Psico'])
-        dicE = json.loads(paciente[16])
-        #Equipamiento
-        self.actPac.cama.setChecked(dicE['Cama'])
-        self.actPac.colchon.setChecked(dicE['Colchon'])
-        self.actPac.silla.setChecked(dicE['Silla'])
+            dicE = json.loads(paciente[16])
+            # Equipamiento
+            self.actPac.cama.setChecked(dicE['Cama'])
+            self.actPac.colchon.setChecked(dicE['Colchon'])
+            self.actPac.silla.setChecked(dicE['Silla'])
 
-        self.actPac.cbSN.setCurrentText(paciente[17])
-        dicA = json.loads(paciente[18])
-        #Asistencia Respiratoria
-        self.actPac.arA.setChecked(dicA['A'])
-        self.actPac.arB.setChecked(dicA['B'])
-        self.actPac.arC.setChecked(dicA['C'])
+            self.actPac.cbSN.setCurrentText(paciente[17])
+            dicA = json.loads(paciente[18])
+            # Asistencia Respiratoria
+            self.actPac.arA.setChecked(dicA['A'])
+            self.actPac.arB.setChecked(dicA['B'])
+            self.actPac.arC.setChecked(dicA['C'])
 
-        # Conectar el botón btnGuardar a guardarCambiosProfesional
-        self.actPac.btnGuardar.clicked.connect(lambda: self.guardarCambiosPaciente(id))
+            # Conectar el botón btnGuardar a guardarCambiosPaciente
+            self.actPac.btnGuardar.clicked.connect(lambda: self.guardarCambiosPaciente(id))
+        except Exception as e:
+            QMessageBox.critical(None, 'Error', f"Error: {e}")
 
     def guardarCambiosPaciente(self, id):
         fechaN = self.actPac.txtFechaN.date().toPyDate().strftime("%d/%m/%Y")
@@ -328,104 +322,102 @@ class PacienteWindow():
         
         objData = PacienteData()
         success, error_message = objData.modificar(id, pacActualizado)
-        mBox = QMessageBox()
+        
         if success:
-            mBox.setWindowTitle('Mensaje')
-            mBox.setText("Paciente actualizado correctamente")
+            QMessageBox.information(None, 'Mensaje', 'Paciente actualizado correctamente')
+
         else:
-            mBox.setWindowTitle('Error')
-            mBox.setText(f"El paciente no pudo ser actualizado: {error_message}")
-        mBox.exec()
+            QMessageBox.warning(None, 'Error', f'El paciente no pudo ser actualizado: {error_message}')
+        
         self.actPac.close() #Cierro la ventana
         
         self.mostrarPaciente(id)
        
-        self.listado.abrirListado()
+        self.abrirListado()
         
         self.ver.close()
 
 ### Ver ###
 
+    def set_fecha(self, fecha_str, widget):
+        if fecha_str:
+            try:
+                # Asume que la fecha en la base de datos está en formato 'dd/mm/yyyy'
+                day, month, year = map(int, fecha_str.split("/"))
+                date_qt = QDate(year, month, day)
+            except ValueError:
+                # Manejar error de formato de fecha
+                date_qt = QDate(2000, 1, 1)  # O alguna otra fecha predeterminada
+        else:
+            date_qt = QDate(2000, 1, 1)  # O alguna otra fecha predeterminada
+        widget.setDate(date_qt)
+    
     def mostrarPaciente(self, id):
-        insumosList = InsumosWindow()
-        data = PacienteCoordinadorData()
-        
-        archivos = ArchivosPacienteWindow()
-        coordinador = data.obtener_coordinador_de_paciente(id)
-        if coordinador:
-            nombre_completo = f"{coordinador[1]} {coordinador[2]}"
-            self.ver.txtCoordinador.setText(nombre_completo)
-            self.ver.swCoordinador.setCurrentIndex(0)
-        else:
-            self.ver.swCoordinador.setCurrentIndex(1)
-            self.ver.btnAsignar.clicked.connect(lambda: self.cargar_nombres_coordinadores(id))
-        
-        objData = PacienteData()
-        paciente = objData.mostrar(id)
+        try:
+            insumosList = InsumosWindow()
+            data = PacienteCoordinadorData()
+            
+            archivos = ArchivosPacienteWindow()
+            coordinador = data.obtener_coordinador_de_paciente(id)
+            if coordinador:
+                nombre_completo = f"{coordinador[1]} {coordinador[2]}"
+                self.ver.txtCoordinador.setText(nombre_completo)
+                self.ver.swCoordinador.setCurrentIndex(0)
+            else:
+                self.ver.swCoordinador.setCurrentIndex(1)
+                self.ver.btnAsignar.clicked.connect(lambda: self.cargar_nombres_coordinadores(id))
+            
+            objData = PacienteData()
+            paciente = objData.mostrar(id)
 
-        self.ver.txtNombre.setText(paciente[1])
-        self.ver.txtApellido.setText(paciente[2])
-        self.ver.txtDomicilio.setText(paciente[3])
-        self.ver.txtLocalidad.setText(paciente[4])
-        self.ver.txtDocumento.setText(paciente[5])
+            self.ver.txtNombre.setText(paciente[1])
+            self.ver.txtApellido.setText(paciente[2])
+            self.ver.txtDomicilio.setText(paciente[3])
+            self.ver.txtLocalidad.setText(paciente[4])
+            self.ver.txtDocumento.setText(paciente[5])
 
-        day, month, year = map(int, paciente[6].split("/"))
-        date_qt = QDate(year, month, day)
-        self.ver.txtFechaN.setDate(date_qt)
-        
-        self.ver.cbObraSocial.setCurrentText(paciente[7])
-        self.ver.txtNroAfi.setText(paciente[8])
-        self.ver.txtTelefono.setText(paciente[9])
+            self.set_fecha(paciente[6], self.ver.txtFechaN)
+            self.set_fecha(paciente[10], self.ver.txtFechaI)
+            self.set_fecha(paciente[11], self.ver.txtFechaE)
+                
+            self.ver.txtMotivo.setText(paciente[12])   
+            self.ver.txtFamiliar.setText(paciente[13])
+            self.ver.cbModulo.setCurrentText(paciente[14])
 
-        day, month, year = map(int, paciente[10].split("/"))
-        date_qt = QDate(year, month, day)
-        self.ver.txtFechaI.setDate(date_qt)
+            dic = json.loads(paciente[15])
+            
+            # Submodulo
+            self.ver.fono.setChecked(dic["Fono"])        
+            self.ver.to.setChecked(dic['TO'])        
+            self.ver.psico.setChecked(dic['Psico'])
+            
+            dicE = json.loads(paciente[16])
+            # Equipamiento
+            self.ver.cama.setChecked(dicE['Cama'])
+            self.ver.colchon.setChecked(dicE['Colchon'])
+            self.ver.silla.setChecked(dicE['Silla'])
 
-        if paciente[11] != '':
-            day, month, year = map(int, paciente[11].split("/"))
-            date_qt = QDate(year, month, day)
-            self.ver.txtFechaE.setDate(date_qt)
-        else:
-            date_qt = QDate(2000, 1, 1)
-            self.ver.txtFechaE.setDate(date_qt)
+            self.ver.cbSN.setCurrentText(paciente[17])
+            dicA = json.loads(paciente[18])
+            # Asistencia Respiratoria
+            self.ver.arA.setChecked(dicA['A'])
+            self.ver.arB.setChecked(dicA['B'])
+            self.ver.arC.setChecked(dicA['C'])
 
-        
-        self.ver.txtMotivo.setText(paciente[12])   
-        self.ver.txtFamiliar.setText(paciente[13])
-        self.ver.cbModulo.setCurrentText(paciente[14])
+            self.ver.btnModificar.clicked.connect(lambda: self.abrirVentanaModificarP(id=id))
+            self.ver.btnInsumos.clicked.connect(lambda: insumosList.mostrarInsumos(id_paciente=id))        
+            self.ver.btnProfesionales.clicked.connect(lambda: self.mostrarProfesionales(id_paciente=id))
+            self.ver.btnCarpeta.clicked.connect(lambda: archivos.cargarArchivos(id_paciente=id))
+            if self.usuario.rol == 'admin':
+                self.ver.btnEliminar.clicked.connect(lambda: self.eliminar_paciente(id))
+            else:
+                self.ver.btnEliminar.setVisible(False)
+            
+            self.ver.btnDescargar.clicked.connect(lambda: self.descargar_pdf(id_paciente=id))
 
-        dic = json.loads(paciente[15])
-        
-        #Submodulo
-        self.ver.fono.setChecked(dic["Fono"])        
-        self.ver.to.setChecked(dic['TO'])        
-        self.ver.psico.setChecked(dic['Psico'])
-        
-        dicE = json.loads(paciente[16])
-        #Equipamiento
-        self.ver.cama.setChecked(dicE['Cama'])
-        self.ver.colchon.setChecked(dicE['Colchon'])
-        self.ver.silla.setChecked(dicE['Silla'])
-
-        self.ver.cbSN.setCurrentText(paciente[17])
-        dicA = json.loads(paciente[18])
-        #Asistencia Respiratoria
-        self.ver.arA.setChecked(dicA['A'])
-        self.ver.arB.setChecked(dicA['B'])
-        self.ver.arC.setChecked(dicA['C'])
-
-        self.ver.btnModificar.clicked.connect(lambda: self.abrirVentanaModificarP(id=id))
-        self.ver.btnInsumos.clicked.connect(lambda: insumosList.mostrarInsumos(id_paciente=id))        
-        self.ver.btnProfesionales.clicked.connect(lambda: self.mostrarProfesionales(id_paciente=id))
-        self.ver.btnCarpeta.clicked.connect(lambda: archivos.cargarArchivos(id_paciente=id))
-        if self.usuario.rol == 'admin':
-            self.ver.btnEliminar.clicked.connect(lambda: self.eliminar_paciente(id))
-        else:
-            self.ver.btnEliminar.setVisible(False)
-        
-        self.ver.btnDescargar.clicked.connect(lambda: self.descargar_pdf(id_paciente=id))
-
-        self.ver.show()
+            self.ver.show()
+        except Exception as e:
+            QMessageBox.critical(None, 'Error', f"Error: {e}")
 
 ### Eliminar ###
 
@@ -452,15 +444,12 @@ class PacienteWindow():
         paciente = PacienteData()
         eliminado = paciente.eliminar(id_paciente)
 
-        mBox = QMessageBox()
+        
         if eliminado:
-            mBox.setWindowTitle('Mensaje')
-            mBox.setText("Paciente eliminado")
+            QMessageBox.information(None, 'Mensaje', 'Paciente eliminado')
+            
         else:
-            mBox.setWindowTitle('Error')
-            mBox.setText("El paciente no pudo ser eliminado")
-
-        mBox.exec()
+            QMessageBox.critical(None, 'Error', 'El paciente no pudo ser eliminado')
 
         self.listado.close()
         self.ver.close()
@@ -468,15 +457,12 @@ class PacienteWindow():
 
 ### Listado ###
 
-    def boton_listado_paciente(self, id_valor, fila):
-        
-        
+    def boton_listado_paciente(self, id_valor, fila):              
         # Crear el botón y añadirlo a la columna 7
         # Crear el botón "Ver más" y conectarlo
         btn = QPushButton("Ver más")
         
         btn.clicked.connect(lambda _, id_valor=id_valor: self.mostrarPaciente(id_valor))
-        
         # Agregar estilo al botón
         btn.setStyleSheet("background-color: rgb(71, 40, 37); color: rgb(255, 255, 255);")
         widget = QWidget()
@@ -486,35 +472,6 @@ class PacienteWindow():
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
        
         self.listado.tblListado.setCellWidget(fila, 3, widget)
-
-    # def abrirListado(self):    
-    #     lis = ListadoData() 
-    #     data = lis.obtenerPacientes()    
-    #     fila = 0
-    #     self.listado.tblListado.setRowCount(len(data)) #Cuantas filas traen los datos
-    #     for item in data:
-    #         self.listado.tblListado.setItem(fila, 0, QTableWidgetItem(str(item[2]))) #Apellido
-    #         self.listado.tblListado.setItem(fila, 1, QTableWidgetItem(str(item[1]))) #Nombre
-    #         self.listado.tblListado.setItem(fila, 2, QTableWidgetItem(str(item[10]))) #Fecha de ingreso
-            
-    #         if item[11] == '':                
-    #             self.setRowBackgroundColorP(fila, QColor(170, 255, 127))  # Verde
-    #         else:
-    #            self.setRowBackgroundColorP(fila, QColor(255, 88, 66))  # Rojo
-            
-    #         id_valor = item[0]
-            
-    #         self.boton_listado_paciente(id_valor, fila)
-
-    #         fila += 1
-
-    #     self.listado.tblListado.setColumnWidth(2,150)
-    #     self.listado.tblListado.setColumnWidth(4,150)
-    #     self.listado.tblListado.setColumnWidth(5,150) 
-    #     self.listado.btnBuscar.clicked.connect(lambda: self.buscarPac())
-    #     self.listado.btnLista.setVisible(False)
-    #     self.limpiar_campos_busqueda()
-    #     self.listado.show()
 
     def abrirListado(self):    
         lis = ListadoData() 
@@ -561,10 +518,8 @@ class PacienteWindow():
 
     def buscarPac(self):
         if self.listado.txtApellido.text() == '' and self.listado.txtDocumento.text() == '':
-            mBox = QMessageBox()
-            mBox.setWindowTitle('Mensaje')
-            mBox.setText('Ingrese datos a buscar')
-            mBox.exec()
+            QMessageBox.information(None, 'Mensaje', 'Ingrese datos a buscar')
+            
         else:
             self.listado.tblListado.clearContents()  # Limpiar contenido actual de la tabla
             self.listado.tblListado.setRowCount(0)
@@ -641,18 +596,16 @@ class PacienteWindow():
             if id_profesional != None:
                 objData = PacienteCoordinadorData()
                 exito = objData.asociar_coordinador_a_paciente(id_paciente, id_profesional)
-                mBox = QMessageBox()
+                
                 if exito:
-                    mBox.setWindowTitle('Mensaje')
-                    mBox.setText("Coordinador asociado al paciente correctamente.")
+                    QMessageBox.information(None, 'Mensaje', 'Coordinador asociado al paciente correctamente')
+                    
                 else:
-                    mBox.setWindowTitle('Error')
-                    mBox.setText("No se pudo asociar el coordinador al paciente.")
+                    QMessageBox.warning(None, 'Error', 'No se pudo asociar el coordinador al paciente')
+                    
                 self.nCoord.close() #Cierro la ventana
         except Exception:
-            mBox = QMessageBox()
-            mBox.setWindowTitle('Mensaje')
-            mBox.setText('Seleccione un coordinador')
+            QMessageBox.critical(None, 'Error', 'Seleccione un coordinador')
 
 ### Paciente - Profesionales ###
 
@@ -677,7 +630,6 @@ class PacienteWindow():
             self.lisProfPac.btnProf.clicked.connect(lambda: profesional.cargar_nombres_profesionales(id_paciente))
             self.lisProfPac.btnRefrescar.clicked.connect(lambda: self.mostrarProfesionales(id_paciente))
             self.lisProfPac.show()
-
 
 ############## PDF #################
 
