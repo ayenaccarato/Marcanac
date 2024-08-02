@@ -1,19 +1,17 @@
-import json
 import os
 
-from PyQt6 import uic, QtCore
-from PyQt6.QtCore import Qt, QDate
-from PyQt6.QtGui import QColor
+from PyQt6 import uic
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QMessageBox, QPushButton, QWidget, QHBoxLayout, QTableWidgetItem
 from data.insumos import InsumoData
-from data.listados import ListadoData
 from data.paciente_insumo import PacienteInsumoData
-from gui.insumos.cargar_insumo import NuevoInsumoWindow
 from model.insumo import Insumo
 
 class InsumosWindow():
 
     def __init__(self):
+        InsumoData()
+        PacienteInsumoData()
         #elf.nInsumo = uic.loadUi("gui/insumos/cargar_insumo.ui")
         ui_file = os.path.join(os.path.dirname(__file__), '..', 'insumos', 'cargar_insumo.ui')
         ui_file = os.path.abspath(ui_file)  # Convierte a ruta absoluta
@@ -23,7 +21,7 @@ class InsumosWindow():
         self.nInsumo = uic.loadUi(ui_file)
 
         #self.lInsumo = uic.loadUi("gui/insumos/listado_insumos.ui")
-        ui_file_i = os.path.join(os.path.dirname(__file__), '..', 'gui', 'insumos', 'listado_insumos.ui')
+        ui_file_i = os.path.join(os.path.dirname(__file__), '..', 'insumos', 'listado_insumos.ui')
         ui_file_i = os.path.abspath(ui_file_i)  # Convierte a ruta absoluta
         if not os.path.isfile(ui_file_i):
             print(f"Error: el archivo {ui_file_i} no se encuentra.")
@@ -37,11 +35,8 @@ class InsumosWindow():
         self.nInsumo.show()
 
     def registrarInsumo(self, id_paciente):
-        mBox = QMessageBox()
-        if self.nInsumo.cbInsumo.currentText() == "--Seleccione--" and self.nInsumo.txtOtro.text() == '':            
-            mBox.setWindowTitle('Mensaje')
-            mBox.setText("Seleccione o escriba un insumo")
-            mBox.exec()
+        if self.nInsumo.cbInsumo.currentText() == "--Seleccione--" and self.nInsumo.txtOtro.text() == '':       
+            QMessageBox.information(None, 'Mensaje', 'Seleccione o escriba un insumo')     
         else:
             fechaE = self.nInsumo.txtFechaEnt.date().toPyDate().strftime("%d/%m/%Y") #formateo la fecha
             if self.nInsumo.txtOtro.text() == '':
@@ -58,17 +53,13 @@ class InsumosWindow():
                 )
 
             objData = InsumoData()
-            
-            mBox = QMessageBox()
+
             success, error_message = objData.registrar(insumo=nuevoInsumo, id_paciente=id_paciente)
             if success:   
-                mBox.setWindowTitle('Mensaje')          
-                mBox.setText("Insumo agregado")            
+                QMessageBox.information(None, 'Mensaje', 'Insumo agregado')        
             else:
-                mBox.setWindowTitle('Error')
-                mBox.setText(f"El insumo no pudo ser agregado: {error_message}")
-                
-            mBox.exec()
+                QMessageBox.warning(None, 'Error', f'El insumo no pudo ser agregado: {error_message}')
+
             self.mostrarInsumos(id_paciente)
             self.nInsumo.close() #Cierro la ventana
 
@@ -99,15 +90,10 @@ class InsumosWindow():
         insumo = InsumoData()
         eliminado = insumo.eliminar(id_insumo)
 
-        mBox = QMessageBox()
         if eliminado:
-            mBox.setWindowTitle('Mensaje')
-            mBox.setText("Insumo eliminado")
+            QMessageBox.information(None, 'Mensaje', 'Insumo eliminado')
         else:
-            mBox.setWindowTitle('Error')
-            mBox.setText("El insumo no pudo ser eliminado")
-
-        mBox.exec()
+            QMessageBox.warning(None, 'Error', 'El insumo no pudo ser eliminado')
 
         # self.lInsumo.close()
         # self.mostrarInsumos(id_paciente)
