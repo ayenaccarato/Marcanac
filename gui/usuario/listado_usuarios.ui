@@ -6,12 +6,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>311</width>
-    <height>209</height>
+    <width>626</width>
+    <height>360</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Marcanac - Usuario</string>
+   <string>Marcanac - Listado de Usuarios</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../imagenes/logo.png</normaloff>../imagenes/logo.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
@@ -111,10 +115,42 @@ QPushButton:hover {
              </font>
             </property>
             <property name="text">
-             <string>Usuario</string>
+             <string>Usuarios</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnLista">
+            <property name="font">
+             <font>
+              <family>Segoe UI</family>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color: rgb(71, 40, 37);</string>
+            </property>
+            <property name="text">
+             <string>Volver al listado</string>
             </property>
            </widget>
           </item>
@@ -132,46 +168,29 @@ QPushButton:hover {
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
            <layout class="QGridLayout" name="gridLayout">
-            <item row="1" column="1">
-             <widget class="QLabel" name="label_3">
+            <item row="1" column="3">
+             <widget class="QPushButton" name="btnBuscar">
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
                </font>
               </property>
+              <property name="cursor">
+               <cursorShape>PointingHandCursor</cursorShape>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">background-color: rgb(71, 40, 37);
+color: rgb(255, 255, 255);</string>
+              </property>
               <property name="text">
-               <string>Usuario</string>
+               <string>Buscar</string>
               </property>
              </widget>
             </item>
-            <item row="3" column="1">
-             <widget class="QLabel" name="label_8">
-              <property name="font">
-               <font>
-                <family>Segoe UI</family>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>Rol</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLabel" name="label_2">
-              <property name="font">
-               <font>
-                <family>Segoe UI</family>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>Nombre</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="2">
+            <item row="0" column="3">
              <widget class="QLineEdit" name="txtNombre">
               <property name="enabled">
                <bool>true</bool>
@@ -184,24 +203,32 @@ QPushButton:hover {
               </property>
              </widget>
             </item>
-            <item row="2" column="2">
-             <widget class="QLineEdit" name="txtClave">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="font">
-               <font>
-                <family>Segoe UI</family>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="echoMode">
-               <enum>QLineEdit::Password</enum>
-              </property>
+            <item row="2" column="0" colspan="4">
+             <widget class="QTableWidget" name="tblListado">
+              <column>
+               <property name="text">
+                <string>Nombre</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Usuario</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Rol</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Acciones</string>
+               </property>
+              </column>
              </widget>
             </item>
-            <item row="2" column="1">
-             <widget class="QLabel" name="label_4">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_3">
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -209,12 +236,12 @@ QPushButton:hover {
                </font>
               </property>
               <property name="text">
-               <string>Contraseña</string>
+               <string>Rol</string>
               </property>
              </widget>
             </item>
-            <item row="3" column="2">
-             <widget class="QComboBox" name="cbRol">
+            <item row="0" column="1">
+             <widget class="QComboBox" name="cbProfesion">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -241,11 +268,21 @@ QPushButton:hover {
               </item>
              </widget>
             </item>
-            <item row="1" column="2">
-             <widget class="QLineEdit" name="txtUsuario">
-              <property name="enabled">
-               <bool>true</bool>
+            <item row="0" column="2">
+             <widget class="QLabel" name="label_7">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+               </font>
               </property>
+              <property name="text">
+               <string>Nombre</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="txtUsuario">
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -254,25 +291,16 @@ QPushButton:hover {
               </property>
              </widget>
             </item>
-            <item row="4" column="2">
-             <widget class="QPushButton" name="btnRegistrar">
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_2">
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>12</pointsize>
-                <weight>75</weight>
-                <bold>true</bold>
+                <pointsize>10</pointsize>
                </font>
               </property>
-              <property name="cursor">
-               <cursorShape>PointingHandCursor</cursorShape>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">background-color: rgb(71, 40, 37);
-color: rgb(255, 255, 255);</string>
-              </property>
               <property name="text">
-               <string>Registrar</string>
+               <string>Usuario</string>
               </property>
              </widget>
             </item>

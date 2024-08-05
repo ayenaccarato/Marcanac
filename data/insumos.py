@@ -1,4 +1,3 @@
-from datetime import datetime
 import sqlite3
 import conexion as con
 from data.paciente_insumo import PacienteInsumoData
@@ -65,6 +64,7 @@ class InsumoData():
             FROM insumos 
             JOIN paciente_insumo ON insumos.id = paciente_insumo.insumo_id 
             WHERE paciente_insumo.paciente_id = ?
+            ORDER BY fechaEntrega
             """
             self.cursor.execute(sql, (id,))
             insumos = self.cursor.fetchall()

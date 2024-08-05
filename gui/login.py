@@ -1,6 +1,7 @@
 import os
 
 from PyQt6 import uic
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QMessageBox
 from data.usuario import UsuarioData
 from gui.main import MainWindow
@@ -20,6 +21,10 @@ class Login():
         self.initGUI()
         self.login.show()
 
+    # def keyPressEvent(self, event):
+    #     if event.key() == Qt.Key.Key_Return:  # Detecta Enter
+    #         self.login()
+    #     self.keyPressEvent(event)
 
     def ingresar(self):
         try:

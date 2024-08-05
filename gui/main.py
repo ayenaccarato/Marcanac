@@ -41,7 +41,7 @@ class MainWindow():
                
         profesional = ProfesionalWindow(self.usuario)
 
-        usuario = UsuarioWindow()
+        usuario = UsuarioWindow(self.usuario)
 
         #Botones del menú de main
         self.main.btnListado.clicked.connect(lambda: self.main.stackedWidget.setCurrentWidget(self.main.page_datos)) #Abro pagina de listados
@@ -49,6 +49,10 @@ class MainWindow():
         #Listados
         self.main.listPacientes.clicked.connect(lambda: paciente.abrirListado() )
         self.main.listProfesionales.clicked.connect(lambda: profesional.abrirListadoProfesionales())
+        if self.usuario.rol == 'admin':
+            self.main.listUsuarios.clicked.connect(lambda: usuario.listado_usuarios())
+        else:
+            self.main.listUsuarios.setVisible(False)
         #Registros
         self.main.btnPaciente.clicked.connect(lambda: paciente.abrirRegistro())
         self.main.btnProfesional.clicked.connect(lambda: profesional.abrirRegistroProf())

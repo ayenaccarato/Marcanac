@@ -12,8 +12,8 @@ class PacienteCoordinadorData:
             paciente_id INTEGER,
             coordinador_id INTEGER,
             FOREIGN KEY (paciente_id) REFERENCES pacientes(id) ON DELETE CASCADE,
-            FOREIGN KEY (coordinador_id) REFERENCES profesionales(id),
-            UNIQUE(paciente_id) ON DELETE CASCADE
+            FOREIGN KEY (coordinador_id) REFERENCES profesionales(id) ON DELETE CASCADE,
+            UNIQUE(paciente_id) 
             )"""
             self.cursor.execute(sql_create_paciente_coordinador)
             self.db.commit()

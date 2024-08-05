@@ -1,6 +1,7 @@
 import os
 from PyQt6 import uic
-from PyQt6.QtWidgets import QMessageBox
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QMessageBox, QTableWidgetItem, QWidget, QPushButton, QHBoxLayout
 
 from data.usuario import UsuarioData
 from model.usuario import Usuario
@@ -8,28 +9,25 @@ from model.usuario import Usuario
 
 class UsuarioWindow():  
 
-    def __init__(self):
-        #self.nuevo = uic.loadUi("gui/usuario/nuevo_usuario.ui")
+    def __init__(self, user):
+        self.usuario = user
+        #Carga UI de nuevo usuario
         ui_file = os.path.join(os.path.dirname(__file__), '..', 'usuario', 'nuevo_usuario.ui')
         ui_file = os.path.abspath(ui_file)  # Convierte a ruta absoluta
         if not os.path.isfile(ui_file):
             print(f"Error: el archivo {ui_file} no se encuentra.")
             return
         self.nuevo = uic.loadUi(ui_file)
-    
-    # def __init__(self):
-    #     try:
-    #         ui_file = os.path.join(os.path.dirname(__file__), '..', 'gui', 'usuario', 'nuevo_usuario.ui')
-    #         ui_file = os.path.abspath(ui_file)
-            
-    #         if not os.path.isfile(ui_file):
-    #             raise FileNotFoundError(f"El archivo {ui_file} no se encuentra.")
-            
-    #         self.nuevo = uic.loadUi(ui_file)
-    #         print("Archivo .ui cargado exitosamente.")
-    #     except Exception as e:
-    #         print(f"Error al cargar el archivo .ui: {e}")
 
+        #Carga UI del listado de usuarios
+        ui_file_lis = os.path.join(os.path.dirname(__file__), '..', 'usuario', 'listado_usuarios.ui')
+        ui_file_lis = os.path.abspath(ui_file_lis)  # Convierte a ruta absoluta
+        if not os.path.isfile(ui_file_lis):
+            print(f"Error: el archivo {ui_file_lis} no se encuentra.")
+            return
+        self.listado = uic.loadUi(ui_file_lis)
+
+### Registro ###
     def abrirRegistro(self): 
         self.nuevo.btnRegistrar.clicked.connect(self.registrar)     
         self.nuevo.show()
@@ -62,3 +60,81 @@ class UsuarioWindow():
                 QMessageBox.warning(None, 'Error', 'El usuario no pudo ser registrado')       
 
             self.nuevo.close() #Cierro la ventana
+
+### Eliminar ###
+    def eliminarUsuario(self, id):
+        if id == 1:
+            QMessageBox.critical(None, 'Error', 'No puede eliminar este usuario')
+        else:
+            # Crear el cuadro de diálogo de confirmación
+            mBox = QMessageBox()
+            mBox.setWindowTitle('Confirmar eliminación')
+            mBox.setText("¿Está seguro que desea eliminar este usuario?")
+
+            # Añadir botones personalizados
+            si_btn = mBox.addButton("Sí", QMessageBox.ButtonRole.YesRole)
+            no_btn = mBox.addButton("No", QMessageBox.ButtonRole.NoRole)
+            
+            mBox.setDefaultButton(no_btn)
+            mBox.exec()
+
+            if mBox.clickedButton() == si_btn:
+                self.confirmar(id)
+            else:
+                print("Eliminación cancelada")
+
+    def confirmar(self, id):
+        '''Se elimina el profesional, si confirman'''
+        usuario = UsuarioData()
+        eliminado = usuario.eliminar(id)
+
+        if eliminado:
+            QMessageBox.information(None, 'Mensaje', 'Paciente eliminado')    
+        else:
+            QMessageBox.critical(None, 'Error', 'El paciente no pudo ser eliminado')
+        
+        self.listado_usuarios()
+### Listado ###
+    def boton_listado_usuario(self, id_valor, fila):              
+        # Crear el botón y añadirlo a la columna 7
+        # Crear el botón "Ver más" y conectarlo
+        btn = QPushButton("Eliminar")
+        
+        btn.clicked.connect(lambda _, id_valor=id_valor: self.eliminarUsuario(id_valor))
+        # Agregar estilo al botón
+        btn.setStyleSheet("background-color: rgb(255, 0, 0); color: rgb(255, 255, 255);")
+        widget = QWidget()
+        layout = QHBoxLayout(widget)
+        layout.addWidget(btn)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+       
+        self.listado.tblListado.setCellWidget(fila, 3, widget)
+
+    def listado_usuarios(self):
+        lis = UsuarioData() 
+        data = lis.obtener_usuarios()    
+        fila = 0
+        self.listado.tblListado.setRowCount(len(data)) #Cuantas filas traen los datos
+        for item in data:
+            self.listado.tblListado.setItem(fila, 0, QTableWidgetItem(str(item[1]))) #Nombre
+            self.listado.tblListado.setItem(fila, 1, QTableWidgetItem(str(item[2]))) #Usuario
+            if item[4] == 'admin':
+                self.listado.tblListado.setItem(fila, 2, QTableWidgetItem('Administrador')) #Rol
+            else:
+                self.listado.tblListado.setItem(fila, 2, QTableWidgetItem('Empleado'))
+           
+
+            id_valor = item[0]
+            
+            self.boton_listado_usuario(id_valor, fila)
+
+            fila += 1
+ 
+        self.listado.tblListado.setColumnWidth(0,150)
+        self.listado.tblListado.setColumnWidth(1,150)
+        
+        self.listado.btnBuscar.clicked.connect(lambda: self.buscar())
+        self.listado.btnLista.setVisible(False)
+        #self.limpiar_campos_busqueda()   
+        self.listado.show()

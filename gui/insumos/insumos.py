@@ -1,9 +1,13 @@
 import os
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import cm
 
 from PyQt6 import uic
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QMessageBox, QPushButton, QWidget, QHBoxLayout, QTableWidgetItem
+from PyQt6.QtWidgets import QMessageBox, QPushButton, QWidget, QHBoxLayout, QTableWidgetItem, QFileDialog
 from data.insumos import InsumoData
+from data.paciente import PacienteData
 from data.paciente_insumo import PacienteInsumoData
 from model.insumo import Insumo
 
@@ -127,6 +131,7 @@ class InsumosWindow():
         
         self.lInsumo.btnInsumo.clicked.connect(lambda: self.abrirRegistroInsumo(id_paciente))
         self.lInsumo.btnRefrescar.clicked.connect(lambda: self.mostrarInsumos(id_paciente))
+        self.lInsumo.btnDescargar.clicked.connect(lambda: self.descargar_pdf(id_paciente))
         self.lInsumo.show()
 
     def boton_listado_insumo(self, id_valor, fila, id_paciente):        
@@ -146,3 +151,110 @@ class InsumosWindow():
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
        
         self.lInsumo.tblListadoI.setCellWidget(fila, 3, widget)
+
+########### PDF ###############
+
+    def descargar_pdf(self, id_paciente):
+        try:
+            # Obtener la información de los insumos
+            insumo = InsumoData()
+            paciente = PacienteData()
+            paciente_info = paciente.mostrar(id_paciente)
+            data = insumo.mostrar(id_paciente)
+            print(data)
+            
+            insumos_data_list = []
+            for item in data:
+                insumos_data = {
+                    'fecha_entrega': item[1],
+                    'nombre': item[2],
+                    'cantidad': item[3],
+                }
+                insumos_data_list.append(insumos_data)
+            
+            # Mostrar el cuadro de diálogo para guardar el archivo PDF
+            filePath, _ = QFileDialog.getSaveFileName(self.lInsumo, "Guardar PDF", f"Insumos_de_{paciente_info[1]}_{paciente_info[2]}.pdf", "PDF Files (*.pdf)")
+            
+            if filePath:
+                # Generar el PDF
+                if self.generar_pdf_paciente(insumos_data_list, filePath):
+                    QMessageBox.information(None, "Éxito", "El PDF se guardó correctamente.")
+                else:
+                    QMessageBox.warning(None, "Error", "No se pudo guardar el PDF.")
+            else:
+                QMessageBox.warning(None, "Advertencia", "No se seleccionó ningún archivo para guardar.")
+        except Exception as e:
+            QMessageBox.critical(None, "Error", f"Ocurrió un error: {str(e)}")
+
+    def generar_pdf_paciente(self, insumos_data_list, filePath):
+        try:
+            c = canvas.Canvas(filePath, pagesize=A4)
+            width, height = A4
+            margin = 1 * cm
+            line_height = 0.5 * cm
+            box_margin = 0.2 * cm
+
+            # Ajustar el título
+            c.setFont("Helvetica-Bold", 14)
+            title_x = margin
+            title_y = height - margin
+            title_text = "Insumos de paciente"
+            title_width = c.stringWidth(title_text, "Helvetica-Bold", 14)
+            c.drawString((width - title_width) / 2, title_y, title_text)  # Centrar el título
+
+            # Ajustar el espacio después del título
+            current_y = height - margin - line_height * 4
+            
+            # Ajustar los campos
+            c.setFont("Helvetica", 10)
+            num_cols = 3
+            col_width = (width - 2 * margin) / num_cols  # Dividir el ancho de la página en 3 columnas
+            box_height = 2 * line_height  # Altura de cada recuadro
+            
+            # Dibujar las cabeceras de las columnas
+            headers = ['Fecha de entrega', 'Nombre', 'Cantidad']
+            for i, header in enumerate(headers):
+                x = margin + i * col_width
+                y = current_y
+                c.rect(x, y, col_width, box_height)  # Dibujar el recuadro
+                c.drawString(x + box_margin, y + box_height - line_height - box_margin, header)  # Dibujar el texto del encabezado
+            
+            # Ajustar la posición para los datos
+            current_y -= box_height  # Mover hacia abajo para empezar a dibujar datos
+
+            # Iterar sobre la lista de profesionales
+            for index, insumos_data in enumerate(insumos_data_list):
+                col = 0  # Empezar en la primera columna
+                row = index  # Fila en la que se encuentra el recuadro
+                
+                for key in headers:
+                    # Convertir el encabezado a minúsculas para coincidir con las claves del diccionario
+                    key = key.lower().replace(' de', '').replace(' ', '_')
+                    
+                    value = insumos_data.get(key, '')
+                    
+                    # Calcular la posición para el dato
+                    x = margin + col * col_width
+                    y = current_y - row * box_height
+                    
+                    # Mostrar información de depuración
+                    print(f"Index: {index}, Col: {col}, Row: {row}, X: {x}, Y: {y}, Value: {value}")
+                    
+                    # Dibujar el recuadro para el dato
+                    c.rect(x, y, col_width, box_height)
+                    
+                    # Dibujar el dato dentro del recuadro
+                    c.drawString(x + box_margin, y + box_height - line_height - box_margin, value)
+                    
+                    col += 1  # Mover a la siguiente columna
+                    
+                # Ajustar la posición para la próxima fila
+                if (index + 1) % num_cols == 0:
+                    current_y -= box_height
+
+            # Finalizar el PDF
+            c.save()
+            return True
+        except Exception as e:
+            print(f"Error al generar el PDF: {str(e)}")
+            return False

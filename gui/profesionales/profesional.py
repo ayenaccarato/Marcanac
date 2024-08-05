@@ -64,6 +64,12 @@ class ProfesionalWindow():
         self.prof.btnRegistrar.clicked.connect(self.registrarProfesional)     
         self.prof.show()
 
+    def is_valid_email(self, email):
+        """Verifica si el correo electrónico tiene un formato válido."""
+        import re
+        regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        return re.match(regex, email) is not None
+
     def registrarProfesional(self):
         if self.prof.cbProfesional.currentText() == "--Seleccione--":    
             QMessageBox.information(None, 'Mensaje', 'Seleccione una profesión')
@@ -79,7 +85,11 @@ class ProfesionalWindow():
         # elif len(self.prof.txtCbu3.text()) != 0 and len(self.prof.txtCbu3.text()) < 22:           
         #     mBox.setWindowTitle('Error')
         #     mBox.setText("El CBU 3 ingresado es inválido. Debe contener 22 números")
-        #     mBox.exec()          
+        #     mBox.exec()         
+        # Validar el correo electrónico (opcional, pero recomendado)
+        email = self.prof.txtMail.text()
+        if not self.is_valid_email(email):
+            QMessageBox.critical(None, 'Error', "El correo electrónico ingresado no es válido. Debe ser del estilo: ejemplo@ejemplo.com")
         else:
             fechaN = self.prof.txtFechaN.date().toPyDate().strftime("%d/%m/%Y") #formateo la fecha
                         
@@ -212,7 +222,7 @@ class ProfesionalWindow():
         self.listadoProf.tblListadoProf.clearContents()  # Limpiar contenido actual de la tabla
         self.listadoProf.tblListadoProf.setRowCount(0)
         lis = ListadoData() 
-        data = lis.buscarProfesional(self.listadoProf.txtCuit.text(), self.listadoProf.txtApellido.text(), self.listadoProf.cbProfesion.currentText())
+        data = lis.buscarProfesional(self.listadoProf.txtCuit.text(), self.listadoProf.txtApellido.text().upper(), self.listadoProf.cbProfesion.currentText())
         if data:
               # Reiniciar número de filas
             fila = 0
@@ -431,7 +441,7 @@ class ProfesionalWindow():
         self.abrirListadoProfesionales() 
 
 ####################
-    
+
     def cargar_nombres_profesionales(self, id_paciente):
         objData = ProfesionalData()
         profesionales = objData.obtener_profesionales()
@@ -439,50 +449,51 @@ class ProfesionalWindow():
 
         if profesionales:
             self.asocProf.cbProfesionales.addItem('--Seleccione--')
-            for id_profesional, nombre, apellido in profesionales:
-                item = f"{nombre} {apellido}"
+            for id_profesional, nombre, apellido, profesion in profesionales:
+                item = f"{nombre} {apellido} - {profesion}"
                 self.asocProf.cbProfesionales.addItem(item, userData=id_profesional)
         else:
             self.asocProf.cbProfesionales.addItem("No hay profesionales cargados")
 
         # Conectar señal para actualizar ID del profesional seleccionado
-        self.asocProf.cbProfesionales.currentIndexChanged.connect(lambda index: self.actualizar_id_profesional(index, id_paciente))
+        self.asocProf.cbProfesionales.currentIndexChanged.connect(lambda index: self.actualizar_id_profesional(index))
 
         # Conectar botón Registrar
-        self.asocProf.btnRegistrar.clicked.connect(lambda: self.asociarProfesionalAPaciente(id_paciente, id_profesional))
+        self.asocProf.btnRegistrar.clicked.connect(lambda: self.asociarProfesionalAPaciente(id_paciente))
         self.asocProf.show()
 
-    def actualizar_id_profesional(self, index, id_paciente):
-        id_profesional = None
+    def actualizar_id_profesional(self, index):
         if index >= 0:
             item_data = self.asocProf.cbProfesionales.itemData(index)
             if item_data is not None:
-                id_profesional = item_data
-                print(f"ID del profesional seleccionado: {id_profesional}")
-                #self.asociarProfesionalAPaciente(id_paciente, id_profesional)
+                self.id_profesional_seleccionado = item_data  # Almacenar el ID del profesional seleccionado
+                print(f"ID del profesional seleccionado: {self.id_profesional_seleccionado}")
             else:
                 print("No se encontró el ID del profesional seleccionado.")
         else:
             print("No se seleccionó ningún profesional.")
-        return id_profesional
 
-    def asociarProfesionalAPaciente(self, id_paciente, id_profesional):
-        try:
-            if id_profesional != None:
+    def asociarProfesionalAPaciente(self, id_paciente):
+        if hasattr(self, 'id_profesional_seleccionado'):
+            id_profesional = self.id_profesional_seleccionado
+            try:
                 objData = PacienteProfesionalesData()
                 exito = objData.asociar_profesional_a_paciente(id_paciente, id_profesional)
-                
+
                 if exito:
                     QMessageBox.information(None, 'Mensaje', 'Profesional asociado al paciente correctamente')
-                        
                 else:
                     QMessageBox.warning(None, 'Error', 'No se pudo asociar el profesional al paciente')
-            
-                self.asocProf.close() #Cierro la ventana       
-        except Exception:
-            QMessageBox.critical(None, 'Error', 'Seleccione un profesional')
+                    print(id_profesional)
+
+                self.asocProf.close()  # Cerrar la ventana
+            except Exception as e:
+                QMessageBox.critical(None, 'Error', 'Seleccione un profesional')
+                print(f"Error: {e}")
+        else:
+            QMessageBox.warning(None, 'Error', 'No se ha seleccionado ningún profesional')
            
-################# PDF ###############
+################# PDF Profesionales ###############
 
     def descargar_pdf(self, id_profesional):
         try:
@@ -657,3 +668,5 @@ class ProfesionalWindow():
         except Exception as e:
             print(f"Error al generar el PDF: {str(e)}")
             return False
+        
+

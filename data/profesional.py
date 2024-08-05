@@ -54,8 +54,6 @@ class ProfesionalData():
                         WHEN EXISTS (SELECT 1 FROM profesionales WHERE CUIT = NEW.CUIT) THEN
                             RAISE(ABORT, 'CUIT ya existe')
                     END;
-                    -- Verificar longitud de CUIT2
-                    
                     -- Verificar unicidad de cbu1
                     SELECT CASE
                         WHEN EXISTS (SELECT 1 FROM profesionales WHERE cbu1 = NEW.cbu1 OR cbu2 = NEW.cbu1) THEN
@@ -97,9 +95,6 @@ class ProfesionalData():
                 self.cursor.execute(sql_create_trigger)
                 
                 self.db.commit()
-                #self.cursor.close()
-                #self.db.close()
-                
                 print("Tabla Profesionales y trigger creados")
                 self.crear_datos()
                 ProfesionalData.init = True
@@ -112,35 +107,42 @@ class ProfesionalData():
                     self.db.close()
 
     def crear_datos(self):
-        cuit = random.randint(1000, 9999)
-        cbu = random.randint(1000000000000000000000, 9999999999999999999999)
-        cod = random.randint(1, 200)
-        matricula = random.randint(1000, 9999)
-        try:            
-            sql_insert_profesionales = """INSERT INTO profesionales 
-                (nombre, apellido, domicilio, localidad, CUIT, fechaNacimiento, codPostal, matricula, telefono, cbu1, 
-                cbu2, alias, mail, monotributo, coord, profesional, cuidador, codTransf, nombre2, apellido2, CUIT2, cbu3)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
-            profesionales_datos = [
-                ("Juan", "Perez", "Calle Falsa 123", "Ciudad", str(cuit), "01/01/1980", "1900", str(matricula), "123456789", str(cbu), str(cbu+1), 
-                 "alias", "mail", 'False', 'False', "Enfermero/a", 'True', str(cod), "", "", "", ""),
-                ("Juan", "Garcia", "Calle Falsa 123", "Ciudad", str(cuit+1), "01/01/1980", "1900", str(matricula+1), "123456789", str(cbu+2), str(cbu+3), 
-                 "alias", "mail", 'False', 'True', "Enfermero/a", 'False', str(cod+1), "", "", "", ""),
-                
-            ]
+        try:
+            # Verificar si ya hay datos en la tabla
+            self.cursor.execute("SELECT COUNT(*) FROM profesionales")
+            count = self.cursor.fetchone()[0]
 
-            cur = self.db.cursor()
-            try:
-                cur.executemany(sql_insert_profesionales, profesionales_datos)
-            except Exception as e:
-                print('execute', e)
-            self.db.commit()
-            cur.close()
-            print("Profesionales: Datos de ejemplo insertados correctamente.")
-        except sqlite3.IntegrityError as ie:
-            print("Error de integridad:", ie)
-        except Exception as ex:
-            print("Error al insertar datos de ejemplo:", ex)
+            if count == 0:
+                cuit = random.randint(1000, 9999)
+                cbu = random.randint(1000000000000000000000, 9999999999999999999999)
+                cod = random.randint(1, 200)
+                matricula = random.randint(1000, 9999)
+                
+                sql_insert_profesionales = """INSERT INTO profesionales 
+                    (nombre, apellido, domicilio, localidad, CUIT, fechaNacimiento, codPostal, matricula, telefono, cbu1, 
+                    cbu2, alias, mail, monotributo, coord, profesional, cuidador, codTransf, nombre2, apellido2, CUIT2, cbu3)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
+                profesionales_datos = [
+                    ("Juan", "Perez", "Calle Falsa 123", "Ciudad", str(cuit), "01/01/1980", "1900", str(matricula), "123456789", str(cbu), str(cbu+1), 
+                     "alias", "mail", 'False', 'False', "Enfermero/a", 'True', str(cod), "", "", "", ""),
+                    ("Juan", "Garcia", "Calle Falsa 123", "Ciudad", str(cuit+1), "01/01/1980", "1900", str(matricula+1), "123456789", str(cbu+2), str(cbu+3), 
+                     "alias", "mail", 'False', 'True', "Enfermero/a", 'False', str(cod+1), "", "", "", ""),
+                    
+                ]
+
+                try:
+                    self.cursor.executemany(sql_insert_profesionales, profesionales_datos)
+                    self.db.commit()
+                    print("Profesionales: Datos de ejemplo insertados correctamente.")
+                except sqlite3.IntegrityError as ie:
+                    print("Error de integridad:", ie)
+                except Exception as ex:
+                    print("Error al insertar datos de ejemplo:", ex)
+            else:
+                print("Los datos de ejemplo ya están presentes en la base de datos.")
+
+        except sqlite3.Error as e:
+            print("Error al verificar datos:", e)
 
 
     def registrar(self, profesional:Profesional): 
@@ -220,7 +222,7 @@ class ProfesionalData():
         try:
             self.db = con.Conexion().conectar()
             self.cursor = self.db.cursor()
-            self.cursor.execute("SELECT id, nombre, apellido FROM profesionales")
+            self.cursor.execute("SELECT id, nombre, apellido, profesional FROM profesionales")
             profesionales = self.cursor.fetchall()
             
             return profesionales  # Retorna la lista de tuplas (id, nombre, apellido)

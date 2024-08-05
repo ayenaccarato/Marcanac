@@ -1184,55 +1184,50 @@ color: rgb(255, 255, 255);</string>
             <item row="7" column="4">
              <widget class="QStackedWidget" name="swCoordinador">
               <property name="currentIndex">
-               <number>0</number>
+               <number>1</number>
               </property>
               <widget class="QWidget" name="page">
-               <widget class="QLineEdit" name="txtCoordinador">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="geometry">
-                 <rect>
-                  <x>20</x>
-                  <y>0</y>
-                  <width>113</width>
-                  <height>20</height>
-                 </rect>
-                </property>
-                <property name="font">
-                 <font>
-                  <family>Segoe UI</family>
-                  <pointsize>10</pointsize>
-                 </font>
-                </property>
-               </widget>
+               <layout class="QVBoxLayout" name="verticalLayout_3">
+                <item>
+                 <widget class="QLineEdit" name="txtCoordinador">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <family>Segoe UI</family>
+                    <pointsize>10</pointsize>
+                   </font>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </widget>
               <widget class="QWidget" name="page_2">
-               <widget class="QPushButton" name="btnAsignar">
-                <property name="geometry">
-                 <rect>
-                  <x>40</x>
-                  <y>0</y>
-                  <width>75</width>
-                  <height>23</height>
-                 </rect>
-                </property>
-                <property name="font">
-                 <font>
-                  <family>Segoe UI</family>
-                  <pointsize>10</pointsize>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">background-color: rgb(71, 40, 37);
+               <layout class="QVBoxLayout" name="verticalLayout_4">
+                <item>
+                 <widget class="QPushButton" name="btnAsignar">
+                  <property name="font">
+                   <font>
+                    <family>Segoe UI</family>
+                    <pointsize>10</pointsize>
+                    <weight>75</weight>
+                    <bold>true</bold>
+                   </font>
+                  </property>
+                  <property name="cursor">
+                   <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">background-color: rgb(71, 40, 37);
 color: rgb(255, 255, 255);</string>
-                </property>
-                <property name="text">
-                 <string>Asignar</string>
-                </property>
-               </widget>
+                  </property>
+                  <property name="text">
+                   <string>Asignar</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </widget>
              </widget>
             </item>

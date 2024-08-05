@@ -1,3 +1,4 @@
+import sqlite3
 import conexion as con
 import bcrypt
 from model.usuario import Usuario
@@ -51,3 +52,33 @@ class UsuarioData():
                 self.cursor.close()
             if self.db:
                 self.db.close()
+    
+    def obtener_usuarios(self):
+        '''Retorno los usuarios'''
+        self.db = con.Conexion().conectar()
+        self.cursor = self.db.cursor()
+        sql = """
+            SELECT * FROM usuarios  
+        """
+        res = self.cursor.execute(sql)
+        data = res.fetchall() #Muestro todo lo que me devuelva
+        return data
+    
+    def eliminar(self, id_usuario): 
+        try:
+            self.db = con.Conexion().conectar()
+            self.cursor = self.db.cursor()
+                
+            # Eliminar usuarios
+            self.cursor.execute('DELETE FROM usuarios WHERE id = ?', (id_usuario,))
+            self.db.commit()
+            print(f"Usuario con ID {id_usuario} eliminado correctamente.")
+            return True, ""
+        except sqlite3.Error as ex:
+            return False, str(ex)            
+        finally:
+            if self.cursor:
+                self.cursor.close()
+            if self.db:
+                self.db.close()
+        

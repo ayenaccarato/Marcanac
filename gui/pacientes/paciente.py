@@ -375,6 +375,9 @@ class PacienteWindow():
             self.ver.txtDomicilio.setText(paciente[3])
             self.ver.txtLocalidad.setText(paciente[4])
             self.ver.txtDocumento.setText(paciente[5])
+            self.ver.cbObraSocial.setCurrentText(paciente[7])
+            self.ver.txtTelefono.setText(paciente[9])
+            self.ver.txtNroAfi.setText(paciente[8])
 
             self.set_fecha(paciente[6], self.ver.txtFechaN)
             self.set_fecha(paciente[10], self.ver.txtFechaI)
@@ -443,7 +446,6 @@ class PacienteWindow():
         '''Se elimina el profesional, si confirman'''
         paciente = PacienteData()
         eliminado = paciente.eliminar(id_paciente)
-
         
         if eliminado:
             QMessageBox.information(None, 'Mensaje', 'Paciente eliminado')
@@ -454,6 +456,33 @@ class PacienteWindow():
         self.listado.close()
         self.ver.close()
         self.abrirListado()
+
+    def eliminarRelacionPacienteProfesional(self, id_paciente, id_valor):
+        '''Eliminar la relación entre un paciente y un profesional'''
+
+        # Crear el cuadro de diálogo de confirmación
+        mBox = QMessageBox()
+        mBox.setWindowTitle('Confirmar eliminación')
+        mBox.setText("¿Está seguro que desea eliminar este profesional?")
+
+        # Añadir botones personalizados
+        si_btn = mBox.addButton("Sí", QMessageBox.ButtonRole.YesRole)
+        no_btn = mBox.addButton("No", QMessageBox.ButtonRole.NoRole)
+        
+        mBox.setDefaultButton(no_btn)
+        mBox.exec()
+
+        if mBox.clickedButton() == si_btn:
+            prof = PacienteProfesionalesData()
+            success, error_message = prof.eliminar_relacion_paciente_profesional(id_paciente, id_valor)
+            if success:
+                self.lisProfPac.close()
+                QMessageBox.information(None, "Eliminación exitosa", "El profesional ha sido eliminado correctamente.")            
+                self.mostrarProfesionales(id_paciente)  # Refrescar la tabla
+            else:
+                QMessageBox.warning(None, 'Error', f'No se pudo eliminar el profesional: {error_message}')
+        else:
+            print("Eliminación cancelada")        
 
 ### Listado ###
 
@@ -524,7 +553,7 @@ class PacienteWindow():
             self.listado.tblListado.clearContents()  # Limpiar contenido actual de la tabla
             self.listado.tblListado.setRowCount(0)
             lis = ListadoData() 
-            data = lis.buscarPaciente(self.listado.txtDocumento.text(), self.listado.txtApellido.text())
+            data = lis.buscarPaciente(self.listado.txtDocumento.text(), self.listado.txtApellido.text().upper())
             if data:
                 # Reiniciar número de filas
                 
@@ -584,6 +613,7 @@ class PacienteWindow():
             if item_data is not None:
                 id_profesional = item_data
                 print(f"ID del profesional seleccionado: {id_profesional}")
+                print('actualizar', id_profesional)
                 #self.asociarProfesionalAPaciente(id_paciente, id_profesional)
             else:
                 print("No se encontró el ID del profesional seleccionado.")
@@ -604,34 +634,66 @@ class PacienteWindow():
                     QMessageBox.warning(None, 'Error', 'No se pudo asociar el coordinador al paciente')
                     
                 self.nCoord.close() #Cierro la ventana
+                self.ver.close()
+                self.mostrarPaciente(id_paciente)
+                self.ver.show()
         except Exception:
             QMessageBox.critical(None, 'Error', 'Seleccione un coordinador')
 
 ### Paciente - Profesionales ###
 
+    def boton_listado_profesionales_pac (self, id_paciente, id_valor, fila):              
+        # Crear el botón y añadirlo a la columna 4
+        # Crear el botón "Eliminar" y conectarlo
+        btn = QPushButton("Eliminar")
+        
+        btn.clicked.connect(lambda _, id_valor=id_valor: self.eliminarRelacionPacienteProfesional(id_paciente, id_valor))
+        # Agregar estilo al botón
+        btn.setStyleSheet("background-color: rgb(255, 0, 0); color: rgb(255, 255, 255);")
+        widget = QWidget()
+        layout = QHBoxLayout(widget)
+        layout.addWidget(btn)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.lisProfPac.tblListadoPP.setCellWidget(fila, 3, widget)
+
     def mostrarProfesionales(self, id_paciente):
-            profesional = ProfesionalWindow(self.usuario)
+        profesional = ProfesionalWindow(self.usuario)
 
-            lis = PacienteProfesionalesData()
-            profesionales = lis.obtener_profesionales_de_paciente(id_paciente)        
-            
-            if profesionales:
-                self.lisProfPac.tblListadoPP.setRowCount(len(profesionales))  # Configurar el número de filas
+        lis = PacienteProfesionalesData()
+        profesionales = lis.obtener_profesionales_de_paciente(id_paciente)        
+        
+        # Limpiar la tabla antes de añadir nuevas filas
+        self.lisProfPac.tblListadoPP.clearContents()
+        self.lisProfPac.tblListadoPP.setRowCount(0)
+
+        if profesionales:
+            self.lisProfPac.tblListadoPP.setRowCount(len(profesionales))  # Configurar el número de filas
+            self.lisProfPac.tblListadoPP.setColumnCount(4)
+
+            new_headers = ["Apellido", "Nombre", "Profesión", "Acciones"]
+            self.lisProfPac.tblListadoPP.setHorizontalHeaderLabels(new_headers)
                 
-                fila = 0
-                for item in profesionales:
+            fila = 0
+            for item in profesionales:
                     
-                    self.lisProfPac.tblListadoPP.setItem(fila, 0, QTableWidgetItem(str(item[2]))) #Apellido
-                    self.lisProfPac.tblListadoPP.setItem(fila, 1, QTableWidgetItem(str(item[1]))) #Nombre
-                    self.lisProfPac.tblListadoPP.setItem(fila, 2, QTableWidgetItem(str(item[16]))) #Profesión
+                self.lisProfPac.tblListadoPP.setItem(fila, 0, QTableWidgetItem(str(item[2]))) #Apellido
+                self.lisProfPac.tblListadoPP.setItem(fila, 1, QTableWidgetItem(str(item[1]))) #Nombre
+                self.lisProfPac.tblListadoPP.setItem(fila, 2, QTableWidgetItem(str(item[16]))) #Profesión
 
-                    fila += 1
+                id_valor = item[0]
+                    
+                self.boton_listado_profesionales_pac(id_paciente, id_valor, fila)
+
+                fila += 1
             
-            self.lisProfPac.btnProf.clicked.connect(lambda: profesional.cargar_nombres_profesionales(id_paciente))
-            self.lisProfPac.btnRefrescar.clicked.connect(lambda: self.mostrarProfesionales(id_paciente))
-            self.lisProfPac.show()
+        self.lisProfPac.btnProf.clicked.connect(lambda: profesional.cargar_nombres_profesionales(id_paciente))
+        self.lisProfPac.btnRefrescar.clicked.connect(lambda: self.mostrarProfesionales(id_paciente))
+        self.lisProfPac.btnDescargar.clicked.connect(lambda: self.descargar_pdf_prof_pac(id_paciente))
+        self.lisProfPac.show()
 
-############## PDF #################
+############## PDF Paciente #################
 
     def descargar_pdf(self, id_paciente):
         try:
@@ -793,6 +855,115 @@ class PacienteWindow():
                 c.drawString(title_text_x, title_text_y, f"{label}:")
                 c.drawString(value_text_x, value_text_y, value)
             
+            # Finalizar el PDF
+            c.save()
+            return True
+        except Exception as e:
+            print(f"Error al generar el PDF: {str(e)}")
+            return False
+
+######### PDF Profesionales de Paciente #######
+
+    def descargar_pdf_prof_pac(self, id_paciente):
+        try:
+            # Obtener la información del profesional
+            paciente = PacienteData()
+            paciente_info = paciente.mostrar(id_paciente)
+
+            prof = PacienteProfesionalesData()
+            data = prof.obtener_profesionales_de_paciente(id_paciente)
+            print(data)
+
+            profesionales_data_list = []
+            for item in data:
+                profesional_data = {
+                    'nombre': item[1],
+                    'apellido': item[2],                
+                    'profesion': item[16],          
+                }
+                profesionales_data_list.append(profesional_data)
+            
+            # Mostrar el cuadro de diálogo para guardar el archivo PDF
+            filePath, _ = QFileDialog.getSaveFileName(self.ver, "Guardar PDF", f"Profesionales_de_{paciente_info[1]}_{paciente_info[2]}.pdf", "PDF Files (*.pdf)")
+            
+            if filePath:
+                # Generar el PDF
+                if self.generar_pdf_profesional(profesionales_data_list, filePath):
+                    QMessageBox.information(None, "Éxito", "El PDF se guardó correctamente.")
+                else:
+                    QMessageBox.warning(None, "Error", "No se pudo guardar el PDF.")
+            else:
+                QMessageBox.warning(None, "Advertencia", "No se seleccionó ningún archivo para guardar.")
+        except Exception as e:
+            QMessageBox.critical(None, "Error", f"Ocurrió un error: {str(e)}")
+
+    def generar_pdf_profesional(self, profesionales_data_list, filePath):
+        try:
+            print('profesionales', profesionales_data_list)
+            c = canvas.Canvas(filePath, pagesize=A4)
+            width, height = A4
+            margin = 1 * cm
+            line_height = 0.5 * cm
+            box_margin = 0.2 * cm
+            
+            # Ajustar el título
+            c.setFont("Helvetica-Bold", 14)
+            title_x = margin
+            title_y = height - margin
+            title_text = "Profesionales de paciente"
+            title_width = c.stringWidth(title_text, "Helvetica-Bold", 14)
+            c.drawString((width - title_width) / 2, title_y, title_text)  # Centrar el título
+            
+            # Ajustar el espacio después del título
+            current_y = height - margin - line_height * 4
+            
+            # Ajustar los campos
+            c.setFont("Helvetica", 10)
+            num_cols = 3
+            col_width = (width - 2 * margin) / num_cols  # Dividir el ancho de la página en 3 columnas
+            box_height = 2 * line_height  # Altura de cada recuadro
+            
+            # Dibujar las cabeceras de las columnas
+            headers = ['Nombre', 'Apellido', 'Profesión']
+            for i, header in enumerate(headers):
+                x = margin + i * col_width
+                y = current_y
+                c.rect(x, y, col_width, box_height)  # Dibujar el recuadro
+                c.drawString(x + box_margin, y + box_height - line_height - box_margin, header)  # Dibujar el texto del encabezado
+            
+            # Ajustar la posición para los datos
+            current_y -= box_height  # Mover hacia abajo para empezar a dibujar datos
+            
+            # Iterar sobre la lista de profesionales
+            for index, profesional_data in enumerate(profesionales_data_list):
+                col = 0  # Empezar en la primera columna
+                row = index  # Fila en la que se encuentra el recuadro
+                
+                for key in headers:
+                    # Convertir el encabezado a minúsculas para coincidir con las claves del diccionario
+                    key = key.lower().replace('ó', 'o')
+                    print(key)
+                    value = profesional_data.get(key, '')
+                    
+                    # Calcular la posición para el dato
+                    x = margin + col * col_width
+                    y = current_y - row * box_height
+                    
+                    # Mostrar información de depuración
+                    print(f"Index: {index}, Col: {col}, Row: {row}, X: {x}, Y: {y}, Value: {value}")
+                    
+                    # Dibujar el recuadro para el dato
+                    c.rect(x, y, col_width, box_height)
+                    
+                    # Dibujar el dato dentro del recuadro
+                    c.drawString(x + box_margin, y + box_height - line_height - box_margin, value)
+                    
+                    col += 1  # Mover a la siguiente columna
+                    
+                # Ajustar la posición para la próxima fila
+                if (index + 1) % num_cols == 0:
+                    current_y -= box_height
+
             # Finalizar el PDF
             c.save()
             return True

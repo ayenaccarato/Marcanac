@@ -55,6 +55,7 @@ class PacienteProfesionalesData:
             FROM paciente_profesionales
             JOIN profesionales ON paciente_profesionales.profesional_id = profesionales.id
             WHERE paciente_profesionales.paciente_id = ?
+            ORDER BY apellido
             """
             self.cursor.execute(sql_obtener_profesionales, (paciente_id,))
             profesionales = self.cursor.fetchall()
@@ -95,12 +96,15 @@ class PacienteProfesionalesData:
             self.db = con.Conexion().conectar()
             self.cursor = self.db.cursor()
             self.cursor.execute('''
-                DELETE FROM paciente_profesional
+                DELETE FROM paciente_profesionales
                 WHERE paciente_id = ? AND profesional_id = ?
             ''', (paciente_id, profesional_id))
             self.db.commit()
-        except sqlite3.Error as e:
-            print(f"Error al eliminar la relación: {e}")
+            return True, ""
+        except Exception as ex:
+            return False, str(ex)
+        # except sqlite3.Error as e:
+        #     print(f"Error al eliminar la relación: {e}")
         finally:
             if self.db:
                 self.db.close()

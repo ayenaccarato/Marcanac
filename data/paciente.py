@@ -6,7 +6,7 @@ from model.paciente import Paciente
 class PacienteData:
 
     init = False
-    
+
     def __init__(self):
         if not PacienteData.init:
             try:
@@ -38,7 +38,7 @@ class PacienteData:
                 self.cursor.execute(sql_create_pacientes)
                 self.db.commit()
                 print("Tabla Pacientes creada")
-                self.crear_datos()
+                self.crear_datos()  # Solo creará datos si la tabla está vacía
                 PacienteData.init = True
             except sqlite3.Error as ex:
                 print("Error al crear la tabla Pacientes:", ex)
@@ -51,35 +51,37 @@ class PacienteData:
                     self.db.close()
 
     def crear_datos(self):
-        doc = random.randint(10000000, 99999999)
         try:
+            # Verificar si ya hay datos en la tabla
+            self.cursor.execute("SELECT COUNT(*) FROM pacientes")
+            count = self.cursor.fetchone()[0]
 
-            sql_insert_pacientes = """INSERT INTO pacientes 
-                (nombre, apellido, domicilio, localidad, documento, fechaNacimiento, obraSocial, numAfiliado, telefono, fechaIngreso, 
-                fechaEgreso, motivo, familiar, modulo, submodulo, equip, sopNutri, asisRespi)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
-            pacientes_datos = [
-                ("Juan", "Perez", "Calle Falsa 123", "Ciudad", str(doc), "01/01/1980", "IOMA", "1111", "123456789", "01/01/2000", "", "", 
-                 "Familiar 1", "Módulo 1", '{"Fono": false, "TO": false, "Psico": true}', '{"Cama": false, "Colchon": true, "Silla": false}', "Adultos SIN bomba", '{"A": false, "B": true, "C": false}'),
-                ("Juan", "Garcia", "Calle Falsa 124", "Ciudad", str(doc+1), "01/01/1980", "IOMA", "1111", "123456789", "01/01/2000", 
-                 "01/01/2020", "Motivo 1", "Familiar 1", "Modulo 1", '{"Fono": false, "TO": false, "Psico": true}', '{"Cama": false, "Colchon": true, "Silla": true}', "Adultos CON bomba", '{"A": false, "B": true, "C": true}'),
-                # Agrega más pacientes si es necesario
-            ]
-            try:
-                cur = self.db.cursor()
-            except Exception as e:
-                print('cursor', e)
-            try:
-                cur.executemany(sql_insert_pacientes, pacientes_datos)
-            except Exception as e:
-                print('execute', e)
-            self.db.commit()
-            cur.close()
-            print("Pacientes: Datos de ejemplo insertados correctamente.")
-        except sqlite3.IntegrityError as ie:
-            print("Error de integridad:", ie)
-        except Exception as ex:
-            print("Error al insertar datos de ejemplo:", ex)
+            if count == 0:
+                doc = random.randint(10000000, 99999999)
+                sql_insert_pacientes = """INSERT INTO pacientes 
+                    (nombre, apellido, domicilio, localidad, documento, fechaNacimiento, obraSocial, numAfiliado, telefono, fechaIngreso, 
+                    fechaEgreso, motivo, familiar, modulo, submodulo, equip, sopNutri, asisRespi)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
+                pacientes_datos = [
+                    ("Juan", "Perez", "Calle Falsa 123", "Ciudad", str(doc), "01/01/1980", "IOMA", "1111", "123456789", "01/01/2000", "", "", 
+                     "Familiar 1", "Módulo 1", '{"Fono": false, "TO": false, "Psico": true}', '{"Cama": false, "Colchon": true, "Silla": false}', "Adultos SIN bomba", '{"A": false, "B": true, "C": false}'),
+                    ("Juan", "Garcia", "Calle Falsa 124", "Ciudad", str(doc+1), "01/01/1980", "IOMA", "1111", "123456789", "01/01/2000", 
+                     "01/01/2020", "Motivo 1", "Familiar 1", "Modulo 1", '{"Fono": false, "TO": false, "Psico": true}', '{"Cama": false, "Colchon": true, "Silla": true}', "Adultos CON bomba", '{"A": false, "B": true, "C": true}'),
+                    # Agrega más pacientes si es necesario
+                ]
+                try:
+                    self.cursor.executemany(sql_insert_pacientes, pacientes_datos)
+                    self.db.commit()
+                    print("Pacientes: Datos de ejemplo insertados correctamente.")
+                except sqlite3.IntegrityError as ie:
+                    print("Error de integridad:", ie)
+                except Exception as ex:
+                    print("Error al insertar datos de ejemplo:", ex)
+            else:
+                print("Los datos de ejemplo ya están presentes en la base de datos.")
+
+        except sqlite3.Error as e:
+            print("Error al verificar datos:", e)
 
     def registrar(self, paciente:Paciente): 
         self.db = con.Conexion().conectar()
