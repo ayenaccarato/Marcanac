@@ -200,6 +200,10 @@ color: rgb(255, 255, 255);</string>
    </layout>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>cbProfesionales</tabstop>
+  <tabstop>btnRegistrar</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

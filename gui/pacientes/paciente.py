@@ -86,7 +86,11 @@ class PacienteWindow():
 
 ### Registrar ###
 
-    def abrirRegistro(self):   
+    def abrirRegistro(self):  
+        try:
+            self.nuevo.btnRegistrar.clicked.disconnect()
+        except TypeError:
+            pass
         self.nuevo.btnRegistrar.clicked.connect(self.registrarPaciente)     
         self.nuevo.show()
 
@@ -280,6 +284,11 @@ class PacienteWindow():
             self.actPac.arB.setChecked(dicA['B'])
             self.actPac.arC.setChecked(dicA['C'])
 
+            try:
+                self.actPac.btnGuardar.clicked.disconnect()
+            except TypeError:
+                pass
+
             # Conectar el botón btnGuardar a guardarCambiosPaciente
             self.actPac.btnGuardar.clicked.connect(lambda: self.guardarCambiosPaciente(id))
         except Exception as e:
@@ -332,10 +341,7 @@ class PacienteWindow():
         self.actPac.close() #Cierro la ventana
         
         self.mostrarPaciente(id)
-       
-        self.abrirListado()
-        
-        self.ver.close()
+        self.ver.show()
 
 ### Ver ###
 
@@ -365,6 +371,10 @@ class PacienteWindow():
                 self.ver.swCoordinador.setCurrentIndex(0)
             else:
                 self.ver.swCoordinador.setCurrentIndex(1)
+                try:
+                    self.ver.btnAsignar.clicked.disconnect()
+                except TypeError:
+                    pass
                 self.ver.btnAsignar.clicked.connect(lambda: self.cargar_nombres_coordinadores(id))
             
             objData = PacienteData()
@@ -407,6 +417,17 @@ class PacienteWindow():
             self.ver.arB.setChecked(dicA['B'])
             self.ver.arC.setChecked(dicA['C'])
 
+            try:
+                self.ver.btnDescargar.clicked.disconnect()
+                self.ver.btnModificar.clicked.disconnect()
+                self.ver.btnCarpeta.clicked.disconnect()
+                self.ver.btnEliminar.clicked.disconnect()
+                self.ver.btnInsumos.clicked.disconnect()
+                self.ver.btnProfesionales.clicked.disconnect()  
+                
+            except TypeError:
+                pass
+
             self.ver.btnModificar.clicked.connect(lambda: self.abrirVentanaModificarP(id=id))
             self.ver.btnInsumos.clicked.connect(lambda: insumosList.mostrarInsumos(id_paciente=id))        
             self.ver.btnProfesionales.clicked.connect(lambda: self.mostrarProfesionales(id_paciente=id))
@@ -415,11 +436,7 @@ class PacienteWindow():
                 self.ver.btnEliminar.clicked.connect(lambda: self.eliminar_paciente(id))
             else:
                 self.ver.btnEliminar.setVisible(False)
-            
-            try:
-                self.ver.btnDescargar.clicked.disconnect()
-            except TypeError:
-                pass
+
             self.ver.btnDescargar.clicked.connect(lambda: self.descargar_pdf(id_paciente=id))
 
             self.ver.show()
@@ -449,10 +466,12 @@ class PacienteWindow():
     def confirmar(self, id_paciente):
         '''Se elimina el profesional, si confirman'''
         paciente = PacienteData()
+        pac_coor = PacienteCoordinadorData()
         eliminado = paciente.eliminar(id_paciente)
         
         if eliminado:
             QMessageBox.information(None, 'Mensaje', 'Paciente eliminado')
+            pac_coor.eliminar_relacion(id_paciente)
             
         else:
             QMessageBox.critical(None, 'Error', 'El paciente no pudo ser eliminado')
@@ -532,6 +551,10 @@ class PacienteWindow():
                 self.listado.tblListado.setColumnWidth(2, 150)
                 self.listado.tblListado.setColumnWidth(4, 150)
                 self.listado.tblListado.setColumnWidth(5, 150) 
+                try:
+                    self.listado.btnBuscar.clicked.disconnect()
+                except TypeError:
+                    pass
                 self.listado.btnBuscar.clicked.connect(lambda: self.buscarPac())
                 self.listado.btnLista.setVisible(False)
                 self.limpiar_campos_busqueda()
@@ -607,6 +630,10 @@ class PacienteWindow():
         self.nCoord.cbProfesionales.currentIndexChanged.connect(lambda index: self.actualizar_id_profesional_coordinador(index, id_paciente))
 
         # Conectar botón Registrar
+        try:
+            self.nCoord.btnAsignar.clicked.disconnect()
+        except TypeError:
+            pass
         self.nCoord.btnAsignar.clicked.connect(lambda: self.asociarCoordinadorAPaciente(id_paciente, id_profesional))
         self.nCoord.show()
     
@@ -629,20 +656,22 @@ class PacienteWindow():
         try:
             if id_profesional != None:
                 objData = PacienteCoordinadorData()
-                exito = objData.asociar_coordinador_a_paciente(id_paciente, id_profesional)
+                print('Profesional ', id_profesional, ' paciente ', id_paciente)
+                exito, error_message = objData.asociar_coordinador_a_paciente(id_paciente, id_profesional)
                 
                 if exito:
-                    QMessageBox.information(None, 'Mensaje', 'Coordinador asociado al paciente correctamente')
-                    
+                    QMessageBox.information(None, 'Mensaje', 'Coordinador asociado al paciente correctamente') 
                 else:
-                    QMessageBox.warning(None, 'Error', 'No se pudo asociar el coordinador al paciente')
+                    QMessageBox.critical(None, 'Error', f'El coordinador no pudo ser asociado: {error_message}')
                     
                 self.nCoord.close() #Cierro la ventana
                 self.ver.close()
                 self.mostrarPaciente(id_paciente)
                 self.ver.show()
-        except Exception:
-            QMessageBox.critical(None, 'Error', 'Seleccione un coordinador')
+        except UnboundLocalError as ex:
+            QMessageBox.critical(None, 'Error', f'variable local: {ex}')
+        except Exception as e:
+            QMessageBox.critical(None, 'Error', f'Seleccione un coordinador: {e}')
 
 ### Paciente - Profesionales ###
 

@@ -48,17 +48,57 @@ class PacienteCoordinadorData:
         try:
             self.db = con.Conexion().conectar()
             self.cursor = self.db.cursor()
+
+            # # Primero, verificar si ya existe una asociación para el paciente
+            # sql_check = "SELECT * FROM paciente_coordinador WHERE paciente_id = ?"
+            # self.cursor.execute(sql_check, (paciente_id,))
+            # association_exists = self.cursor.fetchone()
+
+            # if association_exists:
+            #     # Si existe una asociación, puedes decidir si actualizar o lanzar un error
+            #     print(f"El paciente con ID {paciente_id} ya tiene un coordinador asignado.")
+            #     return False
+
             self.cursor.execute("""
             INSERT INTO paciente_coordinador (paciente_id, coordinador_id)
             VALUES (?, ?)
             """, (paciente_id, coordinador_id))
             self.db.commit()
-            return True
+            if self.cursor.rowcount == 1: # Si se afectó una fila
+                return True, None
+            else:
+                return False, "No se pudo registrar el profesional"
         except sqlite3.Error as e:
-            print(f"Error al asociar coordinador a paciente: {e}")
-            return False
+            return False, "Error de integridad: " + str(e)
+        except Exception as ex:
+            return False, "Error: " + str(ex)
         finally:
             if self.cursor:
                 self.cursor.close()
             if self.db:
                 self.db.close()
+
+    def eliminar_relacion(self, paciente_id):
+        try:
+            self.db = con.Conexion().conectar()
+            self.cursor = self.db.cursor()
+
+            # Eliminar cualquier relación existente
+            self.cursor.execute("""
+                DELETE FROM paciente_coordinador
+                WHERE paciente_id = ?
+            """, (paciente_id,))
+            
+            self.db.commit()
+            print("Relación eliminada correctamente.")
+        
+        except sqlite3.Error as ex:
+            return False, "Error al eliminar la relación  " + str(ex)
+        finally:
+            if self.cursor:
+                self.cursor.close()
+            if self.db:
+                self.db.close()
+            
+
+        

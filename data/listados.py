@@ -8,8 +8,10 @@ class ListadoData():
         try:
             with con.Conexion().conectar() as self.db:
                 self.cursor = self.db.cursor()
-                sql = """ SELECT * FROM pacientes
-                        ORDER BY apellido"""
+                sql = """ SELECT * 
+                    FROM pacientes
+                    ORDER BY UPPER(apellido)
+                    """
                 self.cursor.execute(sql)
                 data = self.cursor.fetchall()
                 return data
@@ -44,7 +46,7 @@ class ListadoData():
         self.cursor = self.db.cursor()
         sql = """
             SELECT * FROM profesionales  
-            ORDER BY apellido
+            ORDER BY UPPER(apellido)
         """
 
         res = self.cursor.execute(sql)

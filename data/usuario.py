@@ -2,12 +2,13 @@ import sqlite3
 import conexion as con
 import bcrypt
 from model.usuario import Usuario
+from PyQt6.QtWidgets import QMessageBox
 
 class UsuarioData():   
 
-    def __init__(self):
-        self.db = None
-        self.cursor = None
+    # def __init__(self):
+    #     self.db = None
+    #     self.cursor = None
 
     def login(self, usuario: Usuario):
         try:
@@ -59,8 +60,37 @@ class UsuarioData():
         self.cursor = self.db.cursor()
         sql = """
             SELECT * FROM usuarios  
+            ORDER BY nombre
         """
         res = self.cursor.execute(sql)
+        data = res.fetchall() #Muestro todo lo que me devuelva
+        return data
+    
+    def buscar_usuarios(self, rol, nombre, usuario): 
+        '''Busco usuarios por distintos datos, dependiendo que se ingresa
+        puede ser rol, nombre o usuario'''
+        self.db = con.Conexion().conectar()
+        self.cursor = self.db.cursor()
+
+        # Crear el patrón de búsqueda para el apellido
+        rol_busqueda = f'%{rol}%'
+        nombre_busqueda = f'%{nombre}%'
+        usuario_busqueda = f'%{usuario}%'
+
+        sql = """
+            SELECT * 
+            FROM usuarios 
+            WHERE (UPPER(rol) LIKE ? OR ? = '') 
+            AND (UPPER(nombre) LIKE ? OR ? = '') 
+            AND (UPPER(usuario) LIKE ? OR ? = '')
+        """
+        print(f"Consulta SQL: {sql}")
+        print(f"Parámetros: {rol}, {nombre_busqueda}, {usuario_busqueda}")
+        try:
+            res = self.cursor.execute(sql, (rol_busqueda, rol, nombre_busqueda, nombre, usuario_busqueda, usuario))
+        except Exception as e:
+            QMessageBox.critical(None, 'Error', f'Error: {e}')
+            print(e)
         data = res.fetchall() #Muestro todo lo que me devuelva
         return data
     

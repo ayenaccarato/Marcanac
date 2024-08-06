@@ -787,6 +787,31 @@ color: rgb(255, 255, 255);</string>
    </layout>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>txtNombre</tabstop>
+  <tabstop>txtApellido</tabstop>
+  <tabstop>txtFechaN</tabstop>
+  <tabstop>txtCuit</tabstop>
+  <tabstop>txtDomicilio</tabstop>
+  <tabstop>txtLocalidad</tabstop>
+  <tabstop>txtCP</tabstop>
+  <tabstop>txtTelefono</tabstop>
+  <tabstop>txtMail</tabstop>
+  <tabstop>cbProfesional</tabstop>
+  <tabstop>txtMatricula</tabstop>
+  <tabstop>txtCbu1</tabstop>
+  <tabstop>txtCbu2</tabstop>
+  <tabstop>txtAlias</tabstop>
+  <tabstop>txtCodigo</tabstop>
+  <tabstop>monotributo</tabstop>
+  <tabstop>coordinador</tabstop>
+  <tabstop>cuidador</tabstop>
+  <tabstop>txtNombre_2</tabstop>
+  <tabstop>txtApellido_2</tabstop>
+  <tabstop>txtCuit_2</tabstop>
+  <tabstop>txtCbu3</tabstop>
+  <tabstop>btnRegistrar</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

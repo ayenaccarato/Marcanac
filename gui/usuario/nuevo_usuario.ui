@@ -291,6 +291,13 @@ color: rgb(255, 255, 255);</string>
    </layout>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>txtNombre</tabstop>
+  <tabstop>txtUsuario</tabstop>
+  <tabstop>txtClave</tabstop>
+  <tabstop>cbRol</tabstop>
+  <tabstop>btnRegistrar</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

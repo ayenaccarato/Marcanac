@@ -229,6 +229,11 @@ color: rgb(255, 255, 255);</string>
    </layout>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>txtUsuario</tabstop>
+  <tabstop>txtClave</tabstop>
+  <tabstop>btnAcceder</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

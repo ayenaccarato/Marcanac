@@ -311,6 +311,12 @@ color: rgb(255, 255, 255);</string>
    </layout>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>btnInsumo</tabstop>
+  <tabstop>btnRefrescar</tabstop>
+  <tabstop>btnDescargar</tabstop>
+  <tabstop>tblListadoI</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -278,6 +278,12 @@ color: rgb(255, 255, 255);</string>
    </layout>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>btnProf</tabstop>
+  <tabstop>btnRefrescar</tabstop>
+  <tabstop>tblListadoPP</tabstop>
+  <tabstop>btnDescargar</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

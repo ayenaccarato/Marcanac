@@ -204,7 +204,10 @@ class ProfesionalWindow():
  
         self.listadoProf.tblListadoProf.setColumnWidth(2,150)
         self.listadoProf.tblListadoProf.setColumnWidth(3,150)
-        
+        try:
+            self.listadoProf.btnBuscar.clicked.disconnect()
+        except TypeError:
+            pass
         self.listadoProf.btnBuscar.clicked.connect(lambda: self.buscar())
         self.listadoProf.btnLista.setVisible(False)
         self.limpiar_campos_busqueda()   
@@ -305,16 +308,21 @@ class ProfesionalWindow():
             self.verProf.txtCuit_2.setText(profesional[21])
             self.verProf.txtCbu3.setText(profesional[22])
 
+            try:
+                self.verProf.btnDescargar.clicked.disconnect()
+                self.verProf.btnModificar.clicked.disconnect()
+                self.verProf.btnCarpeta.clicked.disconnect()
+                self.verProf.btnEliminar.clicked.disconnect()
+            except TypeError:
+                pass
+
             self.verProf.btnModificar.clicked.connect(lambda: self.abrirVentanaModificar(id))
             self.verProf.btnCarpeta.clicked.connect(lambda: archivos.cargarArchivosProfesional(id_profesional=id))
             if self.usuario.rol == 'admin':
                 self.verProf.btnEliminar.clicked.connect(lambda: self.eliminar_profesional(id))
             else:
                 self.verProf.btnEliminar.setVisible(False)
-            try:
-                self.verProf.btnDescargar.clicked.disconnect()
-            except TypeError:
-                pass
+
             self.verProf.btnDescargar.clicked.connect(lambda: self.descargar_pdf(id_profesional=id))
 
             self.verProf.show()
@@ -360,6 +368,10 @@ class ProfesionalWindow():
             self.actProf.txtCuit_2.setText(profesional[21])
             self.actProf.txtCbu3.setText(profesional[22])
 
+            try:
+                self.actProf.btnGuardar.clicked.disconnect()
+            except TypeError:
+                pass
             # Conectar el botón btnGuardar a guardarCambiosProfesional
             self.actProf.btnGuardar.clicked.connect(lambda: self.guardarCambiosProfesional(id))
         except Exception as e:

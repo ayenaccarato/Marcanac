@@ -62,6 +62,7 @@ class UsuarioWindow():
             self.nuevo.close() #Cierro la ventana
 
 ### Eliminar ###
+
     def eliminarUsuario(self, id):
         if id == 1:
             QMessageBox.critical(None, 'Error', 'No puede eliminar este usuario')
@@ -95,6 +96,7 @@ class UsuarioWindow():
         
         self.listado_usuarios()
 ### Listado ###
+
     def boton_listado_usuario(self, id_valor, fila):              
         # Crear el botón y añadirlo a la columna 7
         # Crear el botón "Ver más" y conectarlo
@@ -110,6 +112,11 @@ class UsuarioWindow():
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
        
         self.listado.tblListado.setCellWidget(fila, 3, widget)
+
+    def limpiar_campos_busqueda(self):        
+        self.listado.txtNombre.clear()  # Limpia el contenido del primer QLineEdit
+        self.listado.txtUsuario.clear()
+        self.listado.cbRol.setCurrentIndex(0)
 
     def listado_usuarios(self):
         lis = UsuarioData() 
@@ -133,8 +140,55 @@ class UsuarioWindow():
  
         self.listado.tblListado.setColumnWidth(0,150)
         self.listado.tblListado.setColumnWidth(1,150)
-        
+        try:
+            self.listado.btnBuscar.clicked.disconnect()
+        except TypeError:
+            pass
         self.listado.btnBuscar.clicked.connect(lambda: self.buscar())
         self.listado.btnLista.setVisible(False)
-        #self.limpiar_campos_busqueda()   
+        self.limpiar_campos_busqueda()   
         self.listado.show()
+
+    def buscar(self):
+        if self.listado.txtNombre.text() == '' and self.listado.txtUsuario.text() == '' and self.listado.cbRol.currentText() == '--Seleccione--':
+            QMessageBox.information(None, 'Mensaje', 'Ingrese datos a buscar')
+        else:
+            # Limpiar el contenido actual de la tabla
+            self.listado.tblListado.clearContents()
+            self.listado.tblListado.setRowCount(0)
+            lis = UsuarioData() 
+            if self.listado.cbRol.currentText() == 'Administrador':
+                rol = 'admin'
+            elif self.listado.cbRol.currentText() == 'Empleado':
+                rol = 'employee'
+            else:
+                rol = ''
+
+            print('Rol', rol, ' nombre ', self.listado.txtNombre.text().upper(), ' usuario ', self.listado.txtUsuario.text().upper())
+            data = lis.buscar_usuarios(rol.upper(), self.listado.txtNombre.text().upper(), self.listado.txtUsuario.text().upper())
+            
+            if data:
+                # Reiniciar número de filas
+                print('busqueda', data)
+                fila = 0
+                self.listado.tblListado.setRowCount(len(data)) #Cuantas filas traen los datos
+                for item in data:
+                    self.listado.tblListado.setItem(fila, 0, QTableWidgetItem(str(item[1]))) #Nombre
+                    self.listado.tblListado.setItem(fila, 1, QTableWidgetItem(str(item[2]))) #Usuario
+                    if item[4] == 'admin':
+                        self.listado.tblListado.setItem(fila, 2, QTableWidgetItem('Administrador')) #Rol
+                    else:
+                        self.listado.tblListado.setItem(fila, 2, QTableWidgetItem('Empleado'))
+                    
+                    id_valor = item[0]
+                    
+                    self.boton_listado_usuario(id_valor, fila)
+                            
+                    fila += 1
+            else:
+                # Limpiar la tabla si no se encontraron resultados
+                self.listado.tblListado.clearContents()
+                self.listado.tblListado.setRowCount(0)
+
+            self.listado.btnLista.setVisible(True)
+            self.listado.btnLista.clicked.connect(lambda: self.listado_usuarios())

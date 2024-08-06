@@ -1268,6 +1268,40 @@ background-color: rgb(255, 0, 0);</string>
    </layout>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>txtNombre</tabstop>
+  <tabstop>txtApellido</tabstop>
+  <tabstop>txtDocumento</tabstop>
+  <tabstop>txtFechaN</tabstop>
+  <tabstop>txtDomicilio</tabstop>
+  <tabstop>txtLocalidad</tabstop>
+  <tabstop>txtTelefono</tabstop>
+  <tabstop>cbObraSocial</tabstop>
+  <tabstop>txtNroAfi</tabstop>
+  <tabstop>txtFamiliar</tabstop>
+  <tabstop>txtFechaI</tabstop>
+  <tabstop>txtFechaE</tabstop>
+  <tabstop>txtMotivo</tabstop>
+  <tabstop>btnAsignar</tabstop>
+  <tabstop>cbModulo</tabstop>
+  <tabstop>cbSN</tabstop>
+  <tabstop>fono</tabstop>
+  <tabstop>to</tabstop>
+  <tabstop>psico</tabstop>
+  <tabstop>cama</tabstop>
+  <tabstop>colchon</tabstop>
+  <tabstop>silla</tabstop>
+  <tabstop>arA</tabstop>
+  <tabstop>arB</tabstop>
+  <tabstop>arC</tabstop>
+  <tabstop>btnEliminar</tabstop>
+  <tabstop>btnModificar</tabstop>
+  <tabstop>btnDescargar</tabstop>
+  <tabstop>btnCarpeta</tabstop>
+  <tabstop>btnProfesionales</tabstop>
+  <tabstop>btnInsumos</tabstop>
+  <tabstop>txtCoordinador</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

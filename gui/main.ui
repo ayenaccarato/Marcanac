@@ -398,6 +398,17 @@ QPushButton:hover {
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <tabstops>
+  <tabstop>btnListado</tabstop>
+  <tabstop>btnRegistrar</tabstop>
+  <tabstop>listPacientes</tabstop>
+  <tabstop>listProfesionales</tabstop>
+  <tabstop>listUsuarios</tabstop>
+  <tabstop>btnUsuario</tabstop>
+  <tabstop>btnPaciente</tabstop>
+  <tabstop>btnProfesional</tabstop>
+  <tabstop>btnMenu</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
