@@ -416,6 +416,10 @@ class PacienteWindow():
             else:
                 self.ver.btnEliminar.setVisible(False)
             
+            try:
+                self.ver.btnDescargar.clicked.disconnect()
+            except TypeError:
+                pass
             self.ver.btnDescargar.clicked.connect(lambda: self.descargar_pdf(id_paciente=id))
 
             self.ver.show()
@@ -690,6 +694,10 @@ class PacienteWindow():
             
         self.lisProfPac.btnProf.clicked.connect(lambda: profesional.cargar_nombres_profesionales(id_paciente))
         self.lisProfPac.btnRefrescar.clicked.connect(lambda: self.mostrarProfesionales(id_paciente))
+        try:
+            self.lisProfPac.btnDescargar.clicked.disconnect()
+        except TypeError:
+            pass
         self.lisProfPac.btnDescargar.clicked.connect(lambda: self.descargar_pdf_prof_pac(id_paciente))
         self.lisProfPac.show()
 

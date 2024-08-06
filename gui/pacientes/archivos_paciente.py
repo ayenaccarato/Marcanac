@@ -25,6 +25,7 @@ class ArchivosPacienteWindow():
         archivos = lis.obtener_archivos_por_paciente(id_paciente)
         
         if archivos:
+            self.arc.swArchivos.setCurrentIndex(0)
             # Limpiar el QListWidget antes de agregar nuevos ítems
             self.arc.listWidget.clear()
             
@@ -41,15 +42,25 @@ class ArchivosPacienteWindow():
                 # Asignar el ícono según la extensión del archivo
                 ext = os.path.splitext(nombre_archivo)[1].lower()
                 if ext in ['.pdf']:
-                    item.setIcon(QIcon('gui/imagenes/pdf.png'))
+                    ui_file = os.path.join(os.path.dirname(__file__), '..', 'imagenes', 'pdf.png')
+                    ui_file = os.path.abspath(ui_file)
+                    item.setIcon(QIcon(ui_file))
                 elif ext in ['.doc', '.docx']:
-                    item.setIcon(QIcon('gui/imagenes/word.png'))
+                    ui_file = os.path.join(os.path.dirname(__file__), '..', 'imagenes', 'word.png')
+                    ui_file = os.path.abspath(ui_file)
+                    item.setIcon(QIcon(ui_file))
                 elif ext in ['.jpg', '.jpeg', '.png']:
-                    item.setIcon(QIcon('gui/imagenes/imagen.png'))
+                    ui_file = os.path.join(os.path.dirname(__file__), '..', 'imagenes', 'imagen.png')
+                    ui_file = os.path.abspath(ui_file)
+                    item.setIcon(QIcon(ui_file))
                 elif ext in ['.txt']:
-                    item.setIcon(QIcon('gui/imagenes/txt.png'))
+                    ui_file = os.path.join(os.path.dirname(__file__), '..', 'imagenes', 'txt.png')
+                    ui_file = os.path.abspath(ui_file)
+                    item.setIcon(QIcon(ui_file))
                 else:
-                    item.setIcon(QIcon('gui/imagenes/por_defecto.png'))  # Ícono por defecto para otros tipos
+                    ui_file = os.path.join(os.path.dirname(__file__), '..', 'imagenes', 'por_defecto.png')
+                    ui_file = os.path.abspath(ui_file)
+                    item.setIcon(QIcon(ui_file))  # Ícono por defecto para otros tipos
                 
                 # Añadir el ítem al QListWidget
                 self.arc.listWidget.addItem(item)

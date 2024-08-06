@@ -3,7 +3,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
 
-from PyQt6 import uic
+from PyQt6 import uic, QtCore
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QMessageBox, QPushButton, QWidget, QHBoxLayout, QTableWidgetItem, QFileDialog
 from data.insumos import InsumoData
@@ -34,8 +34,22 @@ class InsumosWindow():
 
 ####### Nuevo #######
 
-    def abrirRegistroInsumo(self, id):   
-        self.nInsumo.btnRegistrar.clicked.connect(lambda: self.registrarInsumo(id))          
+    def limpiarCampos(self): 
+        self.nInsumo.txtFechaEnt.setDate(QtCore.QDate.currentDate())       
+        self.nInsumo.cbInsumo.setCurrentIndex(0)
+        self.nInsumo.txtCantI.clear()
+
+        self.nInsumo.txtOtro.clear()
+        self.nInsumo.txtCantO.clear()
+
+    def abrirRegistroInsumo(self, id):
+        # Desconectar cualquier conexión previa para evitar múltiples llamadas a registrarInsumo
+        try:
+            self.nInsumo.btnRegistrar.clicked.disconnect()
+        except TypeError:
+            pass
+        
+        self.nInsumo.btnRegistrar.clicked.connect(lambda: self.registrarInsumo(id))
         self.nInsumo.show()
 
     def registrarInsumo(self, id_paciente):
@@ -61,10 +75,11 @@ class InsumosWindow():
             success, error_message = objData.registrar(insumo=nuevoInsumo, id_paciente=id_paciente)
             if success:   
                 QMessageBox.information(None, 'Mensaje', 'Insumo agregado')        
+                self.limpiarCampos()  
             else:
                 QMessageBox.warning(None, 'Error', f'El insumo no pudo ser agregado: {error_message}')
 
-            self.mostrarInsumos(id_paciente)
+            #self.mostrarInsumos(id_paciente)
             self.nInsumo.close() #Cierro la ventana
 
     ### Eliminar ###
@@ -131,6 +146,10 @@ class InsumosWindow():
         
         self.lInsumo.btnInsumo.clicked.connect(lambda: self.abrirRegistroInsumo(id_paciente))
         self.lInsumo.btnRefrescar.clicked.connect(lambda: self.mostrarInsumos(id_paciente))
+        try:
+            self.lInsumo.btnDescargar.clicked.disconnect()
+        except TypeError:
+            pass
         self.lInsumo.btnDescargar.clicked.connect(lambda: self.descargar_pdf(id_paciente))
         self.lInsumo.show()
 

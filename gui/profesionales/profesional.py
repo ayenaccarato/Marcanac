@@ -311,7 +311,10 @@ class ProfesionalWindow():
                 self.verProf.btnEliminar.clicked.connect(lambda: self.eliminar_profesional(id))
             else:
                 self.verProf.btnEliminar.setVisible(False)
-
+            try:
+                self.verProf.btnDescargar.clicked.disconnect()
+            except TypeError:
+                pass
             self.verProf.btnDescargar.clicked.connect(lambda: self.descargar_pdf(id_profesional=id))
 
             self.verProf.show()
