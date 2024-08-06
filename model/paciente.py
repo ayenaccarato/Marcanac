@@ -6,7 +6,7 @@ class Paciente():
     def __init__(self, nombre:str, apellido:str, domicilio:str, localidad:str, 
                  documento:int, fechaNacimiento:str, obraSocial:str, numAfiliado:int, 
                  telefono:int, fechaIngreso:str, fechaEgreso:str, motivo:str,
-                 familiar:str, modulo:str, submodulo:str, equip:str, sopNutri:str, asisRespi:str):
+                 familiar:str, parentesco:str, telFamiliar:str,  modulo:str, submodulo:str, equip:str, sopNutri:str, asisRespi:str):
         self._nombre = nombre
         self._apellido = apellido
         self._domicilio = domicilio
@@ -20,6 +20,8 @@ class Paciente():
         self._fechaEgreso = fechaEgreso
         self._motivo = motivo
         self._familiar = familiar
+        self._parentesco = parentesco
+        self._telFamiliar = telFamiliar
         self._modulo = modulo
         self._submodulo = submodulo
         self._equip = equip

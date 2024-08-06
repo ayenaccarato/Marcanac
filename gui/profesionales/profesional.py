@@ -178,6 +178,7 @@ class ProfesionalWindow():
         self.listadoProf.tblListadoProf.setCellWidget(fila, 7, widget)
     
     def abrirListadoProfesionales(self): 
+        self.listadoProf.showMaximized() #Maximizo la ventana
 
         lis = ListadoData() 
         data = lis.obtenerProfesionales()    
@@ -566,7 +567,9 @@ class ProfesionalWindow():
             c.setFont("Helvetica-Bold", 14)
             title_x = margin
             title_y = height - margin
-            c.drawString(title_x, title_y, "Profesional")
+            title_text = "Ficha de Profesional"
+            title_width = c.stringWidth(title_text, "Helvetica-Bold", 14)
+            c.drawString((width - title_width) / 2, title_y, title_text)  # Centrar el título
             
             # Ajustar el espacio después del título
             current_y = title_y - line_height * 2
@@ -635,9 +638,21 @@ class ProfesionalWindow():
                 c.drawString(value_text_x, value_text_y, value)
             
             # Agregar sección de Pago a terceros
+            
+            subtitle_text = "Pago a Terceros"
+            text_width = c.stringWidth(subtitle_text, "Helvetica-Bold", 12)
+
+            # Calcular la posición x para centrar el texto
+            text_x = (width - text_width) / 2
+
+            # Ajustar la posición vertical
             current_y = current_y - (len(fields) // 2) * box_height - box_height
             c.setFont("Helvetica-Bold", 12)
-            c.drawString(margin, current_y, "Pago a Terceros")
+
+            # Dibujar el subtítulo centrado
+            c.drawString(text_x, current_y, subtitle_text)
+
+            # Dibujar la línea debajo del subtítulo
             c.line(margin, current_y - 0.2 * cm, width - margin, current_y - 0.2 * cm)
             
             # Sub-secciones (solo los datos cargados)

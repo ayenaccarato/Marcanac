@@ -29,6 +29,8 @@ class PacienteData:
                     fechaEgreso DATETIME,
                     motivo TEXT,
                     familiar TEXT,
+                    parentesco TEXT,
+                    telFamiliar TEXT,
                     modulo TEXT,
                     submodulo TEXT,
                     equip TEXT,
@@ -60,13 +62,13 @@ class PacienteData:
                 doc = random.randint(10000000, 99999999)
                 sql_insert_pacientes = """INSERT INTO pacientes 
                     (nombre, apellido, domicilio, localidad, documento, fechaNacimiento, obraSocial, numAfiliado, telefono, fechaIngreso, 
-                    fechaEgreso, motivo, familiar, modulo, submodulo, equip, sopNutri, asisRespi)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
+                    fechaEgreso, motivo, familiar, parentesco, telFamiliar, modulo, submodulo, equip, sopNutri, asisRespi)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
                 pacientes_datos = [
                     ("Juan", "Perez", "Calle Falsa 123", "Ciudad", str(doc), "01/01/1980", "IOMA", "1111", "123456789", "01/01/2000", "", "", 
-                     "Familiar 1", "Módulo 1", '{"Fono": false, "TO": false, "Psico": true}', '{"Cama": false, "Colchon": true, "Silla": false}', "Adultos SIN bomba", '{"A": false, "B": true, "C": false}'),
+                     "Familiar 1", "Hijo", "2215968741", "Módulo 1", '{"Fono": false, "TO": false, "Psico": true}', '{"Cama": false, "Colchon": true, "Silla": false}', "Adultos SIN bomba", '{"A": false, "B": true, "C": false}'),
                     ("Juan", "Garcia", "Calle Falsa 124", "Ciudad", str(doc+1), "01/01/1980", "IOMA", "1111", "123456789", "01/01/2000", 
-                     "01/01/2020", "Motivo 1", "Familiar 1", "Modulo 1", '{"Fono": false, "TO": false, "Psico": true}', '{"Cama": false, "Colchon": true, "Silla": true}', "Adultos CON bomba", '{"A": false, "B": true, "C": true}'),
+                     "01/01/2020", "Motivo 1", "Familiar 2", "Hijo", "2215369857","Modulo 2", '{"Fono": false, "TO": false, "Psico": true}', '{"Cama": false, "Colchon": true, "Silla": true}', "Adultos CON bomba", '{"A": false, "B": true, "C": true}'),
                     # Agrega más pacientes si es necesario
                 ]
                 try:
@@ -93,12 +95,12 @@ class PacienteData:
         self.cursor.execute("""
         INSERT INTO pacientes values
         (null, '{}', '{}', '{}', '{}', '{}', 
-        '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')
+        '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')
         """.format(paciente._nombre, paciente._apellido, paciente._domicilio,
                 paciente._localidad, paciente._documento, paciente._fechaNacimiento, 
                 paciente._obraSocial, paciente._numAfiliado, paciente._telefono, 
                 paciente._fechaIngreso, paciente._fechaEgreso, paciente._motivo, 
-                paciente._familiar, paciente._modulo, paciente._submodulo, 
+                paciente._familiar, paciente._parentesco, paciente._telFamiliar, paciente._modulo, paciente._submodulo, 
                 paciente._equip, paciente._sopNutri, paciente._asisRespi))
         self.db.commit()
         if self.cursor.rowcount == 1: #Aca me devuelve cuantos elementos afecto
@@ -134,15 +136,16 @@ class PacienteData:
                 nombre = '{}', apellido = '{}', domicilio = '{}', localidad = '{}',
                 documento = '{}', fechaNacimiento = '{}', obraSocial = '{}', numAfiliado = '{}', 
                 telefono = '{}', fechaIngreso = '{}', fechaEgreso = '{}', motivo = '{}',
-                familiar = '{}', modulo = '{}', submodulo = '{}', equip = '{}', 
+                familiar = '{}', parentesco = '{}', telFamiliar = '{}', modulo = '{}', submodulo = '{}', equip = '{}', 
                 sopNutri = '{}', asisRespi = '{}'   
                 WHERE id = '{}'""".format(
                 paciente._nombre, paciente._apellido, paciente._domicilio,
                 paciente._localidad, paciente._documento, paciente._fechaNacimiento, 
                 paciente._obraSocial, paciente._numAfiliado, paciente._telefono, 
                 paciente._fechaIngreso, paciente._fechaEgreso, paciente._motivo, 
-                paciente._familiar, paciente._modulo, paciente._submodulo, 
-                paciente._equip, paciente._sopNutri, paciente._asisRespi, id)
+                paciente._familiar, paciente._parentesco, paciente._telFamiliar, 
+                paciente._modulo, paciente._submodulo, paciente._equip, 
+                paciente._sopNutri, paciente._asisRespi, id)
 
             self.cursor.execute(sql_update)
             self.db.commit()

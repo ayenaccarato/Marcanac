@@ -92,7 +92,8 @@ class PacienteWindow():
         except TypeError:
             pass
         self.nuevo.btnRegistrar.clicked.connect(self.registrarPaciente)     
-        self.nuevo.show()
+        self.nuevo.showMaximized() #Maximizo la ventana
+        #self.nuevo.show()
 
     def registro(self, doc):
         fechaN = self.nuevo.txtFechaN.date().toPyDate().strftime("%d/%m/%Y") #formateo la fecha
@@ -135,6 +136,7 @@ class PacienteWindow():
         self.nuevo.close() #Cierro la ventana
 
     def registrarPaciente(self):
+        
         if self.nuevo.cbObraSocial.currentText() == "--Seleccione--" or self.nuevo.cbModulo.currentText() == "--Seleccione--":            
             QMessageBox.information(None, 'Mensaje', 'Seleccione una obra social o módulo')
 
@@ -239,10 +241,12 @@ class PacienteWindow():
     def abrirVentanaModificarP(self, id):
         self.ver.close()
         self.actualizarPaciente(id)
-        self.actPac.show()
+        #self.actPac.show()
+        self.actPac.showMaximized() #Maximizo la ventana
 
     def actualizarPaciente(self, id):
         try:
+            
             objData = PacienteData()
             paciente = objData.mostrar(id)
 
@@ -262,23 +266,25 @@ class PacienteWindow():
 
             self.actPac.txtMotivo.setText(paciente[12])
             self.actPac.txtFamiliar.setText(paciente[13])
-            self.actPac.cbModulo.setCurrentText(paciente[14])
+            self.ver.txtParentesco.setText(paciente[14])
+            self.ver.txtTelFamiliar.setText(paciente[15])
+            self.actPac.cbModulo.setCurrentText(paciente[16])
 
-            dic = json.loads(paciente[15])
+            dic = json.loads(paciente[17])
             
             # Submodulo
             self.actPac.fono.setChecked(dic['Fono'])
             self.actPac.to.setChecked(dic['TO'])
             self.actPac.psico.setChecked(dic['Psico'])
 
-            dicE = json.loads(paciente[16])
+            dicE = json.loads(paciente[18])
             # Equipamiento
             self.actPac.cama.setChecked(dicE['Cama'])
             self.actPac.colchon.setChecked(dicE['Colchon'])
             self.actPac.silla.setChecked(dicE['Silla'])
 
-            self.actPac.cbSN.setCurrentText(paciente[17])
-            dicA = json.loads(paciente[18])
+            self.actPac.cbSN.setCurrentText(paciente[19])
+            dicA = json.loads(paciente[20])
             # Asistencia Respiratoria
             self.actPac.arA.setChecked(dicA['A'])
             self.actPac.arB.setChecked(dicA['B'])
@@ -322,6 +328,8 @@ class PacienteWindow():
                 fechaEgreso = fechaE,
                 motivo = self.actPac.txtMotivo.text(),
                 familiar = self.actPac.txtFamiliar.text(),
+                parentesco = self.actPac.txtParentesco.text(),
+                telFamiliar = self.actPac.txtTelFamiliar.text(),
                 modulo = self.actPac.cbModulo.currentText(),
                 submodulo = subm,
                 equip = equi,
@@ -360,6 +368,7 @@ class PacienteWindow():
     
     def mostrarPaciente(self, id):
         try:
+            self.ver.showMaximized() #Maximizo la ventana
             insumosList = InsumosWindow()
             data = PacienteCoordinadorData()
             
@@ -395,23 +404,25 @@ class PacienteWindow():
                 
             self.ver.txtMotivo.setText(paciente[12])   
             self.ver.txtFamiliar.setText(paciente[13])
-            self.ver.cbModulo.setCurrentText(paciente[14])
+            self.ver.txtParentesco.setText(paciente[14])
+            self.ver.txtTelFamiliar.setText(paciente[15])
+            self.ver.cbModulo.setCurrentText(paciente[16])
 
-            dic = json.loads(paciente[15])
+            dic = json.loads(paciente[17])
             
             # Submodulo
             self.ver.fono.setChecked(dic["Fono"])        
             self.ver.to.setChecked(dic['TO'])        
             self.ver.psico.setChecked(dic['Psico'])
             
-            dicE = json.loads(paciente[16])
+            dicE = json.loads(paciente[18])
             # Equipamiento
             self.ver.cama.setChecked(dicE['Cama'])
             self.ver.colchon.setChecked(dicE['Colchon'])
             self.ver.silla.setChecked(dicE['Silla'])
 
-            self.ver.cbSN.setCurrentText(paciente[17])
-            dicA = json.loads(paciente[18])
+            self.ver.cbSN.setCurrentText(paciente[19])
+            dicA = json.loads(paciente[20])
             # Asistencia Respiratoria
             self.ver.arA.setChecked(dicA['A'])
             self.ver.arB.setChecked(dicA['B'])
@@ -748,14 +759,16 @@ class PacienteWindow():
                 'obra_social': data[7],
                 'numero_afiliado': data[8],
                 'familiar_a_cargo': data[13],
+                'parentesco': data[14],
+                'telefono_familiar': data[15],
                 'fecha_ingreso': data[10],
                 'fecha_egreso': data[11],
                 'motivo': data[12],
-                'modulo': data[14],
-                'soporte_nutricional': data[17],
-                'submodulo': data[15],
-                'equipamiento': data[16],
-                'asistencia_respiratoria': data[18]
+                'modulo': data[16],
+                'soporte_nutricional': data[19],
+                'submodulo': data[17],
+                'equipamiento': data[18],
+                'asistencia_respiratoria': data[20]
                 
             }
             
@@ -780,12 +793,14 @@ class PacienteWindow():
             margin = 2 * cm
             line_height = 0.5 * cm
             box_margin = 0.2 * cm
-            
-            # Ajustar el título
+
+             # Ajustar el título
             c.setFont("Helvetica-Bold", 14)
             title_x = margin
             title_y = height - margin
-            c.drawString(title_x, title_y, "Paciente")
+            title_text = "Ficha de Paciente"
+            title_width = c.stringWidth(title_text, "Helvetica-Bold", 14)
+            c.drawString((width - title_width) / 2, title_y, title_text)  # Centrar el título
             
             # Ajustar el espacio después del título
             current_y = title_y - line_height * 2
@@ -806,6 +821,8 @@ class PacienteWindow():
                 ('Obra Social', paciente_data.get('obra_social', '')),
                 ('Número de Afiliado', paciente_data.get('numero_afiliado', '')),
                 ('Familiar a Cargo', paciente_data.get('familiar_a_cargo', '')),
+                ('Parentesco', paciente_data.get('parentesco', '')),
+                ('Teléfono familiar', paciente_data.get('telefono_familiar', '')),
                 ('Fecha de Ingreso', paciente_data.get('fecha_ingreso', '')),
                 ('Fecha de Egreso', paciente_data.get('fecha_egreso', '')),
                 ('Motivo', paciente_data.get('motivo', '')),
@@ -840,9 +857,24 @@ class PacienteWindow():
                 c.drawString(value_text_x, value_text_y, value)
             
             # Agregar sección de Resolución
+            # current_y = current_y - (len(fields) // 2) * box_height - box_height
+            # c.setFont("Helvetica-Bold", 12)
+            # c.drawString(margin, current_y, "Resolución")
+            # c.line(margin, current_y - 0.2 * cm, width - margin, current_y - 0.2 * cm)
+            subtitle_text = "Resolución"
+            text_width = c.stringWidth(subtitle_text, "Helvetica-Bold", 12)
+
+            # Calcular la posición x para centrar el texto
+            text_x = (width - text_width) / 2
+
+            # Ajustar la posición vertical
             current_y = current_y - (len(fields) // 2) * box_height - box_height
             c.setFont("Helvetica-Bold", 12)
-            c.drawString(margin, current_y, "Resolución")
+
+            # Dibujar el subtítulo centrado
+            c.drawString(text_x, current_y, subtitle_text)
+
+            # Dibujar la línea debajo del subtítulo
             c.line(margin, current_y - 0.2 * cm, width - margin, current_y - 0.2 * cm)
             
             # Sub-secciones (solo los datos cargados)
