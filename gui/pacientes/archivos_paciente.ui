@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>434</width>
-    <height>300</height>
+    <height>361</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -118,19 +118,15 @@ QPushButton:hover {
       <number>0</number>
      </property>
      <widget class="QWidget" name="page_archivos">
-      <widget class="QTableWidget" name="tableWidget">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="geometry">
-        <rect>
-         <x>5</x>
-         <y>11</y>
-         <width>371</width>
-         <height>201</height>
-        </rect>
-       </property>
-      </widget>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="QListWidget" name="listWidget">
+         <property name="viewMode">
+          <enum>QListView::IconMode</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
      <widget class="QWidget" name="page_mensaje">
       <widget class="QWidget" name="verticalLayoutWidget">

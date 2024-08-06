@@ -25,15 +25,19 @@ class ListadoData():
         puede ser documento o apellido'''
         self.db = con.Conexion().conectar()
         self.cursor = self.db.cursor()
+
+        # Crear el patrón de búsqueda para el apellido
+        patron_busqueda = f'%{apellido.upper()}%'
+
         sql = """
             SELECT * FROM pacientes p
-            WHERE p.documento = '{}' or UPPER(p.apellido) = '{}'  
-        """.format(documento, apellido)
-        print(sql)
-        res = self.cursor.execute(sql)
+            WHERE p.documento = ? OR UPPER(p.apellido) LIKE ?
+        """
+
+        res = self.cursor.execute(sql, (documento, patron_busqueda))
         data = res.fetchall() #Muestro todo lo que me devuelva
         return data
-    
+
     def obtenerProfesionales(self):
         '''Retorno los profesionales'''
         self.db = con.Conexion().conectar()
@@ -42,7 +46,7 @@ class ListadoData():
             SELECT * FROM profesionales  
             ORDER BY apellido
         """
-        print(sql)
+
         res = self.cursor.execute(sql)
         data = res.fetchall() #Muestro todo lo que me devuelva
         return data
@@ -52,11 +56,15 @@ class ListadoData():
         puede ser cuit, apellido o profesión'''
         self.db = con.Conexion().conectar()
         self.cursor = self.db.cursor()
+
+        # Crear el patrón de búsqueda para el apellido
+        patron_busqueda = f'%{apellido.upper()}%'
+
         sql = """
             SELECT * FROM profesionales p
-            WHERE p.cuit = '{}' or UPPER(p.apellido) = '{}' or p.profesional = '{}'  
-        """.format(cuit, apellido, profesion)
-        print(sql)
-        res = self.cursor.execute(sql)
+            WHERE p.cuit = ? or UPPER(p.apellido) LIKE ? or p.profesional = ?  
+        """
+
+        res = self.cursor.execute(sql, (cuit, patron_busqueda, profesion))
         data = res.fetchall() #Muestro todo lo que me devuelva
         return data

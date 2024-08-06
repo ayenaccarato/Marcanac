@@ -64,3 +64,24 @@ class ArchivosProfesionalData():
                 self.cursor.close()
             if self.db:
                 self.db.close()
+
+    def eliminar_archivo(self, nombre_archivo, id_profesional):
+        '''Elimina el archivo de la base de datos'''
+        try:
+            self.db = con.Conexion().conectar()
+            self.cursor = self.db.cursor()
+            # Ejecutar la consulta de eliminación
+            self.cursor.execute("""
+                DELETE FROM archivos_profesional
+                WHERE nombre_archivo = ? AND id_profesional = ?
+            """, (nombre_archivo, id_profesional))
+            self.db.commit()
+            return True
+        except Exception as e:
+            print(f"Error al eliminar el archivo: {e}")
+            return False
+        finally:
+            if self.cursor:
+                self.cursor.close()
+            if self.db:
+                self.db.close()

@@ -1,18 +1,16 @@
 import os
 
 from PyQt6 import uic
-from PyQt6.QtCore import Qt, QStandardPaths, QSize
-from PyQt6.QtWidgets import QFileDialog, QTableWidgetItem, QListWidget, QListWidgetItem, QMessageBox
-from PyQt6.QtGui import QIcon
+from PyQt6.QtCore import Qt, QStandardPaths
+from PyQt6.QtWidgets import QFileDialog, QListWidgetItem, QMessageBox, QMenu
+from PyQt6.QtGui import QIcon, QAction
 from data.archivos_paciente import ArchivosPacienteData
 
 class ArchivosPacienteWindow():
 
     def __init__(self):
         ArchivosPacienteData()
-        #self.arc = uic.loadUi("gui/pacientes/archivos_paciente.ui")
-        #self.arc.show()
-        ui_file = os.path.join(os.path.dirname(__file__), '..', 'pacientes', 'archivos_paciente_2.ui')
+        ui_file = os.path.join(os.path.dirname(__file__), '..', 'pacientes', 'archivos_paciente.ui')
         ui_file = os.path.abspath(ui_file)
         if not os.path.isfile(ui_file):
             print(f"Error: el archivo {ui_file} no se encuentra.")
@@ -60,7 +58,11 @@ class ArchivosPacienteWindow():
         else:
             self.arc.swArchivos.setCurrentIndex(1)
             self.arc.show()
-            
+        
+         # Conectar el menú contextual con el id_paciente
+        self.arc.listWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.arc.listWidget.customContextMenuRequested.connect(lambda pos: self.mostrarMenuContextual(pos, id_paciente))
+
         self.arc.btnAgregar.clicked.connect(lambda: self.abrirArchivo(id_paciente))
 
     def abrirArchivo(self, id_paciente):
@@ -104,30 +106,40 @@ class ArchivosPacienteWindow():
             else:
                 QMessageBox.warning(None, "Error", "No se pudo encontrar el contenido del archivo.")
 
-    # def mostrarMenuContextual(self, pos):
-    #     '''Muestra el menú contextual para eliminar archivos'''
-    #     item = self.arc.listWidget.itemAt(pos)
-    #     if item:
-    #         menu = QMenu(self.arc.listWidget)
+    def mostrarMenuContextual(self, pos, id_paciente):
+        '''Muestra el menú contextual para eliminar archivos'''
+        item = self.arc.listWidget.itemAt(pos)
+        if item:
+            menu = QMenu(self.arc.listWidget)
             
-    #         eliminar_action = QAction('Eliminar', self.arc.listWidget)
-    #         eliminar_action.triggered.connect(lambda: self.eliminarArchivo(item))
-    #         menu.addAction(eliminar_action)
+            eliminar_action = QAction('Eliminar', self.arc.listWidget)
+            eliminar_action.triggered.connect(lambda: self.eliminarArchivo(item, id_paciente))
+            menu.addAction(eliminar_action)
             
-    #         menu.exec(self.arc.listWidget.viewport().mapToGlobal(pos))
+            menu.exec(self.arc.listWidget.viewport().mapToGlobal(pos))
 
-    # def eliminarArchivo(self, item):
-    #     '''Elimina el archivo seleccionado del QListWidget y de la base de datos'''
-    #     nombre_archivo = item.text()
-    #     if QMessageBox.question(self.arc, "Confirmar eliminación", f"¿Estás seguro de que quieres eliminar '{nombre_archivo}'?", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No) == QMessageBox.StandardButton.Yes:
-    #         contenido_archivo = item.data(Qt.ItemDataRole.UserRole)
-    #         if contenido_archivo:
-    #             # Obtener el id del paciente si es necesario
-    #             id_paciente = ...  # Debes manejar cómo obtener el id_paciente
+    def eliminarArchivo(self, item, id_paciente):
+        '''Elimina el archivo seleccionado del QListWidget'''
+        nombre_archivo = item.text()
+        mBox = QMessageBox()
+        mBox.setWindowTitle('Confirmar eliminación')
+        mBox.setText(f"¿Estás seguro de que quieres eliminar '{nombre_archivo}'?")
 
-    #             # Eliminar el archivo de la base de datos
-    #             lis = ArchivosPacienteData()
-    #             if lis.eliminar_archivo(nombre_archivo, id_paciente):
-    #                 self.arc.listWidget.takeItem(self.arc.listWidget.row(item))  # Eliminar el ítem del QListWidget
-    #             else:
-    #                 QMessageBox.critical(self.arc, "Error", "No se pudo eliminar el archivo de la base de datos.")
+        # Añadir botones personalizados
+        si_btn = mBox.addButton("Sí", QMessageBox.ButtonRole.YesRole)
+        no_btn = mBox.addButton("No", QMessageBox.ButtonRole.NoRole)
+        
+        mBox.setDefaultButton(no_btn)
+        mBox.exec()
+
+        if mBox.clickedButton() == si_btn:
+            contenido_archivo = item.data(Qt.ItemDataRole.UserRole)
+            if contenido_archivo:
+                # Eliminar el archivo de la base de datos
+                lis = ArchivosPacienteData()
+                if lis.eliminar_archivo(nombre_archivo, id_paciente):
+                    self.arc.listWidget.takeItem(self.arc.listWidget.row(item))  # Eliminar el ítem del QListWidget
+                else:
+                    QMessageBox.critical(self.arc, "Error", "No se pudo eliminar el archivo.")
+        else:
+            print("Eliminación cancelada")
