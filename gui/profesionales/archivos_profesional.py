@@ -12,7 +12,7 @@ class ArchivosProfesionalWindow():
     def __init__(self):
         ArchivosProfesionalData()
         #self.arcP = uic.loadUi("gui/profesionales/archivos_profesional.ui")
-        ui_file = os.path.join(os.path.dirname(__file__), '..', 'profesionales', 'archivos_profesional_2.ui')
+        ui_file = os.path.join(os.path.dirname(__file__), '..', 'profesionales', 'archivos_profesional.ui')
         ui_file = os.path.abspath(ui_file)
         if not os.path.isfile(ui_file):
             print(f"Error: el archivo {ui_file} no se encuentra.")

@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Marcanac - Listado de Profesionales</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../imagenes/logo.png</normaloff>../imagenes/logo.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
     <string notr="true">background-color: rgb(255, 255, 255);</string>
@@ -229,7 +233,7 @@ QPushButton:hover {
               </column>
               <column>
                <property name="text">
-                <string>New Column</string>
+                <string>Acciones</string>
                </property>
               </column>
              </widget>

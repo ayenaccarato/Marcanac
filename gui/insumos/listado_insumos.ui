@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Marcanac - Insumos</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../imagenes/logo.png</normaloff>../imagenes/logo.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
     <string notr="true">background-color: rgb(255, 255, 255);</string>

@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Archivos de Paciente</string>
+   <string>Marcanac - Archivos de Paciente</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../imagenes/logo.png</normaloff>../imagenes/logo.png</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(255, 255, 255);</string>
