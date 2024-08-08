@@ -526,7 +526,12 @@ QPushButton:hover {
               </item>
               <item>
                <property name="text">
-                <string>Enfermero/a</string>
+                <string>Enfermero/a - Auxiliar</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Enfermero/a - Profesional</string>
                </property>
               </item>
               <item>
@@ -541,7 +546,22 @@ QPushButton:hover {
               </item>
               <item>
                <property name="text">
-                <string>Médico/a</string>
+                <string>Médico/a - Cardiólogo</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Médico/a - Clínico</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Médico/a - Pediátrico</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Médico/a - Urólogo</string>
                </property>
               </item>
               <item>

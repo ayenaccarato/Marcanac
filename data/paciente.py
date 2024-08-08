@@ -108,7 +108,6 @@ class PacienteData:
         else:
             return False
         
-
     def mostrar(self, id):
         try:
             self.db = con.Conexion().conectar()
@@ -124,8 +123,6 @@ class PacienteData:
             return data
         except sqlite3.Error as ex:
             return True
-
-        
 
     def modificar(self, id, paciente):
         try:
@@ -166,6 +163,24 @@ class PacienteData:
             return True, ""
         except sqlite3.Error as ex:
             return False, str(ex)            
+        finally:
+            if self.cursor:
+                self.cursor.close()
+            if self.db:
+                self.db.close()
+
+    def obtener_pacientes(self):
+        pacientes = []
+        try:
+            self.db = con.Conexion().conectar()
+            self.cursor = self.db.cursor()
+            self.cursor.execute("SELECT id, nombre, apellido FROM pacientes")
+            pacientes = self.cursor.fetchall()
+            
+            return pacientes  # Retorna la lista de tuplas (id, nombre, apellido)
+        except sqlite3.Error as e:
+            print(f"Error al obtener nombres de pacientes: {e}")
+            return []
         finally:
             if self.cursor:
                 self.cursor.close()

@@ -1,17 +1,23 @@
 import os
 
+from functools import partial
+from datetime import datetime
+from time import strftime
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
 
 from PyQt6 import uic, QtCore
 from PyQt6.QtCore import Qt, QDate
-from PyQt6.QtWidgets import QFileDialog, QMessageBox, QPushButton, QWidget, QHBoxLayout, QTableWidgetItem
+from PyQt6.QtWidgets import QFileDialog, QMessageBox, QPushButton, QWidget, QHBoxLayout, QTableWidgetItem, QStyledItemDelegate
 from data.listados import ListadoData
+from data.paciente import PacienteData
 from data.paciente_profesionales import PacienteProfesionalesData
+from data.pago_profesional import PagoProfesionalData
 from data.profesional import ProfesionalData
 from gui.profesionales.archivos_profesional import ArchivosProfesionalWindow
 
+from model.pago import PagoProfesional
 from model.profesional import Profesional
 from model.usuario import Usuario
 
@@ -60,6 +66,22 @@ class ProfesionalWindow():
             return
         self.asocProf = uic.loadUi(ui_file_a)
 
+        ui_file_pago= os.path.join(os.path.dirname(__file__), '..', 'profesionales' ,'listado_profesionales_pago.ui')
+        ui_file_pago = os.path.abspath(ui_file_pago)  # Convierte a ruta absoluta
+        if not os.path.isfile(ui_file_pago):
+            print(f"Error: el archivo {ui_file_pago} no se encuentra.")
+            return
+        self.lisPago = uic.loadUi(ui_file_pago)
+
+        ui_file_pac = os.path.join(os.path.dirname(__file__), '..', 'profesionales' ,'listado_pacientes_profesional.ui')
+        ui_file_pac = os.path.abspath(ui_file_pac)  # Convierte a ruta absoluta
+        if not os.path.isfile(ui_file_pac):
+            print(f"Error: el archivo {ui_file_pac} no se encuentra.")
+            return
+        self.lisPacientes = uic.loadUi(ui_file_pac)
+
+        # self.lisPacientes.tblListado.cellChanged.connect(lambda: self.handleCellChanged)
+
     def abrirRegistroProf(self):   
         self.prof.btnRegistrar.clicked.connect(self.registrarProfesional)     
         self.prof.show()
@@ -72,20 +94,7 @@ class ProfesionalWindow():
 
     def registrarProfesional(self):
         if self.prof.cbProfesional.currentText() == "--Seleccione--":    
-            QMessageBox.information(None, 'Mensaje', 'Seleccione una profesión')
-            
-        # elif len(self.prof.txtCbu1.text()) < 22:           
-        #     mBox.setWindowTitle('Error')
-        #     mBox.setText("El CBU 1 ingresado es inválido. Debe contener 22 números")
-        #     mBox.exec()
-        # elif len(self.prof.txtCbu2.text()) < 22:           
-        #     mBox.setWindowTitle('Error')
-        #     mBox.setText("El CBU 2 ingresado es inválido. Debe contener 22 números")
-        #     mBox.exec()   
-        # elif len(self.prof.txtCbu3.text()) != 0 and len(self.prof.txtCbu3.text()) < 22:           
-        #     mBox.setWindowTitle('Error')
-        #     mBox.setText("El CBU 3 ingresado es inválido. Debe contener 22 números")
-        #     mBox.exec()         
+            QMessageBox.information(None, 'Mensaje', 'Seleccione una profesión')       
         # Validar el correo electrónico (opcional, pero recomendado)
         email = self.prof.txtMail.text()
         if not self.is_valid_email(email):
@@ -94,10 +103,10 @@ class ProfesionalWindow():
             fechaN = self.prof.txtFechaN.date().toPyDate().strftime("%d/%m/%Y") #formateo la fecha
                         
             nuevoProfesional = Profesional(
-                nombre = self.prof.txtNombre.text(),
-                apellido = self.prof.txtApellido.text(),
-                domicilio = self.prof.txtDomicilio.text(),
-                localidad = self.prof.txtLocalidad.text(),
+                nombre = self.prof.txtNombre.text().capitalize(), #Pongo primer letra en mayuscula
+                apellido = self.prof.txtApellido.text().capitalize(),
+                domicilio = self.prof.txtDomicilio.text().capitalize(),
+                localidad = self.prof.txtLocalidad.text().capitalize(),
                 CUIT = int(self.prof.txtCuit.text()),
                 fechaNacimiento = fechaN,
                 codPostal = self.prof.txtCP.text(),
@@ -113,8 +122,8 @@ class ProfesionalWindow():
                 cuidador = self.prof.cuidador.isChecked(),
                 codTransf = self.prof.txtCodigo.text(), 
                 ### Datos de pago a terceros ### 
-                nombre2 = self.prof.txtNombre_2.text(),
-                apellido2 = self.prof.txtApellido_2.text(),
+                nombre2 = self.prof.txtNombre_2.text().capitalize(),
+                apellido2 = self.prof.txtApellido_2.text().capitalize(),
                 CUIT2 = self.prof.txtCuit_2.text(),
                 cbu3 = self.prof.txtCbu3.text()         
             )
@@ -177,6 +186,27 @@ class ProfesionalWindow():
         
         self.listadoProf.tblListadoProf.setCellWidget(fila, 7, widget)
     
+    # def boton_pagar(self, id_valor, fila):
+        
+    #     btn_pagar = QPushButton("Pagar")
+        
+    #     btn_pagar.clicked.connect(lambda _, id_valor=id_valor: self.agregarPago(id_valor))
+    #     # Agregar estilo al botón
+    #     btn_pagar.setStyleSheet("background-color: rgb(85, 170, 255); color: rgb(255, 255, 255);")
+    #     widget = QWidget()
+    #     layout = QHBoxLayout(widget)
+    #     layout.addWidget(btn_pagar)
+    #     layout.setContentsMargins(0, 0, 0, 0)
+    #     layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        
+    #     self.listadoProf.tblListadoProf.setCellWidget(fila, 8, widget)
+    
+    # def obtener_ultimo_mes(self, pagos):
+    #     # Suponemos que la fecha está en la segunda posición de cada tupla
+    #     fechas = [datetime.strptime(pago[2], "%d/%m/%Y") for pago in pagos]
+    #     fecha_mas_actual = max(fechas)  # Obtiene la fecha más reciente
+    #     return fecha_mas_actual.strftime("%m")
+    
     def abrirListadoProfesionales(self): 
         self.listadoProf.showMaximized() #Maximizo la ventana
 
@@ -197,9 +227,29 @@ class ProfesionalWindow():
             self.listadoProf.tblListadoProf.setItem(fila, 5, QTableWidgetItem(str(item[18]))) #Codigo
             self.listadoProf.tblListadoProf.setItem(fila, 6, QTableWidgetItem(str(item[16]))) #Profesion
 
+            self.listadoProf.tblListadoProf.hideColumn(8) #PAgo
+
             id_valor = item[0]
             
             self.boton_listado_profesional(id_valor, fila)
+
+            # if self.usuario.rol == 'admin':
+            #     mes_actual = '0' + str(datetime.now().month) 
+
+            #     pago_profesional = PagoProfesionalData()
+            #     pagos_existentes = pago_profesional.obtener_pagos()
+                
+            #     pago_realizado = any(id_valor == tup[1] for tup in pagos_existentes)
+                
+            #     if not pago_realizado:
+            #         self.listadoProf.tblListadoProf.showColumn(8)
+            #         self.boton_pagar(id_valor, fila)
+            #     else:
+            #         if mes_actual == pago_profesional.obtener_fecha_pago_profesional(id_valor)[0]:
+            #             self.listadoProf.tblListadoProf.setItem(fila, 8, QTableWidgetItem('Pago'))
+            #             self.listadoProf.tblListadoProf.setCellWidget(fila, 8, None)
+            # else:
+            #     self.listadoProf.tblListadoProf.hideColumn(8)
 
             fila += 1
  
@@ -209,10 +259,67 @@ class ProfesionalWindow():
             self.listadoProf.btnBuscar.clicked.disconnect()
         except TypeError:
             pass
-        self.listadoProf.btnBuscar.clicked.connect(lambda: self.buscar())
+        self.listadoProf.btnBuscar.clicked.connect(lambda: self.buscar('prof'))
         self.listadoProf.btnLista.setVisible(False)
+        if self.usuario.rol == 'admin':
+            self.listadoProf.btnPago.setVisible(True)
+            self.listadoProf.btnPago.clicked.connect(lambda: self.listado_pagos())
+        else:
+            self.listadoProf.btnPago.setVisible(False)
         self.limpiar_campos_busqueda()   
         self.listadoProf.show()
+
+    # def agregarPago(self, id_profesional):
+        
+    #     fecha = datetime.now().strftime("%d/%m/%Y")
+
+    #     nuevo_pago = PagoProfesional(
+    #         profesional_id = id_profesional,
+    #         fecha_pago = fecha
+    #     )
+
+    #     pago = PagoProfesionalData()
+
+    #     success, error_message = pago.registrar_pago(nuevo_pago)
+    #     if success:   
+    #         QMessageBox.information(None, 'Mensaje', 'Pago registrado')     
+    #         self.abrirListadoProfesionales() 
+    #     else:
+    #         QMessageBox.critical(None, 'Error', f'El pago no pudo ser registrado: {error_message}')
+
+    # def listado_pagos(self):
+        # self.lisPago.showMaximized() #Maximizo la ventana
+
+        # lis = PagoProfesionalData()
+        # data = lis.obtener_pagos()   
+        # fila = 0
+        # self.lisPago.tblListado.setRowCount(len(data)) #Cuantas filas traen los datos
+
+        # for item in data:
+        #     #Obtengo el profesional
+        #     profesional = ProfesionalData().mostrar(item[0])
+
+        #     self.lisPago.tblListado.setItem(fila, 0, QTableWidgetItem(str(item[2]))) #Fecha de pago
+        #     self.lisPago.tblListado.setItem(fila, 1, QTableWidgetItem(str(profesional[2]))) #Apellido
+        #     self.lisPago.tblListado.setItem(fila, 2, QTableWidgetItem(str(profesional[1]))) #Nombre
+        #     self.lisPago.tblListado.setItem(fila, 3, QTableWidgetItem(str(profesional[18]))) #Codigo
+        #     self.lisPago.tblListado.setItem(fila, 4, QTableWidgetItem(str(profesional[16]))) #Profesion
+
+        #     fila += 1
+ 
+        # self.lisPago.tblListado.setColumnWidth(1,150)
+        # self.lisPago.tblListado.setColumnWidth(2,150)
+        # self.lisPago.tblListado.setColumnWidth(4,150)
+        # try:
+        #     self.lisPago.btnBuscar.clicked.disconnect()
+        # except TypeError:
+        #     pass
+
+        # self.lisPago.btnBuscar.clicked.connect(lambda: self.buscar('pagos'))
+        # self.lisPago.btnLista.setVisible(False)
+
+        # #self.limpiar_campos_busqueda()   
+        # self.lisPago.show()
     
     def setRowBackgroundColor(self, row, color):
         # Verificar si la fila existe en la tabla antes de establecer el color
@@ -222,44 +329,182 @@ class ProfesionalWindow():
                 if item:
                     item.setBackground(color)
 
-    def buscar(self):
-        self.listadoProf.tblListadoProf.clearContents()  # Limpiar contenido actual de la tabla
-        self.listadoProf.tblListadoProf.setRowCount(0)
-        lis = ListadoData() 
-        data = lis.buscarProfesional(self.listadoProf.txtCuit.text(), self.listadoProf.txtApellido.text().upper(), self.listadoProf.cbProfesion.currentText())
-        if data:
-              # Reiniciar número de filas
-            fila = 0
-            self.listadoProf.tblListadoProf.setRowCount(len(data)) #Cuantas filas traen los datos
-            for item in data:
-                self.listadoProf.tblListadoProf.setItem(fila, 0, QTableWidgetItem(str(item[2]))) #Apellido
-                self.listadoProf.tblListadoProf.setItem(fila, 1, QTableWidgetItem(str(item[1]))) #Nombre
-                self.listadoProf.tblListadoProf.setItem(fila, 2, QTableWidgetItem(str(item[10]))) #CBU
-                if item[11] == '': #CBU2
-                    self.listadoProf.tblListadoProf.setItem(fila, 3, QTableWidgetItem("---"))
-                else:
-                    self.listadoProf.tblListadoProf.setItem(fila, 3, QTableWidgetItem(str(item[11]))) 
-            
-                self.listadoProf.tblListadoProf.setItem(fila, 4, QTableWidgetItem(str(item[12]))) #Alias
-                self.listadoProf.tblListadoProf.setItem(fila, 5, QTableWidgetItem(str(item[17]))) #Codigo
-                self.listadoProf.tblListadoProf.setItem(fila, 6, QTableWidgetItem(str(item[16]))) #Profesion
-                
-                id_valor = item[0]
-                
-                self.boton_listado_profesional(id_valor, fila)
-                        
-                fila += 1
-        else:
-            # Limpiar la tabla si no se encontraron resultados
-            self.listadoProf.tblListadoProf.clearContents()
+    def buscar(self, tipo):
+        if tipo == 'prof':
+            self.listadoProf.tblListadoProf.clearContents()  # Limpiar contenido actual de la tabla
             self.listadoProf.tblListadoProf.setRowCount(0)
-        self.listadoProf.btnLista.setVisible(True)
-        self.listadoProf.btnLista.clicked.connect(lambda: self.abrirListadoProfesionales())    
+            lis = ListadoData() 
+            data = lis.buscarProfesional(self.listadoProf.txtCuit.text(), self.listadoProf.txtApellido.text().upper(), self.listadoProf.cbProfesion.currentText())
+            if data:
+                # Reiniciar número de filas
+                fila = 0
+                self.listadoProf.tblListadoProf.setRowCount(len(data)) #Cuantas filas traen los datos
+                for item in data:
+                    self.listadoProf.tblListadoProf.setItem(fila, 0, QTableWidgetItem(str(item[2]))) #Apellido
+                    self.listadoProf.tblListadoProf.setItem(fila, 1, QTableWidgetItem(str(item[1]))) #Nombre
+                    self.listadoProf.tblListadoProf.setItem(fila, 2, QTableWidgetItem(str(item[10]))) #CBU
+                    if item[11] == '': #CBU2
+                        self.listadoProf.tblListadoProf.setItem(fila, 3, QTableWidgetItem("---"))
+                    else:
+                        self.listadoProf.tblListadoProf.setItem(fila, 3, QTableWidgetItem(str(item[11]))) 
+                
+                    self.listadoProf.tblListadoProf.setItem(fila, 4, QTableWidgetItem(str(item[12]))) #Alias
+                    self.listadoProf.tblListadoProf.setItem(fila, 5, QTableWidgetItem(str(item[17]))) #Codigo
+                    self.listadoProf.tblListadoProf.setItem(fila, 6, QTableWidgetItem(str(item[16]))) #Profesion
+                    
+                    id_valor = item[0]
+                    
+                    self.boton_listado_profesional(id_valor, fila)
+                            
+                    fila += 1
+            else:
+                # Limpiar la tabla si no se encontraron resultados
+                self.listadoProf.tblListadoProf.clearContents()
+                self.listadoProf.tblListadoProf.setRowCount(0)
+            self.listadoProf.btnLista.setVisible(True)
+            self.listadoProf.btnLista.clicked.connect(lambda: self.abrirListadoProfesionales())    
+        else:
+            self.lisPago.tblListado.clearContents()  # Limpiar contenido actual de la tabla
+            self.lisPago.tblListado.setRowCount(0)
+
+            lis = PagoProfesionalData() 
+            data = lis.obtener_pagos_profesional(self.lisPago.cbMes.currentText())
+
+            if data:
+                # Reiniciar número de filas
+                fila = 0
+                self.lisPago.tblListado.setRowCount(len(data)) #Cuantas filas traen los datos
+                for item in data:
+                    profesional = ProfesionalData().mostrar(item[0])
+
+                    self.lisPago.tblListado.setItem(fila, 0, QTableWidgetItem(str(item[2]))) #Fecha de pago
+                    self.lisPago.tblListado.setItem(fila, 1, QTableWidgetItem(str(profesional[2]))) #Apellido
+                    self.lisPago.tblListado.setItem(fila, 2, QTableWidgetItem(str(profesional[1]))) #Nombre
+                    self.lisPago.tblListado.setItem(fila, 3, QTableWidgetItem(str(profesional[18]))) #Codigo
+                    self.lisPago.tblListado.setItem(fila, 4, QTableWidgetItem(str(profesional[16]))) #Profesion
+
+                    fila += 1
+                
+            else:
+                # Limpiar la tabla si no se encontraron resultados
+                self.lisPago.tblListado.clearContents()
+                self.lisPago.tblListado.setRowCount(0)
+
+            self.lisPago.btnLista.setVisible(True)
+            self.lisPago.btnLista.clicked.connect(lambda: self.listado_pagos())
 
     def limpiar_campos_busqueda(self):        
         self.listadoProf.txtCuit.clear()  # Limpia el contenido del primer QLineEdit
         self.listadoProf.txtApellido.clear()
         self.listadoProf.cbProfesion.setCurrentIndex(0)
+
+    def handleCellChanged(self, item, id_profesional):
+        self.pp = PacienteProfesionalesData()
+        if item is not None:
+            row = item.row()
+            column = item.column()
+            id_paciente = self.lisPacientes.tblListado.item(row, 0).text()  # ID del paciente
+            new_value = item.text()  # Nuevo valor de la celda
+
+            # Convertir el nuevo valor a número si es necesario
+            try:
+                if column == 4:
+                    new_value = float(new_value)
+            except ValueError:
+                # Si no es posible convertir a float, se ignora el cambio
+                return
+
+            # Solo actualiza si la columna es una de las permitidas
+            if column in [3, 4]:  # Columnas editables: visitas (3) y valor (4)
+                # Obtener los valores actuales de visitas y valor
+                visitas_item = self.lisPacientes.tblListado.item(row, 3)
+                valor_item = self.lisPacientes.tblListado.item(row, 4)
+                total_item = self.lisPacientes.tblListado.item(row, 5)
+
+                visitas = float(visitas_item.text()) if visitas_item is not None else 0
+                valor = float(valor_item.text()) if valor_item is not None else 0
+
+                # Calcular el nuevo total
+                total = visitas * valor
+
+                # Actualizar la celda del total
+                if total_item is not None:
+                    total_item.setText(str(total))
+                else:
+                    self.lisPacientes.tblListado.setItem(row, 5, QTableWidgetItem(str(total)))
+
+                # Actualizar en la base de datos
+                success, error_message = self.pp.actualizar_dato(id_paciente=id_paciente, columna=column, nuevo_valor=new_value, id_profesional=id_profesional)
+                if not success:
+                    QMessageBox.critical(None, 'Error', f"No se pudo actualizar el dato: {error_message}")
+                else:
+                    QMessageBox.information(None, 'Mensaje', f"Paciente ID: {id_paciente}, Columna: {column}, Nuevo valor: {new_value}")
+        # if item is not None:
+        #     row = item.row()
+        #     column = item.column()
+        #     print('handle')
+        #     id_paciente = self.lisPacientes.tblListado.item(row, 0).text()
+        #     print('id pac ', id_paciente)
+        #     new_value = item.text()
+        #     print('nuevo valor', new_value)
+
+        #     exito, error_message = self.pp.actualizar_dato(id_paciente=id_paciente, id_profesional=id_profesional, columna=column, nuevo_valor=new_value)
+        #     if exito:
+        #         print('si')
+        #         QMessageBox.information(None, 'Mensaje', f"Paciente ID: {id_paciente}, Columna: {column}, Nuevo valor: {new_value}")
+        #     else:
+        #         print('no')
+        #         QMessageBox.critical(None, 'Error', f"Ocurrio un error: {error_message}")
+
+    def listado_pacientes(self, id_profesional):
+        from gui.pacientes.paciente import PacienteWindow
+        pacientes = PacienteProfesionalesData()
+        data = pacientes.obtener_pacientes_de_profesional(id_profesional)
+        print('data ', data)
+
+        fila = 0
+        self.lisPacientes.tblListado.setRowCount(len(data)) #Cuantas filas traen los datos
+        for item in data:
+            paciente = PacienteData().mostrar(item[0])          
+
+            self.lisPacientes.tblListado.setItem(fila, 0, QTableWidgetItem(str(item[0]))) #ID
+            self.lisPacientes.tblListado.hideColumn(0)
+            self.lisPacientes.tblListado.setItem(fila, 1, QTableWidgetItem(str(paciente[2]))) #Apellido
+            self.lisPacientes.tblListado.setItem(fila, 2, QTableWidgetItem(str(paciente[1]))) #Nombre
+            if item[3] == None:
+                self.lisPacientes.tblListado.setItem(fila, 3, QTableWidgetItem(str(0))) #Cantidad de visitas
+            else:
+                self.lisPacientes.tblListado.setItem(fila, 3, QTableWidgetItem(str(item[3]))) #Cantidad de visitas
+            if item[4] == None:
+                self.lisPacientes.tblListado.setItem(fila, 4, QTableWidgetItem(str(0))) #Valor de visita
+            else:
+                self.lisPacientes.tblListado.setItem(fila, 4, QTableWidgetItem(str(item[4]))) #Valor de visita
+            if item[5] == None:
+                self.lisPacientes.tblListado.setItem(fila, 5, QTableWidgetItem(str(0))) #Total
+            else:
+                self.lisPacientes.tblListado.setItem(fila, 5, QTableWidgetItem(str(item[5]))) #Total
+
+            fila += 1
+
+        # Conectar el evento cellChanged al método handleCellChanged
+        self.lisPacientes.tblListado.itemChanged.connect(lambda item: self.handleCellChanged(item, id_profesional))
+        #self.lisPacientes.tblListado.itemChanged.connect(self.handleCellChanged)
+
+        # # Desconectar cualquier conexión existente
+        # self.lisPacientes.tblListado.cellChanged.disconnect(self.handleCellChanged)
+
+        self.lisPacientes.tblListado.setColumnWidth(1,150)
+        self.lisPacientes.tblListado.setColumnWidth(2,150)
+        self.lisPacientes.tblListado.setColumnWidth(3,150)
+
+        self.paciente_window = PacienteWindow(self.usuario)
+        self.lisPacientes.btnAgregar.clicked.connect(lambda: self.paciente_window.cargar_pacientes(id_profesional=id_profesional))
+        self.lisPacientes.btnRefrescar.clicked.connect(lambda: self.listado_pacientes(id_profesional))
+        self.lisPacientes.btnDescargar.clicked.connect(lambda: self.descargar_pdf_pacientes(id_profesional))
+
+        self.lisPacientes.show()
+
+##### Ver #####
 
     def set_fecha(self, fecha_str, widget):
         if fecha_str:
@@ -325,6 +570,7 @@ class ProfesionalWindow():
                 self.verProf.btnEliminar.setVisible(False)
 
             self.verProf.btnDescargar.clicked.connect(lambda: self.descargar_pdf(id_profesional=id))
+            self.verProf.btnPacientes.clicked.connect(lambda: self.listado_pacientes(id_profesional=id))
 
             self.verProf.show()
         except Exception as e:
@@ -699,4 +945,135 @@ class ProfesionalWindow():
             print(f"Error al generar el PDF: {str(e)}")
             return False
         
+###### PDF Pacientes de Profesional ######
 
+    def descargar_pdf_pacientes(self, id_profesional):
+        try:
+            # Obtener la información del profesional y sus pacientes
+            profesional = ProfesionalData().mostrar(id=id_profesional)
+            pacientes = PacienteProfesionalesData().obtener_pacientes_de_profesional(profesional_id=id_profesional)
+            print('pacientes ', pacientes)
+            pacientes_data_list = []
+            for item in pacientes:
+                print('paciente ', item[0])
+                profesional_data = {
+                    'nombre': item[1],
+                    'apellido': item[2],
+                    'visitas': item[3],
+                    'valor': item[4],
+                    'total': item[5]                 
+                }
+                pacientes_data_list.append(profesional_data)
+            
+            # Mostrar el cuadro de diálogo para guardar el archivo PDF
+            filePath, _ = QFileDialog.getSaveFileName(self.verProf, "Guardar PDF", f"Pacientes_de_{profesional[1]}_{profesional[2]}.pdf", "PDF Files (*.pdf)")
+
+            if filePath:
+                # Generar el PDF
+                if self.generar_pdf_pacientes(pacientes_data_list, filePath, profesional):
+                    QMessageBox.information(None, "Éxito", "El PDF se guardó correctamente.")
+                else:
+                    QMessageBox.warning(None, "Error", "No se pudo guardar el PDF.")
+            else:
+                QMessageBox.warning(None, "Advertencia", "No se seleccionó ningún archivo para guardar.")
+        except Exception as e:
+            QMessageBox.critical(None, "Error", f"Ocurrió un error: {str(e)}")
+
+    def generar_pdf_pacientes(self, pacientes_data_list, filePath, profesional):
+        try:
+            c = canvas.Canvas(filePath, pagesize=A4)
+            width, height = A4
+            margin = 1 * cm
+            line_height = 0.5 * cm
+            box_margin = 0.2 * cm
+
+            # Ajustar el título
+            c.setFont("Helvetica-Bold", 14)
+            title_x = margin
+            title_y = height - margin
+            title_text = f"Pacientes de {profesional[1]} {profesional[2]}"
+            title_width = c.stringWidth(title_text, "Helvetica-Bold", 14)
+            c.drawString((width - title_width) / 2, title_y, title_text)  # Centrar el título
+
+            # Ajustar el espacio después del título
+            current_y = height - margin - line_height * 4
+            
+            # Ajustar los campos
+            c.setFont("Helvetica", 10)
+            num_cols = 5  # Cambiado a 5 columnas
+            col_width = (width - 2 * margin) / num_cols  # Dividir el ancho de la página en 5 columnas
+            box_height = 2 * line_height  # Altura de cada recuadro
+            
+             # Inicializar la suma total
+            total_general = 0
+
+            # Dibujar las cabeceras de las columnas
+            headers = ['Apellido', 'Nombre', 'Cantidad de visitas', 'Valor', 'Total']
+            for i, header in enumerate(headers):
+                x = margin + i * col_width
+                y = current_y
+                c.rect(x, y, col_width, box_height)  # Dibujar el recuadro
+                c.drawString(x + box_margin, y + box_height - line_height - box_margin, header)  # Dibujar el texto del encabezado
+            
+            # Ajustar la posición para los datos
+            current_y -= box_height  # Mover hacia abajo para empezar a dibujar datos
+            total_row_y = 0
+            # Iterar sobre la lista de pacientes
+            for index, paciente_data in enumerate(pacientes_data_list):
+                col = 0  # Empezar en la primera columna
+                row = index  # Fila en la que se encuentra el recuadro
+                
+                for key in headers:
+                    print('key ', key)
+                    # Convertir el encabezado a minúsculas para coincidir con las claves del diccionario
+                    key = key.lower().replace('cantidad de ', '')
+                    print('key post ', key)
+                    value = paciente_data.get(key, '')
+
+                    # Sumar el total si es una columna de total
+                    if key == 'total':
+                        try:
+                            total_general += float(value)  # Convertir a flotante y acumular
+                        except ValueError:
+                            pass  # Ignorar si el valor no es un número
+                    
+                    # Calcular la posición para el dato
+                    x = margin + col * col_width
+                    y = current_y - row * box_height
+                    
+                    # Mostrar información de depuración
+                    print(f"Index: {index}, Col: {col}, Row: {row}, X: {x}, Y: {y}, Value: {value}")
+                    
+                    # Dibujar el recuadro para el dato
+                    c.rect(x, y, col_width, box_height)
+                    
+                    # Dibujar el dato dentro del recuadro
+                    c.drawString(x + box_margin, y + box_height - line_height - box_margin, value)
+                    
+                    col += 1  # Mover a la siguiente columna
+                    
+                # Ajustar la posición para la próxima fila
+                if (index + 1) % num_cols == 0:
+                    current_y -= box_height
+
+            
+            # Ajustar la posición para la fila de totales (dos filas más abajo)
+            total_row_y = current_y - (box_height * 4) # Mover dos filas hacia abajo
+
+            # # Dibujar la fila de totales
+            # c.setFont("Helvetica-Bold", 10)
+            # c.drawString(margin, total_row_y, "Total General")  # Texto para la fila de totales
+            # c.setFont("Helvetica", 10)
+
+            # Dibujar recuadro del total general
+            x = margin + i * col_width
+            c.rect(x, total_row_y, col_width, box_height)  # Dibujar el recuadro
+            total_str = "{:.2f}".format(total_general)  # Formatear el total
+            c.drawString(x + box_margin, total_row_y + box_height - line_height - box_margin, total_str)
+            
+            # Finalizar el PDF
+            c.save()
+            return True
+        except Exception as e:
+            print(f"Error al generar el PDF: {str(e)}")
+            return False

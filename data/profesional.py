@@ -124,9 +124,9 @@ class ProfesionalData():
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
                 profesionales_datos = [
                     ("Juan", "Perez", "Calle Falsa 123", "Ciudad", str(cuit), "01/01/1980", "1900", str(matricula), "123456789", str(cbu), str(cbu+1), 
-                     "alias", "mail", 'False', 'False', "Enfermero/a", 'True', str(cod), "", "", "", ""),
+                     "alias", "mail", 'False', 'False', "Enfermero/a - Auxiliar", 'True', str(cod), "", "", "", ""),
                     ("Juan", "Garcia", "Calle Falsa 123", "Ciudad", str(cuit+1), "01/01/1980", "1900", str(matricula+1), "123456789", str(cbu+2), str(cbu+3), 
-                     "alias", "mail", 'False', 'True', "Enfermero/a", 'False', str(cod+1), "", "", "", ""),
+                     "alias", "mail", 'False', 'True', "Médico/a - Clínico", 'False', str(cod+1), "", "", "", ""),
                     
                 ]
 

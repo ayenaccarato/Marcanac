@@ -122,8 +122,7 @@ class InsumosWindow():
     def mostrarInsumos(self, id_paciente):
 
         lis = InsumoData()
-        insumos = lis.mostrar(id_paciente)   
-        print(insumos)     
+        insumos = lis.mostrar(id_paciente)       
         
         if insumos:
             self.lInsumo.swInsumos.setCurrentIndex(1)

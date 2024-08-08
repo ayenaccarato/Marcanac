@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>860</width>
-    <height>327</height>
+    <width>662</width>
+    <height>322</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Marcanac - Listado de Profesionales</string>
+   <string>Marcanac - Pacientes de Profesional</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -80,7 +80,7 @@ QPushButton {
 }
 
 QPushButton:hover {
-    background-color: rgb(61, 61, 61);
+    background-color: rgb(255, 255, 255);
     border-radius: 20px;
 }
 </string>
@@ -105,6 +105,39 @@ QPushButton:hover {
            <number>9</number>
           </property>
           <item>
+           <widget class="QPushButton" name="btnDescargar">
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>../imagenes/descargar.png</normaloff>../imagenes/descargar.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>25</width>
+              <height>25</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
            <widget class="QLabel" name="label">
             <property name="font">
              <font>
@@ -115,7 +148,7 @@ QPushButton:hover {
              </font>
             </property>
             <property name="text">
-             <string>Profesionales</string>
+             <string>Pacientes</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -136,31 +169,13 @@ QPushButton:hover {
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="btnPago">
-            <property name="cursor">
-             <cursorShape>PointingHandCursor</cursorShape>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>../imagenes/pago.png</normaloff>../imagenes/pago.png</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>30</width>
-              <height>25</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="btnLista">
+           <widget class="QPushButton" name="btnAgregar">
             <property name="font">
              <font>
               <family>Segoe UI</family>
               <pointsize>10</pointsize>
+              <weight>50</weight>
+              <bold>false</bold>
              </font>
             </property>
             <property name="cursor">
@@ -170,7 +185,17 @@ QPushButton:hover {
              <string notr="true">color: rgb(71, 40, 37);</string>
             </property>
             <property name="text">
-             <string>Volver al listado</string>
+             <string>Agregar</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>../imagenes/paciente.png</normaloff>../imagenes/paciente.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>25</width>
+              <height>25</height>
+             </size>
             </property>
            </widget>
           </item>
@@ -188,34 +213,13 @@ QPushButton:hover {
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
            <layout class="QGridLayout" name="gridLayout">
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_3">
-              <property name="font">
-               <font>
-                <family>Segoe UI</family>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>Apellido</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLineEdit" name="txtApellido">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="font">
-               <font>
-                <family>Segoe UI</family>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0" colspan="4">
-             <widget class="QTableWidget" name="tblListadoProf">
+            <item row="1" column="0" colspan="2">
+             <widget class="QTableWidget" name="tblListado">
+              <column>
+               <property name="text">
+                <string>ID</string>
+               </property>
+              </column>
               <column>
                <property name="text">
                 <string>Apellido</string>
@@ -228,134 +232,27 @@ QPushButton:hover {
               </column>
               <column>
                <property name="text">
-                <string>CBU 1</string>
+                <string>Cantidad de visitas</string>
                </property>
               </column>
               <column>
                <property name="text">
-                <string>CBU 2</string>
+                <string>Valor Visita</string>
                </property>
               </column>
               <column>
                <property name="text">
-                <string>Alias</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Código</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Profesión</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Acciones</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Pago</string>
+                <string>Total</string>
                </property>
               </column>
              </widget>
             </item>
-            <item row="1" column="1">
-             <widget class="QComboBox" name="cbProfesion">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
+            <item row="0" column="1">
+             <widget class="QPushButton" name="btnRefrescar">
               <property name="font">
                <font>
                 <family>Segoe UI</family>
                 <pointsize>10</pointsize>
-               </font>
-              </property>
-              <item>
-               <property name="text">
-                <string>--Seleccione--</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Enfermero/a</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Fonoaudiólogo/a</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Kinesiólogo/a</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Médico/a</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Psicólogo/a</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Terapista Ocupacional</string>
-               </property>
-              </item>
-             </widget>
-            </item>
-            <item row="0" column="2">
-             <widget class="QLabel" name="label_7">
-              <property name="font">
-               <font>
-                <family>Segoe UI</family>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>CUIT</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_11">
-              <property name="font">
-               <font>
-                <family>Segoe UI</family>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>Profesion</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="3">
-             <widget class="QLineEdit" name="txtCuit">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="font">
-               <font>
-                <family>Segoe UI</family>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="3">
-             <widget class="QPushButton" name="btnBuscar">
-              <property name="font">
-               <font>
-                <family>Segoe UI</family>
-                <pointsize>12</pointsize>
                 <weight>75</weight>
                 <bold>true</bold>
                </font>
@@ -368,9 +265,22 @@ QPushButton:hover {
 color: rgb(255, 255, 255);</string>
               </property>
               <property name="text">
-               <string>Buscar</string>
+               <string>Refrescar</string>
               </property>
              </widget>
+            </item>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
             </item>
            </layout>
           </item>
@@ -384,12 +294,10 @@ color: rgb(255, 255, 255);</string>
   </widget>
  </widget>
  <tabstops>
-  <tabstop>txtApellido</tabstop>
-  <tabstop>txtCuit</tabstop>
-  <tabstop>cbProfesion</tabstop>
-  <tabstop>btnBuscar</tabstop>
-  <tabstop>tblListadoProf</tabstop>
-  <tabstop>btnLista</tabstop>
+  <tabstop>btnAgregar</tabstop>
+  <tabstop>btnRefrescar</tabstop>
+  <tabstop>tblListado</tabstop>
+  <tabstop>btnDescargar</tabstop>
  </tabstops>
  <resources/>
  <connections/>

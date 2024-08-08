@@ -17,6 +17,7 @@ from data.paciente_profesionales import PacienteProfesionalesData
 from data.profesional import ProfesionalData
 from gui.pacientes.archivos_paciente import ArchivosPacienteWindow
 from gui.insumos.insumos import InsumosWindow
+from gui.pacientes.historia_clinica import HistoriaClinicaWindow
 from gui.profesionales.profesional import ProfesionalWindow
 from model.paciente import Paciente
 from model.usuario import Usuario
@@ -84,6 +85,14 @@ class PacienteWindow():
             return
         self.lisProfPac = uic.loadUi(ui_file_lisP)
 
+        # Cargar UI para asociar paciente
+        ui_file_pac = os.path.join(os.path.dirname(__file__), '..', 'profesionales', 'asociar_paciente.ui')
+        ui_file_pac = os.path.abspath(ui_file_pac)
+        if not os.path.isfile(ui_file_pac):
+            print(f"Error: el archivo {ui_file_pac} no se encuentra.")
+            return
+        self.asocPac = uic.loadUi(ui_file_pac)
+
 ### Registrar ###
 
     def abrirRegistro(self):  
@@ -93,7 +102,7 @@ class PacienteWindow():
             pass
         self.nuevo.btnRegistrar.clicked.connect(self.registrarPaciente)     
         self.nuevo.showMaximized() #Maximizo la ventana
-        #self.nuevo.show()
+        #self.nuevo.show()     
 
     def registro(self, doc):
         fechaN = self.nuevo.txtFechaN.date().toPyDate().strftime("%d/%m/%Y") #formateo la fecha
@@ -104,10 +113,10 @@ class PacienteWindow():
         equi = json.dumps(self.agruparEquip('nuevo'))
         asisR = json.dumps(self.agruparAsisR('nuevo'))
         nuevoPaciente = Paciente(
-            nombre = self.nuevo.txtNombre.text(),
-            apellido = self.nuevo.txtApellido.text(),
-            domicilio = self.nuevo.txtDomicilio.text(),
-            localidad = self.nuevo.txtLocalidad.text(),
+            nombre = self.nuevo.txtNombre.text().capitalize(),
+            apellido = self.nuevo.txtApellido.text().capitalize(),
+            domicilio = self.nuevo.txtDomicilio.text().capitalize(),
+            localidad = self.nuevo.txtLocalidad.text().capitalize(),
             documento = int(doc),
             fechaNacimiento = fechaN,
             obraSocial = self.nuevo.cbObraSocial.currentText(),
@@ -116,7 +125,9 @@ class PacienteWindow():
             fechaIngreso = fechaI,
             fechaEgreso = "",
             motivo = "",
-            familiar = self.nuevo.txtFamiliar.text(),
+            familiar = self.nuevo.txtFamiliar.text().capitalize(),
+            parentesco = self.nuevo.txtParentesco.text(),
+            telFamiliar = self.nuevo.txtTelFamiliar.text(),
             modulo = self.nuevo.cbModulo.currentText(),
             submodulo = subm,
             equip = equi,
@@ -139,7 +150,8 @@ class PacienteWindow():
         
         if self.nuevo.cbObraSocial.currentText() == "--Seleccione--" or self.nuevo.cbModulo.currentText() == "--Seleccione--":            
             QMessageBox.information(None, 'Mensaje', 'Seleccione una obra social o módulo')
-
+        elif len(self.nuevo.txtNroAfi.text()) < 12:
+            QMessageBox.information(None, 'Mensaje', 'El número de afiliado debe contener 12 números')
         elif len(self.nuevo.txtDocumento.text()) < 7:  
             QMessageBox.warning(None, 'Error', 'El número de documento ingresado es inválido')
         elif len(self.nuevo.txtDocumento.text()) == 7:
@@ -373,6 +385,7 @@ class PacienteWindow():
             data = PacienteCoordinadorData()
             
             archivos = ArchivosPacienteWindow()
+            hc = HistoriaClinicaWindow()
             coordinador = data.obtener_coordinador_de_paciente(id)
             if coordinador:
                 nombre_completo = f"{coordinador[1]} {coordinador[2]}"
@@ -435,6 +448,7 @@ class PacienteWindow():
                 self.ver.btnEliminar.clicked.disconnect()
                 self.ver.btnInsumos.clicked.disconnect()
                 self.ver.btnProfesionales.clicked.disconnect()  
+                self.ver.btnHisClinica.clicked.disconnect()
                 
             except TypeError:
                 pass
@@ -449,6 +463,7 @@ class PacienteWindow():
                 self.ver.btnEliminar.setVisible(False)
 
             self.ver.btnDescargar.clicked.connect(lambda: self.descargar_pdf(id_paciente=id))
+            self.ver.btnHisClinica.clicked.connect(lambda: hc.cargarArchivos(id_paciente=id))
 
             self.ver.show()
         except Exception as e:
@@ -740,6 +755,60 @@ class PacienteWindow():
             pass
         self.lisProfPac.btnDescargar.clicked.connect(lambda: self.descargar_pdf_prof_pac(id_paciente))
         self.lisProfPac.show()
+
+##### Pacientes de Profesional #####
+    def cargar_pacientes(self, id_profesional):
+        self.id_profesional_seleccionado = id_profesional
+        objData = PacienteData()
+        pacientes = objData.obtener_pacientes()
+        self.asocPac.cbPacientes.clear()  # Limpiar ComboBox antes de agregar nuevos items
+
+        if pacientes:
+            self.asocPac.cbPacientes.addItem('--Seleccione--')
+            for id_paciente, nombre, apellido in pacientes:
+                item = f"{nombre} {apellido}"
+                self.asocPac.cbPacientes.addItem(item, userData=id_paciente)
+        else:
+            self.asocPac.cbPacientes.addItem("No hay pacientes cargados")
+
+        # Conectar señal para actualizar ID del paciente seleccionado
+        self.asocPac.cbPacientes.currentIndexChanged.connect(lambda index: self.actualizar_id_paciente(index))
+
+        # Conectar botón Registrar
+        self.asocPac.btnRegistrar.clicked.connect(lambda: self.asociarPacienteAProfesional())
+        self.asocPac.show()
+
+    def actualizar_id_paciente(self, index):
+        if index >= 0:
+            item_data = self.asocPac.cbPacientes.itemData(index)
+            if item_data is not None:
+                self.id_paciente_seleccionado = item_data  # Almacenar el ID del paciente seleccionado
+                print(f"ID del paciente seleccionado: {self.id_paciente_seleccionado}")
+            else:
+                print("No se encontró el ID del paciente seleccionado.")
+        else:
+            print("No se seleccionó ningún paciente.")
+
+    def asociarPacienteAProfesional(self):
+        if hasattr(self, 'id_paciente_seleccionado') and hasattr(self, 'id_profesional_seleccionado'):
+            id_paciente = self.id_paciente_seleccionado
+            id_profesional = self.id_profesional_seleccionado
+            try:
+                objData = PacienteProfesionalesData()
+                exito = objData.asociar_profesional_a_paciente(id_paciente, id_profesional)
+
+                if exito:
+                    QMessageBox.information(None, 'Mensaje', 'Paciente asociado al profesional correctamente')
+                else:
+                    QMessageBox.warning(None, 'Error', 'No se pudo asociar el paciente al profesional')
+                    print(id_paciente, id_profesional)
+
+                self.asocPac.close()  # Cerrar la ventana
+            except Exception as e:
+                QMessageBox.critical(None, 'Error', 'Error al asociar paciente con profesional')
+                print(f"Error: {e}")
+        else:
+            QMessageBox.warning(None, 'Error', 'No se ha seleccionado un paciente o profesional')
 
 ############## PDF Paciente #################
 

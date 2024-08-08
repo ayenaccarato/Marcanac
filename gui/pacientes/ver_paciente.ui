@@ -315,6 +315,32 @@ QPushButton:hover {
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QPushButton" name="btnHisClinica">
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
+            <property name="toolTip">
+             <string>Historia Clínica</string>
+            </property>
+            <property name="toolTipDuration">
+             <number>-1</number>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>../imagenes/historia_clinica.png</normaloff>../imagenes/historia_clinica.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>25</width>
+              <height>25</height>
+             </size>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>

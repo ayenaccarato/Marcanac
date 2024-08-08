@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>630</width>
+    <width>659</width>
     <height>550</height>
    </rect>
   </property>
@@ -189,6 +189,29 @@ QPushButton:hover {
             <property name="iconSize">
              <size>
               <width>20</width>
+              <height>20</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnPacientes">
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
+            <property name="toolTip">
+             <string>Pacientes</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>../imagenes/pacientes.png</normaloff>../imagenes/pacientes.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>25</width>
               <height>20</height>
              </size>
             </property>
@@ -598,7 +621,12 @@ QPushButton:hover {
               </item>
               <item>
                <property name="text">
-                <string>Enfermero/a</string>
+                <string>Enfermero/a - Auxiliar</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Enfermero/a - Profesional</string>
                </property>
               </item>
               <item>
@@ -613,7 +641,22 @@ QPushButton:hover {
               </item>
               <item>
                <property name="text">
-                <string>Médico/a</string>
+                <string>Médico/a - Cardiólogo</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Médico/a - Clínico</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Médico/a - Pediátrico</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Médico/a - Urólogo</string>
                </property>
               </item>
               <item>

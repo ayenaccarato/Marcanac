@@ -1,6 +1,3 @@
-import datetime
-
-
 class Profesional():
 
     def __init__(self, nombre:str, apellido:str, domicilio:str, localidad:str, 
