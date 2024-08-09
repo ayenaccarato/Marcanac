@@ -1,3 +1,4 @@
+import calendar
 import os
 
 from functools import partial
@@ -9,15 +10,14 @@ from reportlab.lib.units import cm
 
 from PyQt6 import uic, QtCore
 from PyQt6.QtCore import Qt, QDate
-from PyQt6.QtWidgets import QFileDialog, QMessageBox, QPushButton, QWidget, QHBoxLayout, QTableWidgetItem, QStyledItemDelegate
+from PyQt6.QtWidgets import QFileDialog, QMessageBox, QPushButton, QWidget, QHBoxLayout, QTableWidgetItem, QStyledItemDelegate, QListWidgetItem
 from data.listados import ListadoData
 from data.paciente import PacienteData
 from data.paciente_profesionales import PacienteProfesionalesData
-from data.pago_profesional import PagoProfesionalData
+
 from data.profesional import ProfesionalData
 from gui.profesionales.archivos_profesional import ArchivosProfesionalWindow
 
-from model.pago import PagoProfesional
 from model.profesional import Profesional
 from model.usuario import Usuario
 
@@ -66,22 +66,13 @@ class ProfesionalWindow():
             return
         self.asocProf = uic.loadUi(ui_file_a)
 
-        ui_file_pago= os.path.join(os.path.dirname(__file__), '..', 'profesionales' ,'listado_profesionales_pago.ui')
-        ui_file_pago = os.path.abspath(ui_file_pago)  # Convierte a ruta absoluta
-        if not os.path.isfile(ui_file_pago):
-            print(f"Error: el archivo {ui_file_pago} no se encuentra.")
-            return
-        self.lisPago = uic.loadUi(ui_file_pago)
-
         ui_file_pac = os.path.join(os.path.dirname(__file__), '..', 'profesionales' ,'listado_pacientes_profesional.ui')
         ui_file_pac = os.path.abspath(ui_file_pac)  # Convierte a ruta absoluta
         if not os.path.isfile(ui_file_pac):
             print(f"Error: el archivo {ui_file_pac} no se encuentra.")
             return
         self.lisPacientes = uic.loadUi(ui_file_pac)
-
-        # self.lisPacientes.tblListado.cellChanged.connect(lambda: self.handleCellChanged)
-
+            
     def abrirRegistroProf(self):   
         self.prof.btnRegistrar.clicked.connect(self.registrarProfesional)     
         self.prof.show()
@@ -185,31 +176,10 @@ class ProfesionalWindow():
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
         self.listadoProf.tblListadoProf.setCellWidget(fila, 7, widget)
-    
-    # def boton_pagar(self, id_valor, fila):
-        
-    #     btn_pagar = QPushButton("Pagar")
-        
-    #     btn_pagar.clicked.connect(lambda _, id_valor=id_valor: self.agregarPago(id_valor))
-    #     # Agregar estilo al botón
-    #     btn_pagar.setStyleSheet("background-color: rgb(85, 170, 255); color: rgb(255, 255, 255);")
-    #     widget = QWidget()
-    #     layout = QHBoxLayout(widget)
-    #     layout.addWidget(btn_pagar)
-    #     layout.setContentsMargins(0, 0, 0, 0)
-    #     layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        
-    #     self.listadoProf.tblListadoProf.setCellWidget(fila, 8, widget)
-    
-    # def obtener_ultimo_mes(self, pagos):
-    #     # Suponemos que la fecha está en la segunda posición de cada tupla
-    #     fechas = [datetime.strptime(pago[2], "%d/%m/%Y") for pago in pagos]
-    #     fecha_mas_actual = max(fechas)  # Obtiene la fecha más reciente
-    #     return fecha_mas_actual.strftime("%m")
-    
+
     def abrirListadoProfesionales(self): 
         self.listadoProf.showMaximized() #Maximizo la ventana
-
+        archivos = ArchivosProfesionalWindow()
         lis = ListadoData() 
         data = lis.obtenerProfesionales()    
         fila = 0
@@ -262,65 +232,13 @@ class ProfesionalWindow():
         self.listadoProf.btnBuscar.clicked.connect(lambda: self.buscar('prof'))
         self.listadoProf.btnLista.setVisible(False)
         if self.usuario.rol == 'admin':
-            self.listadoProf.btnPago.setVisible(True)
-            self.listadoProf.btnPago.clicked.connect(lambda: self.listado_pagos())
+            self.listadoProf.btnPago.setVisible(True)   
+            self.listadoProf.btnPago.clicked.connect(lambda: archivos.mostrar_listWidget_meses())         
         else:
             self.listadoProf.btnPago.setVisible(False)
         self.limpiar_campos_busqueda()   
         self.listadoProf.show()
 
-    # def agregarPago(self, id_profesional):
-        
-    #     fecha = datetime.now().strftime("%d/%m/%Y")
-
-    #     nuevo_pago = PagoProfesional(
-    #         profesional_id = id_profesional,
-    #         fecha_pago = fecha
-    #     )
-
-    #     pago = PagoProfesionalData()
-
-    #     success, error_message = pago.registrar_pago(nuevo_pago)
-    #     if success:   
-    #         QMessageBox.information(None, 'Mensaje', 'Pago registrado')     
-    #         self.abrirListadoProfesionales() 
-    #     else:
-    #         QMessageBox.critical(None, 'Error', f'El pago no pudo ser registrado: {error_message}')
-
-    # def listado_pagos(self):
-        # self.lisPago.showMaximized() #Maximizo la ventana
-
-        # lis = PagoProfesionalData()
-        # data = lis.obtener_pagos()   
-        # fila = 0
-        # self.lisPago.tblListado.setRowCount(len(data)) #Cuantas filas traen los datos
-
-        # for item in data:
-        #     #Obtengo el profesional
-        #     profesional = ProfesionalData().mostrar(item[0])
-
-        #     self.lisPago.tblListado.setItem(fila, 0, QTableWidgetItem(str(item[2]))) #Fecha de pago
-        #     self.lisPago.tblListado.setItem(fila, 1, QTableWidgetItem(str(profesional[2]))) #Apellido
-        #     self.lisPago.tblListado.setItem(fila, 2, QTableWidgetItem(str(profesional[1]))) #Nombre
-        #     self.lisPago.tblListado.setItem(fila, 3, QTableWidgetItem(str(profesional[18]))) #Codigo
-        #     self.lisPago.tblListado.setItem(fila, 4, QTableWidgetItem(str(profesional[16]))) #Profesion
-
-        #     fila += 1
- 
-        # self.lisPago.tblListado.setColumnWidth(1,150)
-        # self.lisPago.tblListado.setColumnWidth(2,150)
-        # self.lisPago.tblListado.setColumnWidth(4,150)
-        # try:
-        #     self.lisPago.btnBuscar.clicked.disconnect()
-        # except TypeError:
-        #     pass
-
-        # self.lisPago.btnBuscar.clicked.connect(lambda: self.buscar('pagos'))
-        # self.lisPago.btnLista.setVisible(False)
-
-        # #self.limpiar_campos_busqueda()   
-        # self.lisPago.show()
-    
     def setRowBackgroundColor(self, row, color):
         # Verificar si la fila existe en la tabla antes de establecer el color
         if row < self.listado.tblListado.rowCount():
@@ -416,6 +334,7 @@ class ProfesionalWindow():
 
             # Solo actualiza si la columna es una de las permitidas
             if column in [3, 4]:  # Columnas editables: visitas (3) y valor (4)
+                self.lisPacientes.tblListado.blockSignals(True)
                 # Obtener los valores actuales de visitas y valor
                 visitas_item = self.lisPacientes.tblListado.item(row, 3)
                 valor_item = self.lisPacientes.tblListado.item(row, 4)
@@ -435,32 +354,17 @@ class ProfesionalWindow():
 
                 # Actualizar en la base de datos
                 success, error_message = self.pp.actualizar_dato(id_paciente=id_paciente, columna=column, nuevo_valor=new_value, id_profesional=id_profesional)
+                self.lisPacientes.tblListado.blockSignals(False)
                 if not success:
                     QMessageBox.critical(None, 'Error', f"No se pudo actualizar el dato: {error_message}")
-                else:
-                    QMessageBox.information(None, 'Mensaje', f"Paciente ID: {id_paciente}, Columna: {column}, Nuevo valor: {new_value}")
-        # if item is not None:
-        #     row = item.row()
-        #     column = item.column()
-        #     print('handle')
-        #     id_paciente = self.lisPacientes.tblListado.item(row, 0).text()
-        #     print('id pac ', id_paciente)
-        #     new_value = item.text()
-        #     print('nuevo valor', new_value)
-
-        #     exito, error_message = self.pp.actualizar_dato(id_paciente=id_paciente, id_profesional=id_profesional, columna=column, nuevo_valor=new_value)
-        #     if exito:
-        #         print('si')
-        #         QMessageBox.information(None, 'Mensaje', f"Paciente ID: {id_paciente}, Columna: {column}, Nuevo valor: {new_value}")
-        #     else:
-        #         print('no')
-        #         QMessageBox.critical(None, 'Error', f"Ocurrio un error: {error_message}")
+                # else:
+                #     if column == 4 or column == 3:  # Si se actualizó visitas o valor
+                #         QMessageBox.information(None, 'Mensaje', f"Paciente ID: {id_paciente}, Columna: {column}, Nuevo valor: {new_value}")
 
     def listado_pacientes(self, id_profesional):
         from gui.pacientes.paciente import PacienteWindow
         pacientes = PacienteProfesionalesData()
         data = pacientes.obtener_pacientes_de_profesional(id_profesional)
-        print('data ', data)
 
         fila = 0
         self.lisPacientes.tblListado.setRowCount(len(data)) #Cuantas filas traen los datos
@@ -947,12 +851,74 @@ class ProfesionalWindow():
         
 ###### PDF Pacientes de Profesional ######
 
+    def obtener_nombre_mes(self):
+        # Obtener el número del mes actual (01 a 12)
+        mes_numero = int(datetime.now().strftime("%m"))  # Convertir el mes a entero para usar en calendar.month_name
+
+        # Diccionario para traducir nombres de meses a castellano
+        meses_castellano = {
+            1: 'Enero',
+            2: 'Febrero',
+            3: 'Marzo',
+            4: 'Abril',
+            5: 'Mayo',
+            6: 'Junio',
+            7: 'Julio',
+            8: 'Agosto',
+            9: 'Septiembre',
+            10: 'Octubre',
+            11: 'Noviembre',
+            12: 'Diciembre'
+        }
+        
+        # Obtener el nombre del mes en castellano
+        mes_nombre = meses_castellano.get(mes_numero)
+        
+        # Verificar si el nombre del mes es None, lo que indica un mes no válido
+        if mes_nombre is None:
+            raise ValueError("Número de mes inválido")
+        
+        return mes_nombre
+
+    # def descargar_pdf_pacientes(self, id_profesional):
+    #     try:
+    #         # Obtener la información del profesional y sus pacientes
+    #         profesional = ProfesionalData().mostrar(id=id_profesional)
+    #         pacientes = PacienteProfesionalesData().obtener_pacientes_de_profesional(profesional_id=id_profesional)
+    #         print('pacientes ', pacientes)
+    #         pacientes_data_list = []
+    #         for item in pacientes:
+    #             print('paciente ', item[0])
+    #             profesional_data = {
+    #                 'nombre': item[1],
+    #                 'apellido': item[2],
+    #                 'visitas': item[3],
+    #                 'valor': item[4],
+    #                 'total': item[5]                 
+    #             }
+    #             pacientes_data_list.append(profesional_data)
+            
+    #         # Mostrar el cuadro de diálogo para guardar el archivo PDF
+    #         filePath, _ = QFileDialog.getSaveFileName(self.verProf, "Guardar PDF", f"Pacientes_de_{profesional[1]}_{profesional[2]}.pdf", "PDF Files (*.pdf)")
+
+    #         if filePath:
+    #             # Generar el PDF
+    #             if self.generar_pdf_pacientes(pacientes_data_list, filePath, profesional):
+    #                 QMessageBox.information(None, "Éxito", "El PDF se guardó correctamente.")
+    #             else:
+    #                 QMessageBox.warning(None, "Error", "No se pudo guardar el PDF.")
+    #         else:
+    #             QMessageBox.warning(None, "Advertencia", "No se seleccionó ningún archivo para guardar.")
+    #     except Exception as e:
+    #         QMessageBox.critical(None, "Error", f"Ocurrió un error: {str(e)}")
+
     def descargar_pdf_pacientes(self, id_profesional):
         try:
             # Obtener la información del profesional y sus pacientes
             profesional = ProfesionalData().mostrar(id=id_profesional)
             pacientes = PacienteProfesionalesData().obtener_pacientes_de_profesional(profesional_id=id_profesional)
             print('pacientes ', pacientes)
+            
             pacientes_data_list = []
             for item in pacientes:
                 print('paciente ', item[0])
@@ -968,9 +934,21 @@ class ProfesionalWindow():
             # Mostrar el cuadro de diálogo para guardar el archivo PDF
             filePath, _ = QFileDialog.getSaveFileName(self.verProf, "Guardar PDF", f"Pacientes_de_{profesional[1]}_{profesional[2]}.pdf", "PDF Files (*.pdf)")
 
+            # Obtener la ruta de la carpeta del mes actual
+            mes_nombre = self.obtener_nombre_mes()
+            ruta_carpeta_mes = os.path.join(os.path.dirname(__file__), '..', 'pagos', mes_nombre)
+
+            # Verificar si se ha seleccionado una ruta para guardar el archivo PDF
             if filePath:
+                # Crear la carpeta del mes si no existe
+                if not os.path.exists(ruta_carpeta_mes):
+                    os.makedirs(ruta_carpeta_mes)
+                
+                # Guardar el PDF en la carpeta del mes
+                ruta_completa = os.path.join(ruta_carpeta_mes, os.path.basename(filePath))
+                
                 # Generar el PDF
-                if self.generar_pdf_pacientes(pacientes_data_list, filePath, profesional):
+                if self.generar_pdf_pacientes(pacientes_data_list, ruta_completa, profesional):
                     QMessageBox.information(None, "Éxito", "El PDF se guardó correctamente.")
                 else:
                     QMessageBox.warning(None, "Error", "No se pudo guardar el PDF.")
@@ -1024,10 +1002,8 @@ class ProfesionalWindow():
                 row = index  # Fila en la que se encuentra el recuadro
                 
                 for key in headers:
-                    print('key ', key)
                     # Convertir el encabezado a minúsculas para coincidir con las claves del diccionario
                     key = key.lower().replace('cantidad de ', '')
-                    print('key post ', key)
                     value = paciente_data.get(key, '')
 
                     # Sumar el total si es una columna de total

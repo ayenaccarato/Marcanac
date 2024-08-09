@@ -774,12 +774,12 @@ class PacienteWindow():
         # Conectar señal para actualizar ID del paciente seleccionado
         self.asocPac.cbPacientes.currentIndexChanged.connect(lambda index: self.actualizar_id_paciente(index))
 
-        # Conectar botón Registrar
-        self.asocPac.btnRegistrar.clicked.connect(lambda: self.asociarPacienteAProfesional())
+        # Conectar botón Registrar usando el ID del paciente seleccionado dinámicamente
+        self.asocPac.btnRegistrar.clicked.connect(self.asociarPacienteAProfesional)
         self.asocPac.show()
 
     def actualizar_id_paciente(self, index):
-        if index >= 0:
+        if index > 0:  # Asegúrate de que no sea la primera opción '--Seleccione--'
             item_data = self.asocPac.cbPacientes.itemData(index)
             if item_data is not None:
                 self.id_paciente_seleccionado = item_data  # Almacenar el ID del paciente seleccionado
@@ -787,14 +787,21 @@ class PacienteWindow():
             else:
                 print("No se encontró el ID del paciente seleccionado.")
         else:
-            print("No se seleccionó ningún paciente.")
+            self.id_paciente_seleccionado = None  # Resetear si se selecciona la opción '--Seleccione--'
+            print("No se seleccionó ningún paciente válido.")
 
     def asociarPacienteAProfesional(self):
-        if hasattr(self, 'id_paciente_seleccionado') and hasattr(self, 'id_profesional_seleccionado'):
-            id_paciente = self.id_paciente_seleccionado
+        if hasattr(self, 'id_profesional_seleccionado') and self.id_paciente_seleccionado:            
             id_profesional = self.id_profesional_seleccionado
+            id_paciente = self.id_paciente_seleccionado
             try:
                 objData = PacienteProfesionalesData()
+                
+                # # Verificar si la asociación ya existe
+                # if objData.existe_asociacion(id_paciente, id_profesional):
+                #     QMessageBox.warning(None, 'Error', 'El paciente ya está asociado a este profesional')
+                #     return
+                
                 exito = objData.asociar_profesional_a_paciente(id_paciente, id_profesional)
 
                 if exito:

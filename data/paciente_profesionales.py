@@ -36,7 +36,11 @@ class PacienteProfesionalesData:
         try:
             self.db = con.Conexion().conectar()
             self.cursor = self.db.cursor()
-            sql_insert_paciente_profesional = "INSERT INTO paciente_profesionales (paciente_id, profesional_id, visitas, valor, total) VALUES (?, ?, ?, ?, ?)"
+            
+            sql_insert_paciente_profesional = """
+            INSERT INTO paciente_profesionales (paciente_id, profesional_id, visitas, valor, total) 
+            VALUES (?, ?, ?, ?, ?)
+            """
             self.cursor.execute(sql_insert_paciente_profesional, (paciente_id, profesional_id, '0', '0', '0'))
             self.db.commit()
             print("Asociación paciente-profesional creada correctamente")
