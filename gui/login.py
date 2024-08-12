@@ -1,7 +1,7 @@
 import os
 
 from PyQt6 import uic
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QEvent
 from PyQt6.QtWidgets import QMessageBox
 from data.usuario import UsuarioData
 from gui.main import MainWindow
@@ -21,10 +21,8 @@ class Login():
         self.initGUI()
         self.login.show()
 
-    # def keyPressEvent(self, event):
-    #     if event.key() == Qt.Key.Key_Return:  # Detecta Enter
-    #         self.login()
-    #     self.keyPressEvent(event)
+    def initGUI(self):
+        self.login.btnAcceder.clicked.connect(self.ingresar)
 
     def ingresar(self):
         try:
@@ -58,7 +56,3 @@ class Login():
         except Exception as e:
             print(f"Error al intentar ingresar: {e}")
             QMessageBox.critical(None, "Error", f"Error inesperado: {e}")
-
-    def initGUI(self):
-        self.login.btnAcceder.clicked.connect(self.ingresar)
-

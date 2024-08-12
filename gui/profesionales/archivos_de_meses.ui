@@ -62,7 +62,7 @@ QPushButton:hover {
          </font>
         </property>
         <property name="text">
-         <string>Archivos del Mes</string>
+         <string>Pagos</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -123,7 +123,7 @@ QPushButton:hover {
    <item>
     <widget class="QLabel" name="label_3">
      <property name="text">
-      <string>Nota: Los archivos se abrirán haciendo doble click sobre él</string>
+      <string>Nota: Las carpetas se abrirán haciendo doble click</string>
      </property>
     </widget>
    </item>

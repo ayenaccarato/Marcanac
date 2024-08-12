@@ -38,6 +38,13 @@ class ArchivosProfesionalWindow():
             return
         self.mes = uic.loadUi(ui_file_mes)
 
+        ui_file_meses= os.path.join(os.path.dirname(__file__), '..', 'profesionales' ,'archivos_de_meses.ui')
+        ui_file_meses = os.path.abspath(ui_file_meses)  # Convierte a ruta absoluta
+        if not os.path.isfile(ui_file_meses):
+            print(f"Error: el archivo {ui_file_meses} no se encuentra.")
+            return
+        self.meses = uic.loadUi(ui_file_meses)
+
         self.mes.listWidget.itemDoubleClicked.connect(self.manejarDobleClicMes)
 
     def cargarArchivosProfesional(self, id_profesional):
@@ -178,7 +185,7 @@ class ArchivosProfesionalWindow():
 
 ############# Archivos de pagos ###############
 
-    def mostrar_listWidget_meses(self):
+    def mostrar_listWidget_años(self):
         # Limpiar el listWidget antes de agregar nuevos elementos
         self.lisPago.listWidget.clear()
 
@@ -187,6 +194,49 @@ class ArchivosProfesionalWindow():
         self.lisPago.listWidget.setIconSize(QSize(64, 64))  # Ajustar el tamaño del ícono según sea necesario
         self.lisPago.listWidget.setResizeMode(QListView.ResizeMode.Adjust)  # Ajuste automático de tamaño
         self.lisPago.listWidget.setSpacing(10)  # Espacio entre ítems
+
+        anos = []
+        ano_actual = datetime.now().year
+        
+        # Agregar el año actual si no está ya en la lista
+        if ano_actual not in anos:
+            anos.append(ano_actual)
+        
+        # Ruta al ícono de la carpeta
+        ui_file = os.path.join(os.path.dirname(__file__), '..', 'imagenes', 'carpeta.png')
+        ui_file = os.path.abspath(ui_file)
+        icono_carpeta = QIcon(ui_file)
+
+        # Agregar los años al listWidget
+        for ano in anos:
+            item = QListWidgetItem(icono_carpeta, str(ano))  # Convertir el año a cadena
+            item.setTextAlignment(Qt.AlignmentFlag.AlignHCenter)  # Centrar el texto debajo del ícono
+            print('año seleccionado ', ano)
+            item.setData(Qt.ItemDataRole.UserRole, ano)  # Guardar el año en el item
+            self.lisPago.listWidget.addItem(item)
+
+        # Conectar el evento de clic a un método que manejará la selección
+        self.lisPago.listWidget.itemDoubleClicked.connect(self.mostrar_listWidget_meses)
+
+        # Mostrar el listWidget
+        self.lisPago.show()
+
+    def mostrar_listWidget_meses(self, item):
+        if item is None:
+            return  # Salir si no se pasa un item válido
+
+        # Obtener el año seleccionado del item (se debe almacenar en self.año_seleccionado)
+        self.año_seleccionado = self.lisPago.listWidget.currentItem().data(Qt.ItemDataRole.UserRole)
+        print('Año mostrado:', self.año_seleccionado)
+        
+        # Limpiar el listWidget antes de agregar nuevos elementos
+        self.meses.listWidget.clear()
+
+        # Configurar el listWidget en modo de íconos y organizar en cuadrícula
+        self.meses.listWidget.setViewMode(QListView.ViewMode.IconMode)
+        self.meses.listWidget.setIconSize(QSize(64, 64))
+        self.meses.listWidget.setResizeMode(QListView.ResizeMode.Adjust)
+        self.meses.listWidget.setSpacing(10)
 
         # Crear las carpetas de los meses
         meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
@@ -199,66 +249,39 @@ class ArchivosProfesionalWindow():
         for mes in meses:
             item = QListWidgetItem(icono_carpeta, mes)
             item.setTextAlignment(Qt.AlignmentFlag.AlignHCenter)  # Centrar el texto debajo del ícono
-            self.lisPago.listWidget.addItem(item)
+            item.setData(Qt.ItemDataRole.UserRole, mes)  # Guardar el mes en el item
+            self.meses.listWidget.addItem(item)
 
         # Conectar el evento de clic a un método que manejará la selección
-        self.lisPago.listWidget.itemDoubleClicked.connect(self.mostrar_archivos_del_mes)
+        self.meses.listWidget.itemDoubleClicked.connect(self.mostrar_archivos_del_mes)
 
         # Mostrar el listWidget
-        self.lisPago.show()
-
-    # def mostrar_archivos_del_mes(self, item):
-    #     mes_seleccionado = item.text()
-    #     # Aquí deberías obtener los archivos correspondientes al mes seleccionado
-    #     archivos = self.obtener_archivos_del_mes(mes_seleccionado)
-
-    #     # Aquí puedes mostrar los archivos, por ejemplo, en otro listWidget o en una vista de lista
-    #     print(f"Archivos en la carpeta {mes_seleccionado}: {archivos}")
-
-    # def mostrar_archivos_del_mes(self, item):
-    #     mes_seleccionado = item.text()
-    #     self.ruta_carpeta_mes = os.path.join(os.path.dirname(__file__),'..', 'pagos', mes_seleccionado)  # Ajusta la ruta base según sea necesario
-        
-    #     # Aquí deberías obtener los archivos correspondientes al mes seleccionado
-    #     archivos = self.obtener_archivos_del_mes(mes_seleccionado)
-        
-    #     # Aquí puedes mostrar los archivos, por ejemplo, en otro listWidget o en una vista de lista
-    #     if archivos:
-    #         self.mes.listWidget.clear()
-    #         for archivo in archivos:
-    #             nombre_archivo = archivo[0]  # Ajusta según la estructura de los datos
-    #             item = QListWidgetItem(nombre_archivo)
-    #             self.mes.listWidget.addItem(item)
-    #     else:
-    #         self.mes.listWidget.clear()
-    #         self.mes.listWidget.addItem('No hay archivos cargados')
-        
-    #     # Mostrar el listWidget
-    #     self.mes.show()
+        self.meses.show()
 
     def mostrar_archivos_del_mes(self, item):
         mes_seleccionado = item.text()
-        
-        # Obtener la ruta de la carpeta del mes
-        ruta_carpeta_mes = os.path.join(os.path.dirname(__file__),'..', 'pagos', mes_seleccionado)
-        
+        print('Año:', self.año_seleccionado, 'Mes:', mes_seleccionado)
+
+        # Usar el año seleccionado para construir la ruta del mes
+        ruta_carpeta_mes = os.path.join(os.path.dirname(__file__), '..', 'pagos', str(self.año_seleccionado), mes_seleccionado)
+
         # Verificar si la carpeta existe
         if os.path.exists(ruta_carpeta_mes):
             # Obtener los archivos de la carpeta
             archivos = os.listdir(ruta_carpeta_mes)
-            
+
             # Limpiar el listWidget antes de agregar nuevos elementos
             self.mes.listWidget.clear()
-            
-            # Configurar el listWidget en modo de íconos y organizar en cuadrícula
-            self.mes.listWidget.setViewMode(QListView.ViewMode.IconMode)
-            self.mes.listWidget.setIconSize(QSize(64, 64))
-            self.mes.listWidget.setResizeMode(QListView.ResizeMode.Adjust)
-            self.mes.listWidget.setSpacing(10)
-            
+
+            # Configurar el listWidget en modo de lista para ajuste del texto
+            self.mes.listWidget.setViewMode(QListView.ViewMode.ListMode)  # Cambiar a modo de lista
+            self.mes.listWidget.setIconSize(QSize(64, 64))  # Tamaño del ícono
+            self.mes.listWidget.setResizeMode(QListView.ResizeMode.Adjust)  # Ajuste automático de tamaño
+            self.mes.listWidget.setSpacing(10)  # Espacio entre ítems
+
             for archivo in archivos:
                 archivo_path = os.path.join(ruta_carpeta_mes, archivo)
-                item = QListWidgetItem(archivo)
+                item = QListWidgetItem()
                 
                 # Asignar el ícono según la extensión del archivo
                 ext = os.path.splitext(archivo)[1].lower()
@@ -274,11 +297,12 @@ class ArchivosProfesionalWindow():
                     ui_file = os.path.join(os.path.dirname(__file__), '..', 'imagenes', 'por_defecto.png')
                 
                 item.setIcon(QIcon(ui_file))
+                item.setText(archivo)  # Establecer el texto del archivo
                 item.setData(Qt.ItemDataRole.UserRole, archivo_path)
                 
                 # Añadir el ítem al QListWidget
                 self.mes.listWidget.addItem(item)
-            
+
             # Mostrar el listWidget
             self.mes.show()
         else:
@@ -325,9 +349,17 @@ class ArchivosProfesionalWindow():
                     ui_file = os.path.join(os.path.dirname(__file__), '..', 'imagenes', 'por_defecto.png')
                     ui_file = os.path.abspath(ui_file)
                     item.setIcon(QIcon(ui_file))  # Ícono por defecto para otros tipos
+
+                 # Crear el widget personalizado para el ítem
+                widget_item = CustomListWidgetItem(icon_path, archivo)
+                list_widget_item = QListWidgetItem()
+                list_widget_item.setSizeHint(widget_item.sizeHint())  # Establecer el tamaño del ítem
+
+                self.mes.listWidget.addItem(list_widget_item)
+                self.mes.listWidget.setItemWidget(list_widget_item, widget_item)
                 
-                # Añadir el ítem al QListWidget
-                self.mes.listWidget.addItem(item)
+                # # Añadir el ítem al QListWidget
+                # self.mes.listWidget.addItem(item)
                 
             self.mes.show()
         else:
@@ -373,9 +405,14 @@ class ArchivosProfesionalWindow():
         '''Maneja el doble clic en un ítem del QListWidget'''
         if item:
             nombre_archivo = item.text()
-            mes = self.obtener_nombre_mes()  # Obtén el mes actual de la vista o del contexto adecuado
-            ruta_carpeta_mes = os.path.join(os.path.dirname(__file__),'..', 'pagos', mes)
+            # Obtener el mes actual de la vista o del contexto adecuado
+            mes = self.obtener_nombre_mes() 
+            
+            # Construir la ruta completa al archivo
+            ruta_carpeta_mes = os.path.join(os.path.dirname(__file__), '..', 'pagos', str(self.año_seleccionado), mes)
             ruta_archivo = os.path.join(ruta_carpeta_mes, nombre_archivo)
+            
+            print('Ruta del archivo:', ruta_archivo)  # Imprimir la ruta para depuración
 
             if os.path.exists(ruta_archivo):
                 try:

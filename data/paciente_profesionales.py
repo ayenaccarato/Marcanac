@@ -104,6 +104,7 @@ class PacienteProfesionalesData:
         try:
             self.db = con.Conexion().conectar()
             self.cursor = self.db.cursor()
+            print(f"Eliminando relación: paciente_id={paciente_id}, profesional_id={profesional_id}")
             self.cursor.execute('''
                 DELETE FROM paciente_profesionales
                 WHERE paciente_id = ? AND profesional_id = ?

@@ -1,0 +1,5 @@
+# Ignorar todos los PDFs en la carpeta pagos
+pagos/**/*.pdf
+
+# Ignorar cualquier PDF en cualquier parte del repositorio
+*.pdf

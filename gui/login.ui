@@ -6,9 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>291</width>
+    <width>321</width>
     <height>406</height>
    </rect>
+  </property>
+  <property name="contextMenuPolicy">
+   <enum>Qt::DefaultContextMenu</enum>
   </property>
   <property name="windowTitle">
    <string>Marcanac - Iniciar Sesión</string>
@@ -16,6 +19,9 @@
   <property name="windowIcon">
    <iconset>
     <normaloff>imagenes/logo.png</normaloff>imagenes/logo.png</iconset>
+  </property>
+  <property name="toolButtonStyle">
+   <enum>Qt::ToolButtonTextOnly</enum>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
