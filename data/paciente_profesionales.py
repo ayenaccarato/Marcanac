@@ -15,6 +15,7 @@ class PacienteProfesionalesData:
             profesional_id INTEGER,
             visitas TEXT,
             valor TEXT,
+            mes TEXT,
             total TEXT,
             FOREIGN KEY (paciente_id) REFERENCES pacientes(id) ON DELETE CASCADE,
             FOREIGN KEY (profesional_id) REFERENCES profesionales(id) ON DELETE CASCADE,
@@ -124,46 +125,48 @@ class PacienteProfesionalesData:
             self.db = con.Conexion().conectar()
             self.cursor = self.db.cursor()
 
-                # Convertir el nuevo valor a número si es necesario
+            # Convertir el nuevo valor a número si es necesario
             try:
                 nuevo_valor = float(nuevo_valor)
             except ValueError:
                 return False, "El valor ingresado no es numérico"
 
             # Construir la consulta para actualizar la columna especificada
-            columnas = ['visitas', 'valor', 'total']
-            if columna in [3, 4]:  # Columnas editables: visitas (3) y valor (4)
-                # Obtener los valores actuales de visitas y valor
+            if columna in [3, 4, 5]:  # Columnas editables: visitas (3), valor (4), mes (5)
+                # Obtener los valores actuales de visitas, valor y mes
                 consulta = """
-                SELECT visitas, valor 
+                SELECT visitas, valor, mes 
                 FROM paciente_profesionales 
                 WHERE paciente_id = ? AND profesional_id = ?
                 """
                 self.cursor.execute(consulta, (id_paciente, id_profesional))
                 result = self.cursor.fetchone()
                 if result:
-                    visitas_actuales, valor_actual = result
+                    visitas_actuales, valor_actual, mes_actual = result
                     visitas_actuales = float(visitas_actuales) if visitas_actuales else 0
                     valor_actual = float(valor_actual) if valor_actual else 0
+                    mes_actual = float(mes_actual) if mes_actual else 1  # Si no hay mes, se usa 1
 
                     if columna == 3:  # Si se está actualizando visitas
                         visitas_actuales = nuevo_valor
                     elif columna == 4:  # Si se está actualizando valor
                         valor_actual = nuevo_valor
+                    elif columna == 5:  # Si se está actualizando mes
+                        mes_actual = nuevo_valor
 
                     # Calcular el nuevo total
-                    total = visitas_actuales * valor_actual
+                    total = visitas_actuales * valor_actual * mes_actual
 
-                    # Actualizar la columna especificada
+                    # Actualizar la columna especificada y el total
                     if columna == 3:
                         consulta = "UPDATE paciente_profesionales SET visitas = ?, total = ? WHERE paciente_id = ? AND profesional_id = ?"
                         self.cursor.execute(consulta, (nuevo_valor, total, id_paciente, id_profesional))
                     elif columna == 4:
                         consulta = "UPDATE paciente_profesionales SET valor = ?, total = ? WHERE paciente_id = ? AND profesional_id = ?"
                         self.cursor.execute(consulta, (nuevo_valor, total, id_paciente, id_profesional))
-                    elif columna == 5:  # En caso de actualizar directamente el total
-                        consulta = "UPDATE paciente_profesionales SET total = ? WHERE paciente_id = ? AND profesional_id = ?"
-                        self.cursor.execute(consulta, (nuevo_valor, id_paciente, id_profesional))
+                    elif columna == 5:
+                        consulta = "UPDATE paciente_profesionales SET mes = ?, total = ? WHERE paciente_id = ? AND profesional_id = ?"
+                        self.cursor.execute(consulta, (nuevo_valor, total, id_paciente, id_profesional))
 
                     self.db.commit()
                     return True, ""

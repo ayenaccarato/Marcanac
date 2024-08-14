@@ -144,7 +144,6 @@ class ProfesionalData():
         except sqlite3.Error as e:
             print("Error al verificar datos:", e)
 
-
     def registrar(self, profesional:Profesional): 
         try:
             self.db = con.Conexion().conectar()
@@ -272,4 +271,30 @@ class ProfesionalData():
                 self.cursor.close()
             if self.db:
                 self.db.close()
+
+    def es_cuidador(self, id_profesional):
+        
+        try:
+            self.db = con.Conexion().conectar()
+            self.cursor = self.db.cursor()
+
+            # El parámetro debe ser una tupla, por eso agregamos una coma después de id_profesional
+            self.cursor.execute("""SELECT cuidador
+                                FROM profesionales
+                                WHERE id = ?""", (id_profesional,))
+            profesional = self.cursor.fetchone()
+            if profesional:  # Si fetchone() devuelve una tupla (es decir, si se encontró un profesional)
+                return profesional[0]  # Devuelve el valor booleano de la columna 'cuidador'
+            else:
+                return None  # Si no se encontró el profesional, devuelve None
+        except Exception as e:
+            print("Error al obtener al profesional: ", e)
+        finally:
+            if self.cursor:
+                self.cursor.close()
+            if self.db:
+                self.db.close()
+
+
+
     

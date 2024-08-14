@@ -195,7 +195,7 @@ class InsumosWindow():
             
             if filePath:
                 # Generar el PDF
-                if self.generar_pdf_paciente(insumos_data_list, filePath):
+                if self.generar_pdf_paciente(insumos_data_list, filePath, paciente_info):
                     QMessageBox.information(None, "Éxito", "El PDF se guardó correctamente.")
                 else:
                     QMessageBox.warning(None, "Error", "No se pudo guardar el PDF.")
@@ -204,7 +204,7 @@ class InsumosWindow():
         except Exception as e:
             QMessageBox.critical(None, "Error", f"Ocurrió un error: {str(e)}")
 
-    def generar_pdf_paciente(self, insumos_data_list, filePath):
+    def generar_pdf_paciente(self, insumos_data_list, filePath, paciente):
         try:
             c = canvas.Canvas(filePath, pagesize=A4)
             width, height = A4
@@ -216,7 +216,7 @@ class InsumosWindow():
             c.setFont("Helvetica-Bold", 14)
             title_x = margin
             title_y = height - margin
-            title_text = "Insumos de paciente"
+            title_text = f"Insumos de {paciente[1]} {paciente[2]}"
             title_width = c.stringWidth(title_text, "Helvetica-Bold", 14)
             c.drawString((width - title_width) / 2, title_y, title_text)  # Centrar el título
 
@@ -240,12 +240,38 @@ class InsumosWindow():
             # Ajustar la posición para los datos
             current_y -= box_height  # Mover hacia abajo para empezar a dibujar datos
 
-            # Iterar sobre la lista de profesionales
-            for index, insumos_data in enumerate(insumos_data_list):
-                col = 0  # Empezar en la primera columna
-                row = index  # Fila en la que se encuentra el recuadro
+            # # Iterar sobre la lista de profesionales
+            # for index, insumos_data in enumerate(insumos_data_list):
+            #     col = 0  # Empezar en la primera columna
+            #     row = index  # Fila en la que se encuentra el recuadro
                 
-                for key in headers:
+            #     for key in headers:
+            #         # Convertir el encabezado a minúsculas para coincidir con las claves del diccionario
+            #         key = key.lower().replace(' de', '').replace(' ', '_')
+                    
+            #         value = insumos_data.get(key, '')
+                    
+            #         # Calcular la posición para el dato
+            #         x = margin + col * col_width
+            #         y = current_y - row * box_height
+                    
+            #         # Mostrar información de depuración
+            #         print(f"Index: {index}, Col: {col}, Row: {row}, X: {x}, Y: {y}, Value: {value}")
+                    
+            #         # Dibujar el recuadro para el dato
+            #         c.rect(x, y, col_width, box_height)
+                    
+            #         # Dibujar el dato dentro del recuadro
+            #         c.drawString(x + box_margin, y + box_height - line_height - box_margin, value)
+                    
+            #         col += 1  # Mover a la siguiente columna
+                    
+            #     # Ajustar la posición para la próxima fila
+            #     if (index + 1) % num_cols == 0:
+            #         current_y -= box_height
+            # Iterar sobre la lista de insumos
+            for insumos_data in insumos_data_list:
+                for col, key in enumerate(headers):
                     # Convertir el encabezado a minúsculas para coincidir con las claves del diccionario
                     key = key.lower().replace(' de', '').replace(' ', '_')
                     
@@ -253,22 +279,19 @@ class InsumosWindow():
                     
                     # Calcular la posición para el dato
                     x = margin + col * col_width
-                    y = current_y - row * box_height
+                    y = current_y
                     
                     # Mostrar información de depuración
-                    print(f"Index: {index}, Col: {col}, Row: {row}, X: {x}, Y: {y}, Value: {value}")
+                    print(f"Col: {col}, X: {x}, Y: {y}, Value: {value}")
                     
                     # Dibujar el recuadro para el dato
                     c.rect(x, y, col_width, box_height)
                     
                     # Dibujar el dato dentro del recuadro
                     c.drawString(x + box_margin, y + box_height - line_height - box_margin, value)
-                    
-                    col += 1  # Mover a la siguiente columna
-                    
+                
                 # Ajustar la posición para la próxima fila
-                if (index + 1) % num_cols == 0:
-                    current_y -= box_height
+                current_y -= box_height
 
             # Finalizar el PDF
             c.save()

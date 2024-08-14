@@ -180,6 +180,7 @@ class ProfesionalWindow():
         self.listadoProf.tblListadoProf.setCellWidget(fila, 7, widget)
 
     def abrirListadoProfesionales(self): 
+        from gui.profesionales.mes_pago import MesPagoWindow
         self.listadoProf.showMaximized() #Maximizo la ventana
         archivos = ArchivosProfesionalWindow()
         lis = ListadoData() 
@@ -205,34 +206,19 @@ class ProfesionalWindow():
             
             self.boton_listado_profesional(id_valor, fila)
 
-            # if self.usuario.rol == 'admin':
-            #     mes_actual = '0' + str(datetime.now().month) 
-
-            #     pago_profesional = PagoProfesionalData()
-            #     pagos_existentes = pago_profesional.obtener_pagos()
-                
-            #     pago_realizado = any(id_valor == tup[1] for tup in pagos_existentes)
-                
-            #     if not pago_realizado:
-            #         self.listadoProf.tblListadoProf.showColumn(8)
-            #         self.boton_pagar(id_valor, fila)
-            #     else:
-            #         if mes_actual == pago_profesional.obtener_fecha_pago_profesional(id_valor)[0]:
-            #             self.listadoProf.tblListadoProf.setItem(fila, 8, QTableWidgetItem('Pago'))
-            #             self.listadoProf.tblListadoProf.setCellWidget(fila, 8, None)
-            # else:
-            #     self.listadoProf.tblListadoProf.hideColumn(8)
-
             fila += 1
  
         self.listadoProf.tblListadoProf.setColumnWidth(2,150)
         self.listadoProf.tblListadoProf.setColumnWidth(3,150)
         try:
             self.listadoProf.btnBuscar.clicked.disconnect()
+            self.listadoProf.btnAPagar.clicked.disconnect()
         except TypeError:
             pass
         self.listadoProf.btnBuscar.clicked.connect(lambda: self.buscar('prof'))
         self.listadoProf.btnLista.setVisible(False)
+        mes = MesPagoWindow(self.usuario)
+        self.listadoProf.btnAPagar.clicked.connect(lambda: mes.listado_pago_profesionales())  
         if self.usuario.rol == 'admin':
             self.listadoProf.btnPago.setVisible(True)   
             self.listadoProf.btnPago.clicked.connect(lambda: archivos.mostrar_listWidget_años())         
@@ -283,32 +269,32 @@ class ProfesionalWindow():
                 self.listadoProf.tblListadoProf.setRowCount(0)
             self.listadoProf.btnLista.setVisible(True)
             self.listadoProf.btnLista.clicked.connect(lambda: self.abrirListadoProfesionales())    
-        else:
-            self.lisPago.tblListado.clearContents()  # Limpiar contenido actual de la tabla
-            self.lisPago.tblListado.setRowCount(0)
+        # else:
+        #     self.lisPago.tblListado.clearContents()  # Limpiar contenido actual de la tabla
+        #     self.lisPago.tblListado.setRowCount(0)
 
-            lis = PagoProfesionalData() 
-            data = lis.obtener_pagos_profesional(self.lisPago.cbMes.currentText())
+        #     lis = PagoProfesionalData() 
+        #     data = lis.obtener_pagos_profesional(self.lisPago.cbMes.currentText())
 
-            if data:
-                # Reiniciar número de filas
-                fila = 0
-                self.lisPago.tblListado.setRowCount(len(data)) #Cuantas filas traen los datos
-                for item in data:
-                    profesional = ProfesionalData().mostrar(item[0])
+        #     if data:
+        #         # Reiniciar número de filas
+        #         fila = 0
+        #         self.lisPago.tblListado.setRowCount(len(data)) #Cuantas filas traen los datos
+        #         for item in data:
+        #             profesional = ProfesionalData().mostrar(item[0])
 
-                    self.lisPago.tblListado.setItem(fila, 0, QTableWidgetItem(str(item[2]))) #Fecha de pago
-                    self.lisPago.tblListado.setItem(fila, 1, QTableWidgetItem(str(profesional[2]))) #Apellido
-                    self.lisPago.tblListado.setItem(fila, 2, QTableWidgetItem(str(profesional[1]))) #Nombre
-                    self.lisPago.tblListado.setItem(fila, 3, QTableWidgetItem(str(profesional[18]))) #Codigo
-                    self.lisPago.tblListado.setItem(fila, 4, QTableWidgetItem(str(profesional[16]))) #Profesion
+        #             self.lisPago.tblListado.setItem(fila, 0, QTableWidgetItem(str(item[2]))) #Fecha de pago
+        #             self.lisPago.tblListado.setItem(fila, 1, QTableWidgetItem(str(profesional[2]))) #Apellido
+        #             self.lisPago.tblListado.setItem(fila, 2, QTableWidgetItem(str(profesional[1]))) #Nombre
+        #             self.lisPago.tblListado.setItem(fila, 3, QTableWidgetItem(str(profesional[18]))) #Codigo
+        #             self.lisPago.tblListado.setItem(fila, 4, QTableWidgetItem(str(profesional[16]))) #Profesion
 
-                    fila += 1
+        #             fila += 1
                 
-            else:
-                # Limpiar la tabla si no se encontraron resultados
-                self.lisPago.tblListado.clearContents()
-                self.lisPago.tblListado.setRowCount(0)
+        #     else:
+        #         # Limpiar la tabla si no se encontraron resultados
+        #         self.lisPago.tblListado.clearContents()
+        #         self.lisPago.tblListado.setRowCount(0)
 
             self.lisPago.btnLista.setVisible(True)
             self.lisPago.btnLista.clicked.connect(lambda: self.listado_pagos())
@@ -317,6 +303,51 @@ class ProfesionalWindow():
         self.listadoProf.txtCuit.clear()  # Limpia el contenido del primer QLineEdit
         self.listadoProf.txtApellido.clear()
         self.listadoProf.cbProfesion.setCurrentIndex(0)
+
+    # def handleCellChanged(self, item, id_profesional):
+    #     self.pp = PacienteProfesionalesData()
+    #     if item is not None:
+    #         row = item.row()
+    #         column = item.column()
+    #         id_paciente = self.lisPacientes.tblListado.item(row, 0).text()  # ID del paciente
+    #         new_value = item.text()  # Nuevo valor de la celda
+
+    #         # Convertir el nuevo valor a número si es necesario
+    #         try:
+    #             if column in [3, 4]:  # Solo convertir si es una columna editable
+    #                 new_value = float(new_value)
+    #         except ValueError:
+    #             # Si no es posible convertir a float, se ignora el cambio
+    #             QMessageBox.warning(None, "Advertencia", "El valor ingresado no es un número válido.")
+    #             return
+
+    #         # Solo actualiza si la columna es una de las permitidas
+    #         if column in [3, 4]:  # Columnas editables: visitas (3) y valor (4)
+    #             self.lisPacientes.tblListado.blockSignals(True)
+    #             try:
+    #                 # Obtener los valores actuales de visitas y valor
+    #                 visitas_item = self.lisPacientes.tblListado.item(row, 3)
+    #                 valor_item = self.lisPacientes.tblListado.item(row, 4)
+    #                 total_item = self.lisPacientes.tblListado.item(row, 5)
+
+    #                 visitas = float(visitas_item.text()) if visitas_item is not None else 0
+    #                 valor = float(valor_item.text()) if valor_item is not None else 0
+
+    #                 # Calcular el nuevo total
+    #                 total = visitas * valor
+
+    #                 # Actualizar la celda del total
+    #                 if total_item is not None:
+    #                     total_item.setText(str(total))
+    #                 else:
+    #                     self.lisPacientes.tblListado.setItem(row, 5, QTableWidgetItem(str(total)))
+
+    #                 # Actualizar en la base de datos
+    #                 success, error_message = self.pp.actualizar_dato(id_paciente=id_paciente, columna=column, nuevo_valor=new_value, id_profesional=id_profesional)
+    #                 if not success:
+    #                     QMessageBox.critical(None, 'Error', f"No se pudo actualizar el dato: {error_message}")
+    #             finally:
+    #                 self.lisPacientes.tblListado.blockSignals(False)
 
     def handleCellChanged(self, item, id_profesional):
         self.pp = PacienteProfesionalesData()
@@ -328,33 +359,34 @@ class ProfesionalWindow():
 
             # Convertir el nuevo valor a número si es necesario
             try:
-                if column in [3, 4]:  # Solo convertir si es una columna editable
+                if column in [3, 4, 5]:  # Solo convertir si es una columna editable
                     new_value = float(new_value)
             except ValueError:
-                # Si no es posible convertir a float, se ignora el cambio
                 QMessageBox.warning(None, "Advertencia", "El valor ingresado no es un número válido.")
                 return
 
             # Solo actualiza si la columna es una de las permitidas
-            if column in [3, 4]:  # Columnas editables: visitas (3) y valor (4)
+            if column in [3, 4, 5]:  # Columnas editables: cantidad (3), valor (4) y mes (5)
                 self.lisPacientes.tblListado.blockSignals(True)
                 try:
-                    # Obtener los valores actuales de visitas y valor
-                    visitas_item = self.lisPacientes.tblListado.item(row, 3)
+                    # Obtener los valores actuales de cantidad, valor, y mes
+                    cantidad_item = self.lisPacientes.tblListado.item(row, 3)
                     valor_item = self.lisPacientes.tblListado.item(row, 4)
-                    total_item = self.lisPacientes.tblListado.item(row, 5)
+                    mes_item = self.lisPacientes.tblListado.item(row, 5)
+                    total_item = self.lisPacientes.tblListado.item(row, 6)
 
-                    visitas = float(visitas_item.text()) if visitas_item is not None else 0
+                    cantidad = float(cantidad_item.text()) if cantidad_item is not None else 0
                     valor = float(valor_item.text()) if valor_item is not None else 0
+                    mes = float(mes_item.text()) if mes_item is not None else 1  # Si no hay mes, se usa 1
 
                     # Calcular el nuevo total
-                    total = visitas * valor
+                    total = cantidad * valor * mes
 
                     # Actualizar la celda del total
                     if total_item is not None:
                         total_item.setText(str(total))
                     else:
-                        self.lisPacientes.tblListado.setItem(row, 5, QTableWidgetItem(str(total)))
+                        self.lisPacientes.tblListado.setItem(row, 6, QTableWidgetItem(str(total)))
 
                     # Actualizar en la base de datos
                     success, error_message = self.pp.actualizar_dato(id_paciente=id_paciente, columna=column, nuevo_valor=new_value, id_profesional=id_profesional)
@@ -377,47 +409,58 @@ class ProfesionalWindow():
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.lisPacientes.tblListado.setCellWidget(fila, 6, widget)
+        self.lisPacientes.tblListado.setCellWidget(fila, 7, widget)
 
     def listado_pacientes(self, id_profesional):
         from gui.pacientes.paciente import PacienteWindow
+        
         pacientes = PacienteProfesionalesData()
         data = pacientes.obtener_pacientes_de_profesional(id_profesional)
 
+        profesional = ProfesionalData()
+        info = profesional.es_cuidador(id_profesional)
+        print('info ', info)
+
         print(f"Datos obtenidos para el profesional {id_profesional}: {data}")
+
+        # Ordenar data por el apellido del paciente (suponiendo que el apellido es el índice 2 en `paciente`)
+        data = sorted(data, key=lambda item: PacienteData().mostrar(item[0])[2])
 
         fila = 0
         self.lisPacientes.tblListado.setRowCount(len(data))  # Cuantas filas traen los datos
 
+        self.total_general = 0
+        self.lisPacientes.txtTotal.setText('$ '+ str(self.total_general))
         for item in data:
             paciente = PacienteData().mostrar(item[0])
 
-            self.lisPacientes.tblListado.setItem(fila, 0, QTableWidgetItem(str(item[0])))  # ID
             self.lisPacientes.tblListado.hideColumn(0)
+            self.lisPacientes.tblListado.setItem(fila, 0, QTableWidgetItem(str(item[0])))  # ID
+            
             self.lisPacientes.tblListado.setItem(fila, 1, QTableWidgetItem(str(paciente[2])))  # Apellido
             self.lisPacientes.tblListado.setItem(fila, 2, QTableWidgetItem(str(paciente[1])))  # Nombre
-            if self.usuario.rol == 'admin':
-                self.lisPacientes.tblListado.setItem(fila, 3, QTableWidgetItem(str(item[3]) if item[3] is not None else '0'))  # Cantidad de visitas
-                self.lisPacientes.tblListado.setItem(fila, 4, QTableWidgetItem(str(item[4]) if item[4] is not None else '0'))  # Valor de visita
-                self.lisPacientes.tblListado.setItem(fila, 5, QTableWidgetItem(str(item[5]) if item[5] is not None else '0'))  # Total
+            
+            self.lisPacientes.tblListado.setItem(fila, 3, QTableWidgetItem(str(item[3]) if item[3] is not None else '0'))  # Cantidad
+            self.lisPacientes.tblListado.setItem(fila, 4, QTableWidgetItem(str(item[4]) if item[4] is not None else '0'))  # Valor
+
+            if info is True:
+                self.lisPacientes.tblListado.setItem(fila, 5, QTableWidgetItem(str(item[4]) if item[4] is not None else '0'))  # Mes
             else:
-                self.lisPacientes.tblListado.hideColumn(3)
-                self.lisPacientes.tblListado.hideColumn(4)
                 self.lisPacientes.tblListado.hideColumn(5)
+
+            self.lisPacientes.tblListado.setItem(fila, 6, QTableWidgetItem(str(item[5]) if item[5] is not None else '0'))  # Total
 
             id_valor = item[0]
 
             self.boton_listado_pacientes_prof(id_profesional, id_valor, fila)
 
-
-
             fila += 1
 
-        # Si el usuario es admin, permitir edición
-        if self.usuario.rol == 'admin':
             self.lisPacientes.tblListado.itemChanged.connect(lambda item: self.handleCellChanged(item, id_profesional))
-        else:
-            self.lisPacientes.tblListado.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)  # Deshabilitar edición
+            self.total_general += float(item[5])
+
+        self.lisPacientes.txtTotal.setText('$ ' + str(self.total_general))
+        self.total_con_descuento = self.total_general  # Inicializa el total con descuento
         
         self.lisPacientes.tblListado.setColumnWidth(1, 150)
         self.lisPacientes.tblListado.setColumnWidth(2, 150)
@@ -428,14 +471,45 @@ class ProfesionalWindow():
             self.lisPacientes.btnDescargar.clicked.disconnect()
             self.lisPacientes.btnRefrescar.clicked.disconnect()
             self.lisPacientes.btnAgregar.clicked.disconnect()
+            self.lisPacientes.btnDescontar.clicked.disconnect()
+            self.lisPacientes.btnGuardar.clicked.disconnect()
         except TypeError:
             pass
         self.lisPacientes.btnAgregar.clicked.connect(lambda: self.paciente_window.cargar_pacientes(id_profesional=id_profesional))
         self.lisPacientes.btnRefrescar.clicked.connect(lambda: self.listado_pacientes(id_profesional))
         self.lisPacientes.btnDescargar.clicked.connect(lambda: self.descargar_pdf_pacientes(id_profesional))
+        self.lisPacientes.btnDescontar.clicked.connect(lambda: self.descontar_10(self.total_general))
+               
+        self.lisPacientes.btnGuardar.clicked.connect(lambda: self.guardar(id_profesional))
 
         self.lisPacientes.show()
 
+    def descontar_10(self, total_general):
+        try:
+            # Calcular el total con el descuento del 10%
+            total_con_descuento = total_general * 0.9
+
+            self.lisPacientes.txtTotal.setText('$ ' + str(total_con_descuento))
+
+            # Guardar el total con descuento en un atributo
+            self.total_con_descuento = total_con_descuento
+        
+        except Exception as e:
+            QMessageBox.critical(None, 'Error', f"Error al aplicar el descuento: {e}")
+
+    def guardar(self, id_profesional):
+        from data.mes_pago import MesPagoData
+        mes = MesPagoData()
+        mes_actual = self.obtener_nombre_mes()
+
+        total_a_guardar = self.total_con_descuento
+
+        success, error_message = mes.guardar_pago(id_profesional, total_a_guardar, mes_actual)
+        if success:
+            QMessageBox.information(None, 'Mensaje', 'El pago fue guardado.')
+        else:
+            QMessageBox.critical(None, 'Error', f'Ocurrió un error: {error_message}')
+        
 ##### Ver #####
 
     def set_fecha(self, fecha_str, widget):
@@ -980,7 +1054,7 @@ class ProfesionalWindow():
                 profesional_data = {
                     'nombre': item[1],
                     'apellido': item[2],
-                    'visitas': item[3],
+                    'cantidad': item[3],
                     'valor': item[4],
                     'total': item[5]                 
                 }
@@ -1027,6 +1101,99 @@ class ProfesionalWindow():
         except Exception as e:
             QMessageBox.critical(None, "Error", f"Ocurrió un error: {str(e)}")
 
+    # def generar_pdf_pacientes(self, pacientes_data_list, filePath, profesional):
+    #     try:
+    #         c = canvas.Canvas(filePath, pagesize=A4)
+    #         width, height = A4
+    #         margin = 1 * cm
+    #         line_height = 0.5 * cm
+    #         box_margin = 0.2 * cm
+
+    #         # Ajustar el título
+    #         c.setFont("Helvetica-Bold", 14)
+    #         title_x = margin
+    #         title_y = height - margin
+    #         title_text = f"Pacientes de {profesional[1]} {profesional[2]}"
+    #         title_width = c.stringWidth(title_text, "Helvetica-Bold", 14)
+    #         c.drawString((width - title_width) / 2, title_y, title_text)  # Centrar el título
+
+    #         # Ajustar el espacio después del título
+    #         current_y = height - margin - line_height * 4
+            
+    #         # Ajustar los campos
+    #         c.setFont("Helvetica", 10)
+    #         num_cols = 5  # Cambiado a 5 columnas
+    #         col_width = (width - 2 * margin) / num_cols  # Dividir el ancho de la página en 5 columnas
+    #         box_height = 2 * line_height  # Altura de cada recuadro
+            
+    #         # # Inicializar la suma total
+    #         # total_general = 0
+
+    #         # Dibujar las cabeceras de las columnas
+    #         headers = ['Apellido', 'Nombre', 'Cantidad', 'Valor', 'Total']
+    #         for i, header in enumerate(headers):
+    #             x = margin + i * col_width
+    #             y = current_y
+    #             c.rect(x, y, col_width, box_height)  # Dibujar el recuadro
+    #             c.drawString(x + box_margin, y + box_height - line_height - box_margin, header)  # Dibujar el texto del encabezado
+            
+    #         # Ajustar la posición para los datos
+    #         current_y -= box_height  # Mover hacia abajo para empezar a dibujar datos
+    #         total_row_y = 0
+    #         # Iterar sobre la lista de pacientes
+    #         for index, paciente_data in enumerate(pacientes_data_list):
+    #             col = 0  # Empezar en la primera columna
+    #             row = index  # Fila en la que se encuentra el recuadro
+                
+    #             for key in headers:
+    #                 # Convertir el encabezado a minúsculas para coincidir con las claves del diccionario
+    #                 key = key.lower().replace('cantidad de ', '')
+    #                 value = paciente_data.get(key, '')
+
+    #                 # # Sumar el total si es una columna de total
+    #                 # if key == 'total':
+    #                 #     try:
+    #                 #         total_general += float(value)  # Convertir a flotante y acumular
+    #                 #     except ValueError:
+    #                 #         pass  # Ignorar si el valor no es un número
+                    
+    #                 # Calcular la posición para el dato
+    #                 x = margin + col * col_width
+    #                 y = current_y - row * box_height
+                    
+    #                 # Mostrar información de depuración
+    #                 print(f"Index: {index}, Col: {col}, Row: {row}, X: {x}, Y: {y}, Value: {value}")
+                    
+    #                 # Dibujar el recuadro para el dato
+    #                 c.rect(x, y, col_width, box_height)
+                    
+    #                 # Dibujar el dato dentro del recuadro
+    #                 c.drawString(x + box_margin, y + box_height - line_height - box_margin, value)
+                    
+    #                 col += 1  # Mover a la siguiente columna
+                    
+    #             # Ajustar la posición para la próxima fila
+    #             if (index + 1) % num_cols == 0:
+    #                 current_y -= box_height
+
+    #         # Ajustar la posición para la fila de totales (dos filas más abajo)
+    #         total_row_y = current_y - (box_height * 4) # Mover dos filas hacia abajo
+
+    #         total_text = self.lisPacientes.txtTotal.text().replace('$ ', '')  # Eliminar el símbolo '$ '
+    #         total_float = float(total_text)  # Convertir a float
+
+    #         # Dibujar recuadro del total general
+    #         x = margin + i * col_width
+    #         c.rect(x, total_row_y, col_width, box_height)  # Dibujar el recuadro
+    #         total_str = "{:.2f}".format(total_float)  # Formatear el total
+    #         c.drawString(x + box_margin, total_row_y + box_height - line_height - box_margin, total_str)
+            
+    #         # Finalizar el PDF
+    #         c.save()
+    #         return True
+    #     except Exception as e:
+    #         print(f"Error al generar el PDF: {str(e)}")
+    #         return False
     def generar_pdf_pacientes(self, pacientes_data_list, filePath, profesional):
         try:
             c = canvas.Canvas(filePath, pagesize=A4)
@@ -1045,50 +1212,36 @@ class ProfesionalWindow():
 
             # Ajustar el espacio después del título
             current_y = height - margin - line_height * 4
-            
+
             # Ajustar los campos
             c.setFont("Helvetica", 10)
-            num_cols = 5  # Cambiado a 5 columnas
+            num_cols = 5  # Número de columnas
             col_width = (width - 2 * margin) / num_cols  # Dividir el ancho de la página en 5 columnas
             box_height = 2 * line_height  # Altura de cada recuadro
-            
-            # Inicializar la suma total
-            total_general = 0
 
             # Dibujar las cabeceras de las columnas
-            headers = ['Apellido', 'Nombre', 'Cantidad de visitas', 'Valor', 'Total']
+            headers = ['Apellido', 'Nombre', 'Cantidad', 'Valor', 'Total']
             for i, header in enumerate(headers):
                 x = margin + i * col_width
                 y = current_y
                 c.rect(x, y, col_width, box_height)  # Dibujar el recuadro
                 c.drawString(x + box_margin, y + box_height - line_height - box_margin, header)  # Dibujar el texto del encabezado
-            
+
             # Ajustar la posición para los datos
             current_y -= box_height  # Mover hacia abajo para empezar a dibujar datos
-            total_row_y = 0
+
             # Iterar sobre la lista de pacientes
             for index, paciente_data in enumerate(pacientes_data_list):
                 col = 0  # Empezar en la primera columna
-                row = index  # Fila en la que se encuentra el recuadro
                 
                 for key in headers:
                     # Convertir el encabezado a minúsculas para coincidir con las claves del diccionario
                     key = key.lower().replace('cantidad de ', '')
                     value = paciente_data.get(key, '')
 
-                    # Sumar el total si es una columna de total
-                    if key == 'total':
-                        try:
-                            total_general += float(value)  # Convertir a flotante y acumular
-                        except ValueError:
-                            pass  # Ignorar si el valor no es un número
-                    
                     # Calcular la posición para el dato
                     x = margin + col * col_width
-                    y = current_y - row * box_height
-                    
-                    # Mostrar información de depuración
-                    print(f"Index: {index}, Col: {col}, Row: {row}, X: {x}, Y: {y}, Value: {value}")
+                    y = current_y
                     
                     # Dibujar el recuadro para el dato
                     c.rect(x, y, col_width, box_height)
@@ -1097,19 +1250,21 @@ class ProfesionalWindow():
                     c.drawString(x + box_margin, y + box_height - line_height - box_margin, value)
                     
                     col += 1  # Mover a la siguiente columna
-                    
+                
                 # Ajustar la posición para la próxima fila
-                if (index + 1) % num_cols == 0:
-                    current_y -= box_height
+                current_y -= box_height
 
-            # Ajustar la posición para la fila de totales (dos filas más abajo)
-            total_row_y = current_y - (box_height * 4) # Mover dos filas hacia abajo
+            # Agregar espacio en blanco antes del total general
+            current_y -= box_height  # Dejar una fila en blanco
+
+            # Dibujar el total general
+            total_text = self.lisPacientes.txtTotal.text().replace('$ ', '')  # Eliminar el símbolo '$ '
+            total_float = float(total_text)  # Convertir a float
 
             # Dibujar recuadro del total general
-            x = margin + i * col_width
-            c.rect(x, total_row_y, col_width, box_height)  # Dibujar el recuadro
-            total_str = "{:.2f}".format(total_general)  # Formatear el total
-            c.drawString(x + box_margin, total_row_y + box_height - line_height - box_margin, total_str)
+            c.rect(margin + 4 * col_width, current_y, col_width, box_height)  # Dibujar el recuadro en la última columna
+            total_str = "{:.2f}".format(total_float)  # Formatear el total
+            c.drawString(margin + 4 * col_width + box_margin, current_y + box_height - line_height - box_margin, total_str)
             
             # Finalizar el PDF
             c.save()

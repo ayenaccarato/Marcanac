@@ -7,7 +7,6 @@ from PyQt6.QtWidgets import QFileDialog, QListWidgetItem, QMessageBox, QMenu, QL
 from PyQt6.QtGui import QIcon, QAction
 
 from data.archivos_profesional import ArchivosProfesionalData
-from data.mes_pago import MesPagoData
 
 
 class ArchivosProfesionalWindow():

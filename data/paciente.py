@@ -3,6 +3,60 @@ import sqlite3
 import conexion as con
 from model.paciente import Paciente
 
+### PostgreSQL ###
+# import psycopg2
+# from psycopg2 import sql
+# import conexion as con
+
+# class PacienteData:
+
+#     init = False
+
+#     def __init__(self):
+#         if not PacienteData.init:
+#             try:
+#                 self.conn = con.Conexion()  # Usa la instancia de Conexion
+#                 self.db = self.conn.conectar()
+#                 self.cursor = self.db.cursor()
+
+#                 # Consulta SQL para crear la tabla
+#                 sql_create_pacientes = """ CREATE TABLE IF NOT EXISTS pacientes (
+#                     id SERIAL PRIMARY KEY, 
+#                     nombre VARCHAR(255), 
+#                     apellido VARCHAR(255),
+#                     domicilio VARCHAR(255),
+#                     localidad VARCHAR(255),
+#                     documento VARCHAR(255) UNIQUE,
+#                     fechaNacimiento TIMESTAMP,
+#                     obraSocial VARCHAR(255),
+#                     numAfiliado VARCHAR(255),
+#                     telefono VARCHAR(255),
+#                     fechaIngreso TIMESTAMP,
+#                     fechaEgreso TIMESTAMP,
+#                     motivo TEXT,
+#                     familiar VARCHAR(255),
+#                     parentesco VARCHAR(255),
+#                     telFamiliar VARCHAR(255),
+#                     modulo VARCHAR(255),
+#                     submodulo VARCHAR(255),
+#                     equip VARCHAR(255),
+#                     sopNutri VARCHAR(255),
+#                     asisRespi VARCHAR(255)
+#                 ) """
+#                 self.cursor.execute(sql_create_pacientes)
+#                 self.db.commit()
+#                 print("Tabla Pacientes creada")
+#                 self.crear_datos()  # Solo creará datos si la tabla está vacía
+#                 PacienteData.init = True
+#             except psycopg2.Error as ex:
+#                 print("Error al crear la tabla Pacientes:", ex)
+#             except Exception as ex:
+#                 print("Error inesperado al crear la tabla Pacientes:", ex)
+#             finally:
+#                 if hasattr(self, 'cursor') and self.cursor:
+#                     self.cursor.close()
+#                 if hasattr(self, 'db') and self.db:
+#                     self.db.close()
 class PacienteData:
 
     init = False

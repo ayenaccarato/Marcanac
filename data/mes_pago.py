@@ -14,9 +14,10 @@ class MesPagoData():
 
                 sql_create_pagos = """ CREATE TABLE IF NOT EXISTS mes_pago (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    nombre_archivo TEXT NOT NULL,
-                    contenido BLOB,
-                    mes TEXT                    
+                    id_profesional INTEGER,
+                    total TEXT,
+                    mes TEXT,
+                    UNIQUE (id_profesional, mes)                    
                 ) """
                 self.cursor.execute(sql_create_pagos)
                 self.db.commit()
@@ -33,33 +34,34 @@ class MesPagoData():
                 if hasattr(self, 'db') and self.db:
                     self.db.close()
 
-    def guardar_archivo(self, nombre_archivo, contenido, mes):
+    def guardar_pago(self, id_profesional, total, mes):
         try:
             self.db = con.Conexion().conectar()
             self.cursor = self.db.cursor()
 
             # Consulta para insertar el archivo
             consulta = """
-            INSERT INTO mes_pago (nombre_archivo, contenido, mes)
+            INSERT INTO mes_pago (id_profesional, total, mes)
             VALUES (?, ?, ?)
             """
-            self.cursor.execute(consulta, (nombre_archivo, contenido, mes))
+            self.cursor.execute(consulta, (id_profesional, total, mes))
             
             self.db.commit()
-        except Exception as e:
-            print(f"Error al guardar archivo: {e}")
+            return True, ""
+        except Exception as ex:
+            return False, str(ex)
         finally:
             self.cursor.close()
             self.db.close()
         
-    def obtener_archivos_por_mes(self, mes):
+    def obtener_profesionales_por_mes(self, mes):
         try:
             self.db = con.Conexion().conectar()
             self.cursor = self.db.cursor()
 
             # Consulta para obtener los archivos del mes especificado
             consulta = """
-            SELECT nombre_archivo, contenido
+            SELECT *
             FROM mes_pago
             WHERE mes = ?
             """
@@ -67,6 +69,27 @@ class MesPagoData():
             archivos = self.cursor.fetchall()
             
             return archivos
+        except Exception as e:
+            print(f"Error al obtener archivos: {e}")
+            return []
+        finally:
+            self.cursor.close()
+            self.db.close()
+
+    def obtener_busqueda(self, apellido, codigo):
+        try:
+            self.db = con.Conexion().conectar()
+            self.cursor = self.db.cursor()
+        
+            consulta = """
+                SELECT profesionales.apellido, profesionales.nombre, profesionales.codTransf, mes_pago.mes, mes_pago.total
+                FROM mes_pago
+                JOIN profesionales ON mes_pago.id_profesional = profesionales.id
+                WHERE UPPER(profesionales.apellido) LIKE ? OR profesionales.codTransf LIKE ?
+                """
+            self.cursor.execute(consulta, (f"%{apellido}%", f"%{codigo}%"))
+
+            return self.cursor.fetchall()
         except Exception as e:
             print(f"Error al obtener archivos: {e}")
             return []

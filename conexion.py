@@ -3,8 +3,6 @@ import os
 import sys
 import bcrypt
 
-
-
 class Conexion:
     init = False
 

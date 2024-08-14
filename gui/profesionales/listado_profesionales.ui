@@ -136,6 +136,26 @@ QPushButton:hover {
            </spacer>
           </item>
           <item>
+           <widget class="QPushButton" name="btnAPagar">
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>../imagenes/a_pagar.png</normaloff>../imagenes/a_pagar.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="btnPago">
             <property name="cursor">
              <cursorShape>PointingHandCursor</cursorShape>
@@ -281,7 +301,12 @@ QPushButton:hover {
               </item>
               <item>
                <property name="text">
-                <string>Enfermero/a</string>
+                <string>Enfermero/a - Auxiliar</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Enfermero/a - Profesional</string>
                </property>
               </item>
               <item>
@@ -296,7 +321,22 @@ QPushButton:hover {
               </item>
               <item>
                <property name="text">
-                <string>Médico/a</string>
+                <string>Médico/a - Cárdiologo</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Médico/a - Clínico</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Médico/a - Pediátrico</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Médico/a - Urólogo</string>
                </property>
               </item>
               <item>

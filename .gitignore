@@ -2,3 +2,4 @@ __pycache__
 .vscode
 marcanac.bd
 /__pycache__
+.env

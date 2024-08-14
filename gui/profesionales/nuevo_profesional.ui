@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>630</width>
-    <height>550</height>
+    <width>760</width>
+    <height>624</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -109,7 +109,7 @@ QPushButton:hover {
             <property name="font">
              <font>
               <family>Segoe UI</family>
-              <pointsize>12</pointsize>
+              <pointsize>14</pointsize>
               <weight>75</weight>
               <bold>true</bold>
              </font>
@@ -144,7 +144,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
              </widget>
@@ -157,7 +157,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
              </widget>
@@ -167,7 +167,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
               <property name="text">
@@ -180,7 +180,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
               <property name="text">
@@ -193,7 +193,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
               <property name="text">
@@ -206,7 +206,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
               <property name="text">
@@ -222,7 +222,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
              </widget>
@@ -235,50 +235,9 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
-             </widget>
-            </item>
-            <item row="9" column="1" colspan="4">
-             <widget class="QFrame" name="frame_2">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>42</height>
-               </size>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">QFrame {
-	background-color: rgb(255, 170, 127);
-}</string>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::StyledPanel</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Raised</enum>
-              </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_2">
-               <item>
-                <widget class="QLabel" name="label_17">
-                 <property name="font">
-                  <font>
-                   <family>Segoe UI</family>
-                   <pointsize>12</pointsize>
-                   <weight>75</weight>
-                   <bold>true</bold>
-                  </font>
-                 </property>
-                 <property name="text">
-                  <string>Pago a Terceros</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignCenter</set>
-                 </property>
-                </widget>
-               </item>
-              </layout>
              </widget>
             </item>
             <item row="7" column="2">
@@ -302,7 +261,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
              </widget>
@@ -312,7 +271,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
               <property name="text">
@@ -325,7 +284,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
               <property name="text">
@@ -341,7 +300,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
              </widget>
@@ -354,7 +313,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
              </widget>
@@ -364,7 +323,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
               <property name="text">
@@ -380,7 +339,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
              </widget>
@@ -390,7 +349,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
               <property name="text">
@@ -403,7 +362,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
               <property name="text">
@@ -419,7 +378,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
               <property name="text">
@@ -435,7 +394,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
              </widget>
@@ -448,7 +407,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
               <property name="text">
@@ -461,7 +420,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
               <property name="text">
@@ -474,7 +433,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
               <property name="text">
@@ -490,7 +449,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
              </widget>
@@ -500,7 +459,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
               <property name="text">
@@ -516,7 +475,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
               <item>
@@ -584,7 +543,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
              </widget>
@@ -597,7 +556,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
               <property name="calendarPopup">
@@ -610,7 +569,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
               <property name="text">
@@ -623,7 +582,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
               <property name="text">
@@ -639,7 +598,7 @@ QPushButton:hover {
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
              </widget>
@@ -674,7 +633,7 @@ color: rgb(255, 255, 255);</string>
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
              </widget>
@@ -684,7 +643,7 @@ color: rgb(255, 255, 255);</string>
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
               <property name="text">
@@ -700,7 +659,7 @@ color: rgb(255, 255, 255);</string>
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
              </widget>
@@ -710,7 +669,7 @@ color: rgb(255, 255, 255);</string>
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
               <property name="text">
@@ -726,7 +685,7 @@ color: rgb(255, 255, 255);</string>
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
              </widget>
@@ -736,7 +695,7 @@ color: rgb(255, 255, 255);</string>
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
               <property name="text">
@@ -749,7 +708,7 @@ color: rgb(255, 255, 255);</string>
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
               <property name="text">
@@ -762,7 +721,7 @@ color: rgb(255, 255, 255);</string>
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
               <property name="text">
@@ -778,7 +737,7 @@ color: rgb(255, 255, 255);</string>
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
              </widget>
@@ -788,12 +747,53 @@ color: rgb(255, 255, 255);</string>
               <property name="font">
                <font>
                 <family>Segoe UI</family>
-                <pointsize>10</pointsize>
+                <pointsize>12</pointsize>
                </font>
               </property>
               <property name="text">
                <string>Cuidador</string>
               </property>
+             </widget>
+            </item>
+            <item row="9" column="1" colspan="4">
+             <widget class="QFrame" name="frame_2">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>42</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QFrame {
+	background-color: rgb(255, 170, 127);
+}</string>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::StyledPanel</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_2">
+               <item>
+                <widget class="QLabel" name="label_17">
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>14</pointsize>
+                   <weight>75</weight>
+                   <bold>true</bold>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Pago a Terceros</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </widget>
             </item>
            </layout>
